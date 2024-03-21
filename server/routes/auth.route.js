@@ -1,11 +1,16 @@
 const { Router } = require('express');
-const { signup, signin } = require('../controllers/auth.controller')
+const { signup, signin, signout, google } = require('../controllers/auth.controller')
 
 // Initialize the router
 const router = Router();
 
-// signup
+// Signup
 router.post('/signup', signup);
+// Signin
 router.post('/signin', signin);
+// Signout
+router.get('/signout', signout);
+// Google Auth
+router.post('/google', google);
 
 module.exports = router;
