@@ -3,21 +3,22 @@ import InputBox from "../components/InputBox"
 import GoogleIcon from '../imgs/google.png'
 import AnimationWrapper from "../common/page-animation"
 import { useState } from "react"
-
+import { signInStart, signInFailure, signInSuccess } from "../redux/user/userSlice"
+import { useDispatch, useSelector } from "react-redux"
 
 const UserSignIn = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { isLoading, error } = useSelector((state) => state.user)
     const [formData, setformData] = useState({        
         email:"", 
-        password:"", 
+        password:"",  
         }); 
 
     const [validationErrors, setValidationErrors] = useState({        
         email:"", 
         password:"",       
-    })
-
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    })   
     
     const handleChange = (e:any) => {        
         const { value, id } = e.target;
@@ -30,7 +31,8 @@ const UserSignIn = () => {
     const handleSubmit = async (e:any) => {
         e.preventDefault();
         setValidationErrors({...validationErrors})
-        setIsLoading(true);
+        
+        dispatch(signInStart());
         try{ 
             const res = await fetch(`/api/auth/signin`, {
                 method: 'POST',
@@ -39,17 +41,17 @@ const UserSignIn = () => {
             });
 
             if (!res.ok) {
-                throw new Error('Failed to submit form');
+                // throw new Error('Failed to submit form');
+                dispatch(signInFailure('Failed to submit form'))
             }
 
-            setIsLoading(false);
             const data = await res.json();
+            dispatch(signInSuccess(data));
             console.log('signed in');            
             console.log(data);
-            navigate('/');
-            
-        }catch(err){
-            setIsLoading(false);
+            navigate('/');            
+        }catch(err){            
+            dispatch(signInFailure(err))
             console.log('error >>', err)
         }    
     }

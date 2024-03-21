@@ -60,7 +60,7 @@ const UserSignUp = () => {
         if(!formData.passwordCheck.trim()){
             validationErrors.passwordCheck = 'Password confirmation is required'
         }else if(formData.passwordCheck !== formData.password){
-            validationErrors.passwordCheck = 'Passwords do not invalid'
+            validationErrors.passwordCheck = 'Passwords do not match'
         }
 
         setValidationErrors(validationErrors as FormData);
