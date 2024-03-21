@@ -2,8 +2,7 @@ import { ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const AnimationWrapper = ({
-    children, 
-    keyValue,
+    children,    
     initial = { opacity: 0 },
     animate = { opacity: 1 },
     transition = { duration: 1 },
@@ -12,15 +11,13 @@ const AnimationWrapper = ({
     children:ReactNode,
     initial?:any,
     animate?:any,
-    transition?:any,
-    keyValue: any,
+    transition?:any,    
     className?: string
 }) => {
 
     return (
         <AnimatePresence>
-            <motion.div
-            key={keyValue}
+            <motion.div            
             initial={initial}
             animate={animate}
             transition={transition}

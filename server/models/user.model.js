@@ -11,8 +11,14 @@ const userSchema = new Schema({
         fullname: {
             type: String,
             lowercase: true,
-            required: true,
+            required: false,
             minlength: [3, 'fullname must be 3 letters long'],
+        },
+        username: {
+            type: String,
+            minlength: [3, 'Username must be 3 letters long'],
+            unique: true,
+            required:true
         },
         email: {
             type: String,
@@ -20,12 +26,7 @@ const userSchema = new Schema({
             lowercase: true,
             unique: true
         },
-        password: String,
-        username: {
-            type: String,
-            minlength: [3, 'Username must be 3 letters long'],
-            unique: true,
-        },
+        password: String,       
         bio: {
             type: String,
             maxlength: [200, 'Bio should not be more than 200'],
@@ -94,38 +95,3 @@ const userSchema = new Schema({
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
-
-
-
-// const userSchema = new mongoose.Schema(
-//   {
-//     username: {
-//       type: String,
-//       required: true,
-//       unique: true,
-//     },
-//     email: {
-//       type: String,
-//       required: true,
-//       unique: true,
-//     },
-//     password: {
-//       type: String,
-//       required: true,
-//     },
-//     profilePicture: {
-//       type: String,
-//       default:
-//         'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
-//     },
-//     isAdmin: {
-//       type: Boolean,
-//       default: false,
-//     },
-//   },
-//   { timestamps: true }
-// );
-
-// const User = mongoose.model('User', userSchema);
-
-// export default User;
