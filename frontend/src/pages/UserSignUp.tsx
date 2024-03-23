@@ -1,6 +1,6 @@
 import { Link, Navigate, useNavigate } from "react-router-dom"
 import InputBox from "../components/InputBox"
-import AnimationWrapper from "../common/page-animation"
+import AnimationWrapper from "../libs/page-animation"
 import { useState } from "react"
 import { signInStart, signInFailure, signInSuccess } from "../redux/user/userSlice"
 import { useDispatch, useSelector } from "react-redux"

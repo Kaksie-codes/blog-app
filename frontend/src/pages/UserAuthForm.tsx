@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import InputBox from "../components/InputBox"
 import GoogleIcon from '../imgs/google.png'
-import AnimationWrapper from "../common/page-animation"
+import AnimationWrapper from "../libs/page-animation"
 import { useState } from "react"
 
 const UserAuthForm = ({type}: {type:string}) => {

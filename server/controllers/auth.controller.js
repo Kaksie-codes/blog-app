@@ -83,7 +83,7 @@ const signin = async (req, res) => {
     }
 }
 
-const google = async (req, res, next) => {
+const googleAuth = async (req, res, next) => {
     const { email, name, photo } = req.body;
     try {
         // Check if user already exists in the database
@@ -142,5 +142,5 @@ module.exports = {
     signup,
     signin,
     signout,
-    google
+    googleAuth
 }

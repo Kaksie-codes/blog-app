@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose; // Correct import
 
-const blogSchema = new Schema({ // Use `new Schema` correctly
+const blogPostSchema = new Schema({ // Use `new Schema` correctly
     blog_id: {
         type: String,
         required: true,
@@ -68,6 +68,6 @@ const blogSchema = new Schema({ // Use `new Schema` correctly
     } 
 });
 
-const Blog = mongoose.model('Blog', blogSchema);
+const BlogPost = mongoose.model('BlogPost', blogPostSchema);
 
-module.exports = Blog;
+module.exports = BlogPost;

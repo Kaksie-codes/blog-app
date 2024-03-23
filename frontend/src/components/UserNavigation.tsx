@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import AnimationWrapper from "../common/page-animation"
+import AnimationWrapper from "../libs/page-animation"
 import { useDispatch, useSelector } from "react-redux";
 import { signoutSuccess } from "../redux/user/userSlice"
 

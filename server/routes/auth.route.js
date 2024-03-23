@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { signup, signin, signout, google } = require('../controllers/auth.controller')
+const { signup, signin, signout, googleAuth } = require('../controllers/auth.controller')
 
 // Initialize the router
 const router = Router();
@@ -11,6 +11,6 @@ router.post('/signin', signin);
 // Signout
 router.get('/signout', signout);
 // Google Auth
-router.post('/google', google);
+router.post('/google-auth', googleAuth);
 
 module.exports = router;

@@ -6,13 +6,13 @@ import UserNavigation from './UserNavigation'
 
 const Navbar = () => {  
     const navPanelRef  = useRef(null);
-    const { currentUser } = useSelector((state) => state.user);
+    const { currentUser } = useSelector((state:any) => state.user);
     const accessToken = currentUser ? currentUser.accessToken : null;
     const profilePic = currentUser ? currentUser.profile_img : null;
     const [searchBoxVisibility, setSeachBoxVisibility] = useState<boolean>(false);
     const [isNavPanelVisible, setIsNavPanelVisible] = useState(false);
 
-    const closeNav = (e) => {
+    const closeNav = (e:any) => {
         // Check if the click occurred outside the navigation menu
         if (navPanelRef.current && !navPanelRef.current.contains(e.target)) {
             // Check if the clicked element or its parent has the toggle button class
