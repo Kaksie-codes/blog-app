@@ -63,8 +63,8 @@ const BlogEditor = ({
                         onChange={handleTitleChange}
                         name="" id=""></textarea>
                     <hr className="w-full opacity-10 my-5"/>
-                        <div id="textEditor" className="font-gelasio">
-                            <ReactQuill theme="snow" value={contentVal} onChange={setContentVal}/>
+                        <div id="textEdito" className="font-gelasio mb-12 h-72">
+                            <ReactQuill theme="snow" className="h-72 bg-grey mb-12;" placeholder="Write your blog content..." value={contentVal} onChange={setContentVal}/>
                         </div>
                 </form>
                 <BlogViewer/>

@@ -16,7 +16,7 @@ const blogPostSchema = new Schema({ // Use `new Schema` correctly
         type: String,
         // required: true,
     },
-    des: {
+    description: {
         type: String,
         maxlength: 200,
         // required: true
@@ -32,7 +32,7 @@ const blogPostSchema = new Schema({ // Use `new Schema` correctly
     author: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'users'
+        ref: 'user'
     },
     activity: {
         total_likes: {
@@ -69,5 +69,4 @@ const blogPostSchema = new Schema({ // Use `new Schema` correctly
 });
 
 const BlogPost = mongoose.model('BlogPost', blogPostSchema);
-
-module.exports = BlogPost;
+export default BlogPost;

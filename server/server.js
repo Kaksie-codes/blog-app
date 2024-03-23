@@ -1,9 +1,9 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const authRoutes = require('./routes/auth.route');
-// const cors = require('cors')
-
+import express from 'express'
+import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+import authRoutes from './routes/auth.route.js'
+import blogPostRoutes from './routes/blogPost.route.js'
+import cookieParser from 'cookie-parser';
 
 const server = express();
 
@@ -12,8 +12,9 @@ dotenv.config();
 
 //this middleware helps the backend receive json data from the frontend
 server.use(express.json());
-// server.use(cors());
- 
+
+// Use cookie-parser middleware to parse cookies
+server.use(cookieParser());
 
 const PORT = 3000;
 mongoose.connect(process.env.MONGO_URL, {autoIndex:true})
@@ -28,14 +29,16 @@ mongoose.connect(process.env.MONGO_URL, {autoIndex:true})
 .catch(err => console.log('error', err));
 
 server.use('/api/auth', authRoutes);
+server.use('/api/post', blogPostRoutes);
 
-//middleware for handling errors
-// server.use((err, req, res, next) => {
-//     const statusCode = err.statusCode || 500;
-//     const message = err.message || 'Internal Server Error';
-//     return res.status(statusCode).json({
-//         success:false,
-//         message,
-//         statusCode
-//     })
-// })
+
+// Error handling middleware
+server.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+    res.status(statusCode).json({
+      success: false,
+      statusCode,
+      message,
+    });
+});

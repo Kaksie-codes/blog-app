@@ -19,7 +19,8 @@ const PublishForm = ({
   let characterLimit = 200;
   let tagsLimit = 10;
   const descriptionCharactersLeft = characterLimit - description.length;
-  // const tagsArray: string[] = []
+  const tagsLeft = tagsLimit - tags.length;
+
 
   const handleKeyDown = (e:any) => {
     console.log(e);
@@ -97,16 +98,23 @@ const PublishForm = ({
                  {
                   tags.length > 0 ? (
                     tags.map((tag, index) => (
-                      <Tag key={index} tag={tag} />
+                      <Tag 
+                        key={index} 
+                        tag={tag} 
+                        tags={tags} 
+                        blogPost={blogPost}
+                        tagIndex={index}
+                        setBlogPost={setBlogPost} />
                       ))
                     ) : (
                       <p>No tags available</p>
                   )
-                }              
+                }                          
             </div>
-            <p className="mt-1 text-dark-grey text-sm text-right">
-              {tags.length === tagsLimit ? `You can add max ${tagsLimit} tags` : ''}
-            </p>
+            <p className="mt-1 mb-4 text-dark-grey text-sm text-right">
+              {tagsLeft} {tagsLeft > 1 ? 'tags' : 'tag'} left
+            </p> 
+            <button className="btn-dark px-8">Publish</button>
           </div>
         </section>
     </AnimationWrapper>

@@ -1,5 +1,4 @@
-// import mongoose from "mongoose";
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
@@ -79,9 +78,9 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
-    blogs: [{
+    blogPosts: [{
         type: Schema.Types.ObjectId,
-        ref: 'blogs',
+        ref: 'BlogPost',
         default: [],
     }]
 }, 
@@ -93,5 +92,4 @@ const userSchema = new Schema({
 
 
 const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+export default User;
