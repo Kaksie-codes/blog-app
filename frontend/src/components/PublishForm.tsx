@@ -6,19 +6,21 @@ import { setBlogTitle, setEditorMode, setUploadedImage, setBlogDescription, setT
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage"
 import { app } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 
 const PublishForm = () => {
   const { title, content, banner, tags, description, uploadedImage, draft } = useSelector((state: any) => state.blogPost) || {};
     const dispatch = useDispatch();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const [disabled, setDisabled] = useState(false);
    
   let characterLimit = 200;
   let tagsLimit = 10;
   const descriptionCharactersLeft = characterLimit - description.length;
   const tagsLeft = tagsLimit - tags.length;
 
-
+console.log('disabled >>',disabled)
   const handleKeyDown = (e:any) => {    
     if(e.keyCode === 13){
         e.preventDefault();
@@ -58,7 +60,7 @@ const PublishForm = () => {
       const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
       // Update the state with image URL
-      dispatch(setBanner(downloadURL))
+     dispatch(setBanner(downloadURL))
       
   } catch (error:any) {
       console.error("Image upload failed:", error);
@@ -70,20 +72,22 @@ const PublishForm = () => {
     e.preventDefault(); 
     let loading;
     try{ 
-      if(e.target.className.includes('disable')){
-        return 
-      }
-  
       if(!title.length){
+        setDisabled(false);
         return toast.error('Write Blog title before publishing')
       }    
   
       if(!description.length || description.length > characterLimit){
+        setDisabled(false);
         return toast.error(`Write a description about your blog within ${characterLimit} characters to be published`)
       }
       if(!tags.length){
+        setDisabled(false);
         return toast.error('Enter at least 1 tag to help us rank your blog')
       }
+
+      setDisabled(true);
+      await uploadImage();
 
       let blogObject = {
         draft,
@@ -93,9 +97,8 @@ const PublishForm = () => {
         content,
         tags
       }
-
-      loading = toast.loading('Publishing...');
-      await uploadImage();
+      
+      // loading = toast.loading('Publishing...');    
   
       const res = await fetch(`/api/post/create-post`, {
           method: 'POST',
@@ -105,7 +108,9 @@ const PublishForm = () => {
 
       const data = await res.json();
       toast.success('Post Published Successfully'); 
-      console.log(data);          
+      console.log(data);
+      setDisabled(false); 
+      toast.dismiss(loading);          
       setTimeout(() => {
         if(data){
           dispatch(setBanner(''));
@@ -114,16 +119,16 @@ const PublishForm = () => {
           dispatch(setBlogTitle(''));
           dispatch(setBlogContent(''));
           dispatch(setTags([]));
+          dispatch(setEditorMode('editor')); 
         }  
         // Navigate after 2 seconds        
         navigate('/');
     }, 3000);           
   }catch(err){ 
-      console.log('error >>', err) 
+      console.log('error >>', err);
+      setDisabled(false);
       return toast.error('Sorry, Could not publish blog post'); 
-  }finally{
-    toast.dismiss(loading);
-  } 
+  }
 }
 
   const handlePreviewClose = () => {
@@ -199,8 +204,11 @@ const PublishForm = () => {
               {tagsLeft} {tagsLeft > 1 ? 'tags' : 'tag'} left
             </p> 
             <button 
+              disabled={disabled}
               onClick={publishBlogPost}
-              className="btn-dark px-8">Publish</button>
+              className={`btn-dark px-8 ${disabled ? 'cursor-not-allowed' : ''}`}>
+                {disabled ? 'Publishing...' : 'Publish'}
+              </button>
           </div>
         </section>
     </AnimationWrapper>

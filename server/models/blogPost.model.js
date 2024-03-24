@@ -32,7 +32,7 @@ const blogPostSchema = new Schema({ // Use `new Schema` correctly
     author: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'user'
+        ref: 'User'
     },
     activity: {
         total_likes: {

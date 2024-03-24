@@ -62,4 +62,19 @@ const createBlog = async (req, res, next) => {
     }
 };
 
-export { createBlog }
+const getLatestBlogPosts = async (req, res, next) => {
+    let maxLimit = 5;
+    try{
+        const blogPosts = await BlogPost.find({ draft: false})
+        .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+        .sort({"publishedAt": -1})
+        .select("blog_id title description banner activity tags publishedAt -_id")
+        .limit(maxLimit);
+        res.status(200).json({ success: true, message: 'latest Blogs', data: blogPosts });
+    }catch(error){
+        return next(error);
+    }    
+}
+
+
+export { createBlog, getLatestBlogPosts  } 

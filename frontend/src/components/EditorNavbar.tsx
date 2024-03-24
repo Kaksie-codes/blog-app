@@ -4,29 +4,30 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { setEditorMode } from "../redux/blogpost/blogPostSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
 
 const EditorNavbar = () => {
-    const { title } = useSelector((state: any) => state.blogPost) || {};
+    const { title, content, banner, tags, description, uploadedImage, draft } = useSelector((state: any) => state.blogPost) || {}; 
     const dispatch = useDispatch(); 
-    
+    const [disabled, setDisabled] = useState(false);
     const navigate = useNavigate();
 
     const handlePublish = () => {
         //validate form
-        // if(!banner.length){
-        //     // return alert('Upload a blog banner to publish it')
-        //     return toast.error('Upload a blog banner to publish it')
-        // }
+        if(!uploadedImage){
+            // return alert('Upload a blog banner to publish it')
+            return toast.error('Upload a blog banner to publish it')
+        }
 
-        // if(!title.length){
-        //     // return alert('Upload a blog banner to publish it')
-        //     return toast.error('Write a blog title to publish it')
-        // }
+        if(!title.length){
+            // return alert('Upload a blog banner to publish it')
+            return toast.error('Write a blog title to publish it')
+        }
 
-        // if(!description.length){
-        //     // return alert('Upload a blog banner to publish it')
-        //     return toast.error('Write something in your blog to publish it')
-        // }
+        if(!content.length){
+            // return alert('Upload a blog banner to publish it')
+            return toast.error('Write something in your blog to publish it')
+        }
         dispatch(setEditorMode('publish'));        
     }
 
