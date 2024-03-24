@@ -1,54 +1,81 @@
 import { useEffect, useState } from 'react';
 import defaultBanner from '../imgs/blog banner.png'
-import { handleImageUpload } from '../libs/handleImageUpload';
+import { useDispatch, useSelector } from "react-redux";
+import { setUploadedImage } from '../redux/blogpost/blogPostSlice';
+// import { handleImageUpload } from '../libs/handleImageUpload';
 
-const UploadBanner = ({
-    banner, 
-    formData, 
-    setFormData, 
-    setBlogPost, 
-    blogPost
-} : {
-    banner: string,
-    formData: any,
-    setFormData: any,
-    setBlogPost: any,
-    blogPost: any
-}) => {
-    const [image, setImage] = useState(undefined);
-    const [imageUploadProgress, setImageUploadProgress] = useState<number>(0);
-    const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+const UploadBanner = () => {
+    const { uploadedImage = null } = useSelector((state: any) => state.blogPost) || {};
+    // const imageUrl = useSelector((state:any) => state.blogPost.imageUrl);
+    const dispatch = useDispatch();
+    // const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [imageError, setImageError] = useState<string | null>(null);
+    // const [imageUploadProgress, setImageUploadProgress] = useState<number>(0);
+    // const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+    // const [banner, setBanner] = useState();
 
-    const handleChange = (e:any) => {        
-        let image = e.target.files[0];
-        console.log(image);
-        setImage(image)
-    }
+   
+    
+
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = e.target.files?.[0];
+    //     if (file) {
+    //         if (file.size > 2 * 1024 * 1024) {
+    //             setImageError('Please select an image smaller than 2MB.');
+    //             e.target.value = '';
+    //             return;
+    //         }
+
+    //         const reader = new FileReader();
+    //         reader.onload = (event) => {
+    //             const result = event.target?.result;
+    //             if (result && typeof result === 'string') {
+    //                 dispatch(setImageFile(file));
+    //                 dispatch(setImageUrl(result));
+    //             }
+    //         };
+    //         reader.readAsDataURL(file);
+    //     }
+    // };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                setImageError('Please select an image smaller than 2MB.');
+                e.target.value = '';
+                return;
+            }
+        //   const imageUrl = URL.createObjectURL(file);
+          dispatch(setUploadedImage(file));
+        }
+      };
+
+
 
     // placeholder: `Let's write an awesome story`
-    useEffect(() => {
-        if(image){
-            handleImageUpload(
-                image, 
-                setImageUploadError, 
-                setImageUploadProgress,
-                setFormData,
-                setBlogPost,
-                formData,
-                blogPost
-          );
-        }else{
-            setImageUploadError('Please select an image');
-        }
-    }, [image])
+    // useEffect(() => {
+    //     if(image){
+    //         handleImageUpload(
+    //             image, 
+    //             setImageUploadError, 
+    //             setImageUploadProgress,
+    //             setFormData,
+    //             setBlogPost,
+    //             formData,
+    //             blogPost
+    //       );
+    //     }else{
+    //         setImageUploadError('Please select an image');
+    //     }
+    // }, [image])
   return (
     <div className="mx-auto max-w-[900px] w-full ">
                     <div className="relative aspect-video hover:opacity-[80%] bg-white border-4 border-grey">
                         <label htmlFor="uploadBanner">
                             {
-                                banner ? (
-                                    // <img src={formData.image} alt="banner image" className="z-20 cursor-pointer" />
-                                    <img src={banner} alt="banner image" className="z-20 cursor-pointer" />
+                                uploadedImage ? (                                    
+                                    <img src={URL.createObjectURL(uploadedImage)} alt="banner image" className="z-20 cursor-pointer" />
                                 ) : (
                                     <img src={defaultBanner} alt="banner image" className="z-20 cursor-pointer" />  
                                 )
@@ -60,8 +87,9 @@ const UploadBanner = ({
                                 onChange={handleChange}
                                 hidden />
                         </label>                        
-                    </div>       
-                    <p className="text-center text-sm">
+                    </div>  
+                    {imageError && <p className="text-center text-sm text-red">{imageError}</p>}     
+                    {/* <p className="text-center text-sm">
                         {
                             imageUploadError ? (
                                 <span className="text-red">{imageUploadError}</span>
@@ -75,7 +103,7 @@ const UploadBanner = ({
                                 )
                             )
                         }                        
-                    </p>             
+                    </p>              */}
                 </div>
   )
 }

@@ -1,51 +1,135 @@
 import AnimationWrapper from "../libs/page-animation"
-import { BlogPost } from "../pages/Editor"
 import { Toaster, toast } from "react-hot-toast"
 import Tag from "./Tag"
+import { useDispatch, useSelector } from "react-redux";
+import { setBlogTitle, setEditorMode, setUploadedImage, setBlogDescription, setTags, setBanner, setBlogContent } from "../redux/blogpost/blogPostSlice";
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage"
+import { app } from "../firebase";
+import { useNavigate } from "react-router-dom";
 
 
-const PublishForm = ({
-  setEditorState, 
-  editorState, 
-  blogPost, 
-  setBlogPost
-} : {
-  setEditorState: any,
-  editorState: string,
-  blogPost: BlogPost,
-  setBlogPost: any
-}) => {
-  const { title, banner, description, author, tags, content } = blogPost; 
+const PublishForm = () => {
+  const { title, content, banner, tags, description, uploadedImage, draft } = useSelector((state: any) => state.blogPost) || {};
+    const dispatch = useDispatch();
+    const navigate = useNavigate()
+   
   let characterLimit = 200;
   let tagsLimit = 10;
   const descriptionCharactersLeft = characterLimit - description.length;
   const tagsLeft = tagsLimit - tags.length;
 
 
-  const handleKeyDown = (e:any) => {
-    console.log(e);
+  const handleKeyDown = (e:any) => {    
     if(e.keyCode === 13){
         e.preventDefault();
-    }
-  }
-  const createTag = (e: any) => {
-    if(e.keyCode === 13 || e.keyCode === 188){
-      e.preventDefault();
-      let tag = e.target.value;
-      if(tags.length < tagsLimit){
-        if(!tags.includes(tag) && tag.length){
-          setBlogPost({...blogPost, tags: [...tags, tag]});
-        }        
-      }else{
-        return toast.error(`You can add max ${tagsLimit} tags`);
-      }      
-      e.target.value = "";
     }    
   }
+  
+  const createTag = (e: any) => {
+    if (e.keyCode === 13 || e.keyCode === 188) {
+        e.preventDefault();
+        let tag = e.target.value.trim(); // Trim to remove leading/trailing whitespaces
+        if (tags.length < tagsLimit) {
+            if (!tags.includes(tag) && tag.length) {
+                const newTagsArray = [...tags, tag]; // Append the new tag to the existing tags array
+                dispatch(setTags(newTagsArray));
+            }
+        } else {
+            return toast.error(`You can add max ${tagsLimit} tags`);
+        }
+        e.target.value = "";
+    }
+}
+
+  const uploadImage = async () => {
+    try {
+      // Get storage reference and generate unique filename
+      const storage = getStorage(app);
+      const fileName = new Date().getTime() + '-' + uploadedImage.name;
+      const storageRef = ref(storage, fileName);
+
+      // Upload image to storage
+      const uploadTask = uploadBytesResumable(storageRef, uploadedImage);
+
+      // Wait for the upload to complete
+      await uploadTask;
+
+      // Get download URL for the uploaded image
+      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+      // Update the state with image URL
+      dispatch(setBanner(downloadURL))
+      
+  } catch (error:any) {
+      console.error("Image upload failed:", error);
+      return toast.error('Sorry, Could not publish blog post'); 
+  }
+}
+
+  const publishBlogPost = async (e:any) => {
+    e.preventDefault(); 
+    let loading;
+    try{ 
+      if(e.target.className.includes('disable')){
+        return 
+      }
+  
+      if(!title.length){
+        return toast.error('Write Blog title before publishing')
+      }    
+  
+      if(!description.length || description.length > characterLimit){
+        return toast.error(`Write a description about your blog within ${characterLimit} characters to be published`)
+      }
+      if(!tags.length){
+        return toast.error('Enter at least 1 tag to help us rank your blog')
+      }
+
+      let blogObject = {
+        draft,
+        title,
+        banner,
+        description,
+        content,
+        tags
+      }
+
+      loading = toast.loading('Publishing...');
+      await uploadImage();
+  
+      const res = await fetch(`/api/post/create-post`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(blogObject),
+      });
+
+      const data = await res.json();
+      toast.success('Post Published Successfully'); 
+      console.log(data);          
+      setTimeout(() => {
+        if(data){
+          dispatch(setBanner(''));
+          dispatch(setUploadedImage(''));
+          dispatch(setBlogDescription(''));
+          dispatch(setBlogTitle(''));
+          dispatch(setBlogContent(''));
+          dispatch(setTags([]));
+        }  
+        // Navigate after 2 seconds        
+        navigate('/');
+    }, 3000);           
+  }catch(err){ 
+      console.log('error >>', err) 
+      return toast.error('Sorry, Could not publish blog post'); 
+  }finally{
+    toast.dismiss(loading);
+  } 
+}
 
   const handlePreviewClose = () => {
-    setEditorState('editor');
+    dispatch(setEditorMode('editor'));    
   }
+  
   return (
     <AnimationWrapper>
         <section className="w-screen min-h-screen grid items-center lg:grid-cols-2 py-16 lg:gap-4">
@@ -57,9 +141,12 @@ const PublishForm = ({
           </button>
           <div className="center max-w-[550px]">
             <p className="text-dark-grey mb-1">Preview</p>
-            <div className="w-full aspect-video rounded-lg overflow-hidden bg-grey mt-4">
-              <img src={banner} alt="banner image" />
+            {
+              uploadedImage &&  <div className="w-full aspect-video rounded-lg overflow-hidden bg-grey mt-4">
+              <img src={URL.createObjectURL(uploadedImage)} alt="banner image" />
             </div>
+            }
+           
             <h1 className="text-4xl leading-tight line-clamp-2 mt-2 font-medium">{title}</h1>
             <p className="font-gelasio line-clamp-2 text-xl leading-7 mt-4">{description}</p>
           </div>          
@@ -70,7 +157,7 @@ const PublishForm = ({
               className="input-box pl-4 "
               placeholder="Blog Title"
               defaultValue={title}
-              onChange={(e) => setBlogPost({...blogPost, title: e.target.value})}
+              onChange={(e) => dispatch(setBlogTitle(e.target.value))}
               />
             <p className="text-dark-grey mb-2 mt-9">Short description about your blog</p>
             <textarea 
@@ -79,7 +166,7 @@ const PublishForm = ({
               placeholder="Blog description"
               className="resize-none h-40 input-box pl-4 leading-7"
               onKeyDown={handleKeyDown}
-              onChange={(e) => setBlogPost({...blogPost, description: e.target.value})}
+              onChange={(e) => dispatch(setBlogDescription(e.target.value))}
 
             ></textarea>
             <p className="mt-1 text-dark-grey text-sm text-right">
@@ -89,22 +176,19 @@ const PublishForm = ({
               Topics - (helps in searching and ranking your blog post)
             </p>
             <div className="relative input-box pl-2 py-2 pb-4 ">
-              <input 
-                // onChange={}
+              <input                
                 onKeyDown={createTag}
                 type="text"
                 className="sticky input-box bg-white top-0 left-0 w-full pl-4 mb-3 focus:bg-white"
                 placeholder="Topic" />
                  {
                   tags.length > 0 ? (
-                    tags.map((tag, index) => (
+                    tags.map((tag:string, index:number) => (
                       <Tag 
                         key={index} 
-                        tag={tag} 
-                        tags={tags} 
-                        blogPost={blogPost}
-                        tagIndex={index}
-                        setBlogPost={setBlogPost} />
+                        tag={tag}                        
+                        tagIndex={index}                        
+                      />
                       ))
                     ) : (
                       <p>No tags available</p>
@@ -114,7 +198,9 @@ const PublishForm = ({
             <p className="mt-1 mb-4 text-dark-grey text-sm text-right">
               {tagsLeft} {tagsLeft > 1 ? 'tags' : 'tag'} left
             </p> 
-            <button className="btn-dark px-8">Publish</button>
+            <button 
+              onClick={publishBlogPost}
+              className="btn-dark px-8">Publish</button>
           </div>
         </section>
     </AnimationWrapper>

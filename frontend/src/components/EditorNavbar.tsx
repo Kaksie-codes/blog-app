@@ -1,9 +1,16 @@
 import { Link } from "react-router-dom"
 import logo from '../imgs/logo.png'
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { setEditorMode } from "../redux/blogpost/blogPostSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-const EditorNavbar = ({ blogPost, setEditorState }:{ blogPost: any, setEditorState: any}) => {
-    const { title, banner, description, author, tags, content } = blogPost; 
+const EditorNavbar = () => {
+    const { title } = useSelector((state: any) => state.blogPost) || {};
+    const dispatch = useDispatch(); 
+    
+    const navigate = useNavigate();
+
     const handlePublish = () => {
         //validate form
         // if(!banner.length){
@@ -20,7 +27,22 @@ const EditorNavbar = ({ blogPost, setEditorState }:{ blogPost: any, setEditorSta
         //     // return alert('Upload a blog banner to publish it')
         //     return toast.error('Write something in your blog to publish it')
         // }
-        setEditorState('publish');
+        dispatch(setEditorMode('publish'));        
+    }
+
+    const handleSaveDraft = (e:any) => {
+        e.preventDefault();
+
+        if(e.target.className.includes('disable')){
+            return 
+        }
+        if(!title.length){
+            return toast.error('Write Blog title before saving it to draft')
+        }    
+
+        let loadingToast = toast.loading('Saving draft....')
+      navigate('/')
+        e.target.classList.add('disable');
     }
 
   return (
@@ -36,7 +58,7 @@ const EditorNavbar = ({ blogPost, setEditorState }:{ blogPost: any, setEditorSta
             <button className="btn-dark py-2" onClick={handlePublish}>
                 Publish
             </button>
-            <button className="btn-light py-2">
+            <button className="btn-light py-2" onClick={handleSaveDraft}>
                 Save Draft
             </button>
         </div>

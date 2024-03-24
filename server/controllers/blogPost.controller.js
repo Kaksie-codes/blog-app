@@ -15,18 +15,20 @@ const createBlog = async (req, res, next) => {
         if(!title.length){
             next(handleError(403, 'You must provide a title'))
         }
-        if(!banner.length){
-            next(handleError(403, 'You must provide a title'))
-        }
-        if(!content.length){
-            next(handleError(403, 'You must provide a blog content'))
-        }
-        if(!tags.length || tags.length > 10){
-            next(handleError(403, 'Provide a maximum of 10 tags to publish post'))
-        }
-        if(!description.length || description.length > 200){
-            next(handleError(403, 'You must provide a a blog description under 200 characters'))
-        }
+        if(!draft){            
+            if(!banner.length){
+                next(handleError(403, 'You must provide a title'))
+            }
+            if(!content.length){
+                next(handleError(403, 'You must provide a blog content'))
+            }
+            if(!tags.length || tags.length > 10){
+                next(handleError(403, 'Provide a maximum of 10 tags to publish post'))
+            }
+            if(!description.length || description.length > 200){
+                next(handleError(403, 'You must provide a a blog description under 200 characters'))
+            }
+        }       
 
         // Convert all tags to lowercase
         let lowerCaseTags = tags.map(tags => tags.toLowerCase()); 

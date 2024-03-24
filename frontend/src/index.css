@@ -86,6 +86,9 @@
         @apply text-black border-r-2 border-black pl-6 bg-grey/50 -ml-6 md:rounded-tl-lg md:rounded-bl-lg max-md:border-none;
     }
 
+    /* .quill{
+        @apply overflow-scroll input-box h-[10rem] !important;
+    } */
     /* .ql-formats{
         font-size: 3rem !important;
     } */

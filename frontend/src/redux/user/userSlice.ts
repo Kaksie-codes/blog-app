@@ -18,10 +18,10 @@ const initialState: UserState = {
     error: null
 }
 
-const userSlice = createSlice({
+const userSlice = createSlice({ 
     name: 'user',
     initialState,
-    reducers:{
+    reducers:{ 
         signInStart: (state) => {
             state.isLoading = true;
         },
