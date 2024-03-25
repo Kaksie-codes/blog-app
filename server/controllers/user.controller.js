@@ -19,7 +19,7 @@ const getUser = async (req, res, next) => {
     try{
         let { username } = req.body;
         let searchedUser = await User.findOne({"personal_info.username": username})
-        .select("-personal_info.password -google_auth -updatedAt -blogPosts -_id")
+        .select("-personal_info.password -google_auth -updatedAt -blogPosts")
         
         res.status(200).json({user:searchedUser});
     }catch(error){

@@ -114,6 +114,7 @@ const Home = () => {
       console.log('error', error);
     }
   };
+  
   const getBlogsbyCategory = (e: any) => {
     let category = e.target.textContent.toLowerCase();
     setBlogs(null);

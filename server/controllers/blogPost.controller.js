@@ -108,13 +108,15 @@ const getTrendingBlogs = async (req, res, next) => {
 const searchBlogPosts = async (req, res, next) => {    
     try{
         let maxLimit = 5;
-        let { tag, query, page } = req.body;
+        let { tag, query, page, authorId } = req.body;
         page = page ? parseInt(page) : 1;
         let searchQuery
         if(tag){
             searchQuery = { tags:tag, draft:false };  
         }else if(query){
             searchQuery = { title: new RegExp(query, 'i'), draft:false };  
+        }else if(authorId){
+            searchQuery = { author: authorId, draft:false }; 
         }
         
        const totalBlogs = await BlogPost.countDocuments({ draft: false });
