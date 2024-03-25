@@ -107,7 +107,7 @@ const googleAuth = async (req, res, next) => {
             const username = name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-8);
 
             user = new User({
-                personal_info: {
+                personal_info: { 
                     fullname: name,
                     username,
                     email,

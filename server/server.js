@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import authRoutes from './routes/auth.route.js'
 import blogPostRoutes from './routes/blogPost.route.js'
+import userRoutes from './routes/user.route.js'
 import cookieParser from 'cookie-parser';
 
 const server = express();
@@ -30,6 +31,7 @@ mongoose.connect(process.env.MONGO_URL, {autoIndex:true})
 
 server.use('/api/auth', authRoutes);
 server.use('/api/post', blogPostRoutes);
+server.use('/api/users', userRoutes);
 
 
 // Error handling middleware

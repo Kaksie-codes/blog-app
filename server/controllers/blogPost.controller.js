@@ -108,14 +108,32 @@ const getTrendingBlogs = async (req, res, next) => {
 const searchBlogPosts = async (req, res, next) => {    
     try{
         let maxLimit = 5;
-        const { tag } = req.body;
-        let searchQuery = { tags:tag, draft:false };    
+        let { tag, query, page } = req.body;
+        page = page ? parseInt(page) : 1;
+        let searchQuery
+        if(tag){
+            searchQuery = { tags:tag, draft:false };  
+        }else if(query){
+            searchQuery = { title: new RegExp(query, 'i'), draft:false };  
+        }
+        
+       const totalBlogs = await BlogPost.countDocuments({ draft: false });
+       const totalPages = Math.ceil(totalBlogs / maxLimit);
+
        const searchedBlogs = await BlogPost.find(searchQuery)
       .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
       .sort({"publishedAt": -1})
       .select("blog_id title description banner activity tags publishedAt -_id")
       .limit(maxLimit);
-      res.status(200).json({ success: true, message: `relevant blogPosts related to ${tag}`, data: searchedBlogs});
+
+       res.status(200).json({ 
+            success: true, 
+            message: `Search result for ${tag ? tag : query}'`, 
+            results: searchedBlogs,
+            currentPage:page,
+            totalBlogs: totalBlogs,
+            totalPages: totalPages  
+        });
     }catch(error){
         return next(error);
     }
