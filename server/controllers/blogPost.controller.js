@@ -62,19 +62,68 @@ const createBlog = async (req, res, next) => {
     }
 };
 
-const getLatestBlogPosts = async (req, res, next) => {
-    let maxLimit = 5;
+const getLatestBlogPosts = async (req, res, next) => { 
     try{
-        const blogPosts = await BlogPost.find({ draft: false})
+        let maxLimit = 5;
+        let { page } = req.body;
+        page = page ? parseInt(page) : 1;
+
+        const totalBlogs = await BlogPost.countDocuments({ draft: false });
+        const totalPages = Math.ceil(totalBlogs / maxLimit);
+
+        const latestBlogPosts = await BlogPost.find({ draft: false})
         .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
         .sort({"publishedAt": -1})
         .select("blog_id title description banner activity tags publishedAt -_id")
+        .skip((page - 1) * maxLimit)
         .limit(maxLimit);
-        res.status(200).json({ success: true, message: 'latest Blogs', data: blogPosts });
+        
+        res.status(200).json({ 
+            success: true, 
+            message: 'latest Blogs', 
+            results: latestBlogPosts,
+            currentPage:page,
+            totalBlogs: totalBlogs,
+            totalPages: totalPages  
+        });
     }catch(error){
         return next(error);
     }    
 }
 
 
-export { createBlog, getLatestBlogPosts  } 
+const getTrendingBlogs = async (req, res, next) => {
+    try{
+        const trendingBlogPosts = await BlogPost.find({ draft: false})
+        .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+        .sort({"activity.total_read": -1, "activity.total_likes": -1, "publishedAt": -1})
+        .select("blog_id title publishedAt -_id")
+        .limit(3);
+        res.status(200).json({ success: true, message: 'trending Blogs', data: trendingBlogPosts});
+    }catch(error){
+        return next(error);
+    }
+}
+
+const searchBlogPosts = async (req, res, next) => {    
+    try{
+        let maxLimit = 5;
+        const { tag } = req.body;
+        let searchQuery = { tags:tag, draft:false };    
+       const searchedBlogs = await BlogPost.find(searchQuery)
+      .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+      .sort({"publishedAt": -1})
+      .select("blog_id title description banner activity tags publishedAt -_id")
+      .limit(maxLimit);
+      res.status(200).json({ success: true, message: `relevant blogPosts related to ${tag}`, data: searchedBlogs});
+    }catch(error){
+        return next(error);
+    }
+}
+
+export { 
+    createBlog, 
+    getLatestBlogPosts,
+    getTrendingBlogs,
+    searchBlogPosts,
+} 

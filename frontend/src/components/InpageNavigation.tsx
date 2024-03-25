@@ -1,16 +1,17 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 interface InpageNavigationProps {
-    routes: string[];
-    defaultActiveIndex: number;
+    routes: string[];    
     defaultHidden: string[];
     children: ReactNode;
+    activeTabRef: React.RefObject<HTMLButtonElement>;
+    defaultActiveIndex?: number;
 }
 
-const InpageNavigation: React.FC<InpageNavigationProps> = ({ children, routes, defaultHidden, defaultActiveIndex = 0 }) => {
+const InpageNavigation: React.FC<InpageNavigationProps> = ({ activeTabRef, children, routes, defaultHidden, defaultActiveIndex = 0 }) => {
     const [inPageNavIndex, setInPageNavIndex] = useState<number>(defaultActiveIndex);
     const activeTabLineRef = useRef<HTMLHRElement>(null);
-    const activeTabRef = useRef<HTMLButtonElement>(null);
+    
 
     const changePageState = (btn: HTMLButtonElement, i: number) => {
         const { offsetLeft, offsetWidth } = btn;
@@ -30,7 +31,7 @@ const InpageNavigation: React.FC<InpageNavigationProps> = ({ children, routes, d
 
     return (
         <>
-            <div className="relative mb-8 border-b bg-white border-grey flex flex-nowrap overflow-x-auto">
+            <div className="relative mb-8 border-b bg-white max-w-[700px] border-grey flex flex-nowrap overflow-x-auto">
                 {routes.map((route, index) => (
                     <button
                         key={index}
