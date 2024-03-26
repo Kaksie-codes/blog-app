@@ -107,7 +107,7 @@ const UserSignUp = () => {
                 <Navigate to={'/'}/>
             ) : (
                 <AnimationWrapper>
-                <section className="h-cover flex items-center justify-center">            
+                <section className="container xl:px-[5vw] h-cover flex items-center justify-center">            
                     <div className="w-[80%] max-w-[400px]">
                         <form className="w-full" onSubmit={handleSubmit}>
                             <h1 className="text-4xl font-gelasio capitalize text-center  mb-24 ">

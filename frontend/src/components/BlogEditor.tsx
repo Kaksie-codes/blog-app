@@ -63,7 +63,7 @@ const BlogEditor = () => {
     <>
         <EditorNavbar/>
         <AnimationWrapper>
-            <section className="">
+            <section className="container xl:px-[5vw] ">
                 <form>
                     <Toaster/>
                     <UploadBanner                       

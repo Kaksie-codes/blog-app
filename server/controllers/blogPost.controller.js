@@ -98,7 +98,7 @@ const getTrendingBlogs = async (req, res, next) => {
         .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
         .sort({"activity.total_read": -1, "activity.total_likes": -1, "publishedAt": -1})
         .select("blog_id title publishedAt -_id")
-        .limit(3);
+        .limit(5);
         res.status(200).json({ success: true, message: 'trending Blogs', data: trendingBlogPosts});
     }catch(error){
         return next(error);
@@ -140,6 +140,50 @@ const searchBlogPosts = async (req, res, next) => {
         return next(error);
     }
 }
+
+// const searchBlogPosts = async (req, res, next) => {    
+//     try{
+//         let maxLimit = 5;
+//         let { tag, query, page, authorId } = req.body;
+//         page = page ? parseInt(page) : 1;
+//         let searchQuery;
+        
+//         if (tag) {
+//             searchQuery = { tags: tag, draft: false };  
+//         } else if (query) {
+//             searchQuery = { title: new RegExp(query, 'i'), draft: false };  
+//         } else if (authorId) {
+//             // Check if the authorId exists in the database before querying
+//             const authorExists = await User.findById(authorId);
+//             if (!authorExists) {
+//                 next(handleError(404, 'Author not found' ))
+//                 // return res.status(404).json({ success: false, message: 'Author not found' });
+//             }
+//             searchQuery = { author: authorId, draft: false }; 
+//         }
+        
+//         const totalBlogs = await BlogPost.countDocuments({ draft: false });
+//         const totalPages = Math.ceil(totalBlogs / maxLimit);
+
+//         const searchedBlogs = await BlogPost.find(searchQuery)
+//             .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+//             .sort({"publishedAt": -1})
+//             .select("blog_id title description banner activity tags publishedAt -_id")
+//             .limit(maxLimit);
+
+//         res.status(200).json({ 
+//             success: true, 
+//             message: `Search result for ${tag ? tag : query}`, 
+//             results: searchedBlogs,
+//             currentPage: page,
+//             totalBlogs: totalBlogs,
+//             totalPages: totalPages  
+//         });
+//     } catch(error){
+//         return next(error);
+//     }
+// }
+
 
 export { 
     createBlog, 

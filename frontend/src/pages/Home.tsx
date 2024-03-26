@@ -46,14 +46,14 @@ const Home = () => {
 
   let categories = [
     'programming',
-    'relationship',
+    // 'relationship',
     'Tech',
     // 'Social Media',
     // 'Cooking',
     // 'Finance',
     // 'Cryptocurrencies',
     // 'travel',
-    // 'love'
+    'love'
   ];
 
   useEffect(() => {
@@ -114,7 +114,6 @@ const Home = () => {
       console.log('error', error);
     }
   };
-  
   const getBlogsbyCategory = (e: any) => {
     let category = e.target.textContent.toLowerCase();
     setBlogs(null);
@@ -128,23 +127,30 @@ const Home = () => {
   console.log('blogs >>>', blogs)
   return (
     <AnimationWrapper>
-      <section className="h-cover flex gap-10 justify-center">
-        <div className="w-full">
-          <InpageNavigation activeTabRef={activeTabRef} routes={[pageState, "trending blogs"]} defaultHidden={["trending blogs"]}>
-            <div className="max-w-[700px]">
-              {blogs == null ? (
-                <Loader />
-              ) : (
+      <section className="h-cover container xl:px-[5vw] pb-4 flex justify-center">
+        <div className=" flex-1 border-grey md:border-r">
+          <InpageNavigation 
+            activeTabRef={activeTabRef} 
+            routes={[pageState, "trending blogs"]} 
+            defaultHidden={["trending blogs"]}
+          >
+            <div className="w-full pr-8">
+              {
+                blogs == null ? (
+                  <Loader />
+                ) : (
                 <>
-                  {blogs.results.length ? (
-                    blogs.results.map((blog: any, index: number) => (
-                      <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
-                        <BlogCard content={blog} />
-                      </AnimationWrapper>
-                    ))
-                  ) : (
+                  {
+                    blogs.results.length ? (
+                      blogs.results.map((blog: any, index: number) => (
+                        <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
+                          <BlogCard content={blog} />
+                        </AnimationWrapper>
+                        ))
+                    ) : (
                     <Nodata message={`No results found for ${pageState}`} />
-                  )}
+                  )
+                  }
                 </>
               )}
               <LoadMore state={blogs} fetchDataFunction={fetchLatestBlogs}/>
@@ -167,16 +173,16 @@ const Home = () => {
             </>
           </InpageNavigation>
         </div>
-
-        <div className="fixed pt-[80px] top-0 h-screen md:block hidden max-w-min  right-[5vw] md:right-[7vw] lg:right-[10vw]">
-          <div className="min-w-[40%] lg:min-w-[400px] rounded-xl  pt-2 border pl-8 mt-8  border-grey">
-            <div className="flex flex-col gap-10">
-              <div>
-                <h1 className="font-medium mb-8 text-xl">Stories from all interests</h1>
-                <div className="flex gap-3 flex-wrap">
+        <div className="h-cover w-[40%]">
+          <div className="p-4 md:px-8
+          max-md:items-center gap-5 md:full  md:pl-8 md:sticky md:pt-10">
+            <div className="relative flex flex-col gap-8 w-full h-full">
+              <div className="bg-grey w-full sticky left-0 p-4 rounded-lg top-[80px]">
+                <h1 className="font-medium mb-4 text-xl">Stories from all interests</h1>
+                <div className="flex gap-3 ">
                   {categories.map((category, index) => (
                     <button
-                      className={`tag ${pageState === category.toLowerCase() ? 'bg-black text-white' : ''}`}
+                      className={`tag ${pageState === category.toLowerCase() ? 'bg-black text-white' : 'bg-white text-dark-grey '}`}
                       onClick={(e) => getBlogsbyCategory(e)}
                       key={index}
                     >
@@ -184,12 +190,13 @@ const Home = () => {
                     </button>
                   ))}
                 </div>
+                
               </div>
-              <div>
-                <h1 className="font-medium mb-8 text-xl">
+              <div className="border px-2 border-grey rounded-lg"> 
+              <h1 className="font-medium py-4 text-xl px-2">
                   Trending
                   <i className="fi fi-rr-arrow-trend-up"></i>
-                </h1>
+                </h1>               
                 {trendingBlogs == null ? (
                   <Loader />
                 ) : (

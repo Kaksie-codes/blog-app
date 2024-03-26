@@ -30,21 +30,23 @@ const InpageNavigation: React.FC<InpageNavigationProps> = ({ activeTabRef, child
     }, [defaultActiveIndex]);
 
     return (
-        <>
-            <div className="relative mb-8 border-b bg-white max-w-[700px] border-grey flex flex-nowrap overflow-x-auto">
-                {routes.map((route, index) => (
-                    <button
-                        key={index}
-                        ref={index === defaultActiveIndex ? activeTabRef : undefined}
-                        onClick={(e) => changePageState(e.currentTarget as HTMLButtonElement, index)}
-                        className={`p-4 px-5 capitalize ${inPageNavIndex === index ? 'text-black font-bold' : 'text-dark-grey'} ${defaultHidden.includes(route) ? 'md:hidden' : ''}`}>
-                        {route}
-                    </button>
-                ))}
-                <hr ref={activeTabLineRef} className="absolute bottom-0 duration-300" />                
+        <div className='w-full '>
+            <div className="top-[80px] z-50 shadow-sm sticky mb-8 border-b bg-white  w-fit mx-auto md:w-full md:mr-auto border-grey flex flex-nowrap overflow-x-auto">
+                <div className='relative'>
+                    {routes.map((route, index) => (
+                        <button
+                            key={index}
+                            ref={index === defaultActiveIndex ? activeTabRef : undefined}
+                            onClick={(e) => changePageState(e.currentTarget as HTMLButtonElement, index)}
+                            className={`p-4 pt-8 px-5 capitalize ${inPageNavIndex === index ? 'text-black font-bold' : 'text-dark-grey'} ${defaultHidden.includes(route) ? 'md:hidden' : ''}`}>
+                            {route}
+                        </button>
+                    ))}
+                    <hr ref={activeTabLineRef} className="absolute bottom-0 duration-300" />
+                </div>              
             </div>
             {Array.isArray(children) ? children[inPageNavIndex] : children}
-        </>
+        </div>
     );
 };
 

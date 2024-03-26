@@ -47,21 +47,23 @@ const EditorNavbar = () => {
     }
 
   return (
-    <nav className="navbar">
-        <Link to={'/'} className='flex items-center justify-center gap-1'>
-            <img src={logo} alt="logo"  className='flex-none w-6 lg:w-10'/>
-            <p className='font-bold text-xl lg:text-2xl'>enBlogg</p>
-        </Link>
-        <p className="max-md:hidden text-black line-clamp-1 w-full ">
-            {title ? `${title}` : "New Blog"}
-        </p>
-        <div className="flex gap-4 ml-auto">
-            <button className="btn-dark py-2" onClick={handlePublish}>
-                Publish
-            </button>
-            <button className="btn-light py-2" onClick={handleSaveDraft}>
-                Save Draft
-            </button>
+    <nav className="z-10 sticky top-0 w-full  py-5 h-[80px] border-b border-grey bg-white">
+        <div className="container flex items-center gap-12">
+            <Link to={'/'} className='flex items-center justify-center gap-1'>
+                <img src={logo} alt="logo"  className='flex-none w-6 lg:w-10'/>
+                <p className='font-bold text-xl lg:text-2xl'>enBlogg</p>
+            </Link>
+            <p className="max-md:hidden text-black line-clamp-1 w-full ">
+                {title ? `${title}` : "New Blog"}
+            </p>
+            <div className="flex gap-4 ml-auto">
+                <button className="btn-dark py-2" onClick={handlePublish}>
+                    Publish
+                </button>
+                <button className="btn-light py-2" onClick={handleSaveDraft}>
+                    Save Draft
+                </button>
+            </div>
         </div>
     </nav>
   )

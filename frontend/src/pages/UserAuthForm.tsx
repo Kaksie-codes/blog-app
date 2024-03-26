@@ -82,7 +82,7 @@ const UserAuthForm = ({type}: {type:string}) => {
 
   return (
     <AnimationWrapper keyValue={type} className="">
-        <section className="h-cover flex items-center justify-center">
+        <section className="container xl:px-[5vw] h-cover flex items-center justify-center">
             {/* <Toaster/> */}
             <div className="w-[80%] max-w-[400px]">
                 <form className="w-full" onSubmit={handleSubmit}>

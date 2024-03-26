@@ -9,11 +9,11 @@ const UploadBanner = () => {
     // const imageUrl = useSelector((state:any) => state.blogPost.imageUrl);
     const dispatch = useDispatch();
     // const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const [imageError, setImageError] = useState<string | null>(null);
+    const [imageError, setImageError] = useState<string | null>('Please select an image smaller than 2MB.');
     // const [imageUploadProgress, setImageUploadProgress] = useState<number>(0);
     // const [imageUploadError, setImageUploadError] = useState<string | null>(null);
     // const [banner, setBanner] = useState();
-
+  
    
     
 
@@ -70,7 +70,7 @@ const UploadBanner = () => {
     //     }
     // }, [image])
   return (
-    <div className="mx-auto max-w-[900px] w-full ">
+    <div className="mx-auto max-w-[700px] w-full mt-3 ">
                     <div className="relative aspect-video hover:opacity-[80%] bg-white border-4 border-grey">
                         <label htmlFor="uploadBanner">
                             {

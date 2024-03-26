@@ -22,9 +22,42 @@
         @apply mt-0.5;
     }
 
-    section{
-        @apply py-4 px-[5vw] md:px-[7vw] lg:px-[10vw];
-    }
+    /* .container{
+        @apply px-[5vw]; 
+    } */
+
+    /* section{
+        @apply py-4 px-[5vw] md:px-[7vw] lg:px-[10vw]; 
+    } */
+
+    ::-webkit-scrollbar {
+        width: 10px;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        @apply bg-dark-grey/50;  
+        border: 2px solid;
+      }
+      
+      /* .onto::-webkit-scrollbar-thumb {
+        @apply bg-transparent;  
+        border: 2px solid;
+      } */
+      /* .onto::-webkit-scrollbar {
+        @apply hidden;
+      } */
+      /* .onto:hover::-webkit-scrollbar{
+        width: 10px ;
+        @apply block border-0;
+      } */
+
+      ::-webkit-scrollbar-thumb {
+        border-color: transparent;  
+      }
+      
+      ::-webkit-scrollbar-track {
+        @apply bg-grey;  
+      }
 
     ::selection {
         @apply bg-purple/30;
@@ -35,7 +68,7 @@
     }
 
     .navbar{
-        @apply z-10 sticky top-0 flex items-center gap-12 w-full px-[5vw] py-5 h-[80px] border-b border-grey bg-white;
+        @apply z-10 sticky top-0 flex items-center gap-12 w-full  py-5 h-[80px] border-b border-grey bg-white;
     }
 
     .h-cover{

@@ -19,7 +19,7 @@ const AboutUser = ({
 }) => {
     return (
         <div className={`${classNames} md:w-[90%] md:mt-7`}>
-            <p>{bio.length ? bio : 'Nothing to read here'}</p>
+            <p className="text-xl leading-7">{bio.length ? bio : `user has no biography...`}</p>
             <div className="flex gap-x-7 gap-y-2 flex-wrap mt-3 items-center text-dark-grey">
                 {
                     Object.keys(social_links).map((key, index) => {

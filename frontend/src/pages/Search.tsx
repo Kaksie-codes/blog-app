@@ -79,46 +79,50 @@ const Search = () => {
     }
 
   return (
-    <section className="h-cover flex justify-center gap-10">
-        <div className="w-full">
-            <InpageNavigation 
-                routes={[`search results from "${query}"`, "Accounts Watched"]}
-                defaultHidden={["Accounts Watched"]}
-                activeTabRef={activeTabRef}>
-                <>
-                  <div className="max-w-[700px]">
-                  {
-                    blogs == null ? (
-                        <Loader />
-                    ) : (
-                      <>
-                       {blogs && blogs.results && blogs.results.length ? (
-    blogs.results.map((blog: any, index: number) => (
-        <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
-            <BlogCard content={blog} />
-        </AnimationWrapper>
-    ))
-) : (
-    
-    <Nodata message={`No results found for "${query}"`} />
-)}
-                       </>
-                    )}
-                    <LoadMore state={blogs} fetchDataFunction={searchBlogs}/>
-                  </div>
-                </>
-                <UserCardWrapper/>
-            </InpageNavigation>
-        </div>
-        <div className="border-l border-grey min-w-[40%] max-w-min lg:min-w-[650px] max-md:hidden pl-8 pt-3">
-            <h1 className="font-medium text-xl mb-8 flex items-center gap-2">
-                User related to search
-                <i className="fi fi-rr-user mt-1"></i>
-            </h1>
-            <UserCardWrapper/>
-        </div>
-    </section>
+    <AnimationWrapper>
+        <section className="h-cover container xl:px-[5vw] pb-4 flex justify-center">
+            <div className="flex-1">
+                <InpageNavigation
+                    routes={[`search results from "${query}"`, "Accounts Watched"]}
+                    defaultHidden={["Accounts Watched"]}
+                    activeTabRef={activeTabRef}
+                >
+                    <div className="w-full pr-10">
+                        {
+                            blogs == null ? (
+                                <Loader />
+                            ) : (
+                          <>
+                            {
+                                blogs && blogs.results && blogs.results.length ? (
+                                    blogs.results.map((blog: any, index: number) => (
+                                        <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
+                                            <BlogCard content={blog} />
+                                        </AnimationWrapper>
+                                        ))
+                                    ) : (
+                                    <Nodata message={`No results found for "${query}"`}/>
+                                )
+                            }
+                           </>
+                        )}
+                        <LoadMore state={blogs} fetchDataFunction={searchBlogs}/>
+                    </div>
+                    <UserCardWrapper/>
+                </InpageNavigation>
+            </div>
+            <div className="w-[40%] xl:w-[30%] hidden md:block pt-4">
+                <div className="h-cover  border-l border-grey w-full  max-md:hidden pl-8">
+                    <h1 className="sticky top-[100px] shadow-sm font-medium text-xl mb-8 flex items-center gap-2">
+                        User related to search
+                        <i className="fi fi-rr-user mt-1"></i>
+                    </h1>
+                    <UserCardWrapper/>
+                </div>
+            </div>
+        </section>
+    </AnimationWrapper>
   )
 }
-
+ 
 export default Search 
