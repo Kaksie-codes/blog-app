@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const { Schema } = mongoose; // Correct import
 
 const blogPostSchema = new Schema({ // Use `new Schema` correctly
-    blog_id: {
+    slug: {
         type: String,
         required: true,
         unique: true,
@@ -22,7 +22,7 @@ const blogPostSchema = new Schema({ // Use `new Schema` correctly
         // required: true
     },
     content: {
-        type: [],
+        type: String,
         // required: true
     },
     tags: {
@@ -31,7 +31,7 @@ const blogPostSchema = new Schema({ // Use `new Schema` correctly
     },
     author: {
         type: Schema.Types.ObjectId,
-        required: true,
+        required: true, 
         ref: 'User'
     },
     activity: {
@@ -54,13 +54,12 @@ const blogPostSchema = new Schema({ // Use `new Schema` correctly
     },
     comments: {
         type: [Schema.Types.ObjectId],
-        ref: 'comments'
+        ref: 'Comment'
     },
     draft: {
         type: Boolean,
         default: false
-    }
-
+    } 
 }, 
 { 
     timestamps: {

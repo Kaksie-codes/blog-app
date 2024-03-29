@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid'
 function generateSlug(title) {
     const slug = title.toLocaleLowerCase() //convert the title to lowercase
     .replace(/\s+/g, '-') // Replace space with dashes
@@ -6,7 +7,7 @@ function generateSlug(title) {
     .replace(/^\-+/, '') // Remove dashes from the beginning
     .replace(/\-+$/, ''); // Remove dashes from the end
   
-    return slug;
+    return slug + nanoid();
   }
   
 export default generateSlug

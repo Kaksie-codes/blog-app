@@ -8,10 +8,10 @@ const notificationSchema = new Schema({
         enum: ["like", "comment", "reply"],
         required: true
     },
-    blog: {
+    blogPost: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'blogs'
+        ref: 'BlogPost'
     },
     notification_for: {
         type: Schema.Types.ObjectId,

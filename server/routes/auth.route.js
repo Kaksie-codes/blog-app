@@ -1,17 +1,18 @@
 import { Router } from 'express';
-import { signup, signin, signout, googleAuth } from '../controllers/auth.controller.js';
-
+import { signupUser, signinUser, signoutUser, googleAuth, getMe } from '../controllers/auth.controller.js';
+import { verifyToken } from '../middleware/verifyToken.js';
 
 // Initialize the router
 const router = Router();
 
 // Signup
-router.post('/signup', signup);
+router.post('/signup', signupUser);
 // Signin
-router.post('/signin', signin);
+router.post('/signin', signinUser);
 // Signout
-router.get('/signout', signout);
+router.get('/signout', signoutUser);
 // Google Auth
 router.post('/google-auth', googleAuth);
+router.get('/get', verifyToken,  getMe);
 
 export default router;

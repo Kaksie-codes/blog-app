@@ -1,5 +1,5 @@
 import AnimationWrapper from "../libs/page-animation"
-import { useState } from "react"
+// import { useEffect, useState } from "react"
 import EditorNavbar from "./EditorNavbar";
 import UploadBanner from "./UploadBanner"
 import { useDispatch, useSelector } from "react-redux";
@@ -8,20 +8,62 @@ import 'react-quill/dist/quill.snow.css';
 import BlogViewer from "./BlogViewer";
 import { Toaster } from "react-hot-toast";
 import { setBlogTitle, setBlogContent } from "../redux/blogpost/blogPostSlice";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+// import EditorJS from "@editorjs/editorjs";
+// import { tools } from "./Tools";
 // import parse from 'html-react-parser'
 
 
 const BlogEditor = () => {
+    // const { blog_id } = useParams();
     const { title, content } = useSelector((state: any) => state.blogPost) || {};
     const dispatch = useDispatch(); 
     
     const handleTitleKeyDown = (e:any) => {        
-        if(e.keyCode === 13){
+        if(e.keyCode === 13){ 
             e.preventDefault();
         }
     }
 
+    // useEffect(() => {
+    //     if(!blog_id){
+    //       return ;
+    //     }
+    //     fetchBlogPost();
+    //   },[]) 
+
+    // const fetchBlogPost = async() => {
+    //     try{
+    //         const res = await fetch('/api/post/get-blog', {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({blog_id, draft:true, mode: 'edit'})
+    //         })
+    //         const { blogPost } = await res.json();
+    //         console.log('blogPost', blogPost.content)
+    //         if(blogPost != null){                
+    //             // setBlog(blogPost);
+    //           const { content } = blogPost;
+    //           // dispatch(setBlogContent(content))
+    //             // setIsLoading(false)                           
+    //         }
+    //         // console.log('blogPost', blogPost);
+    //     }catch(error){ 
+    //         console.log(error);            
+    //     }
+    // }
+
+
     
+    // useEffect(() => {
+    //     let editor = new EditorJS({
+    //         holderId: "textEditor",
+    //         data: '',
+    //         tools: tools,
+    //         placeholder: `Let's write an awesome`
+    //     });        
+    // }, [])
 
     const handleTitleChange = (e:any) => {
         let input = e.target;
@@ -75,18 +117,18 @@ const BlogEditor = () => {
                         onKeyDown={handleTitleKeyDown}
                         onChange={handleTitleChange}
                         name="" id=""></textarea>
-                    <hr className="w-full opacity-10 my-5"/>                    
-                    <div id="textEditor font-gelasio">
-                        <ReactQuill
-                            theme="snow"
-                            className="h-auto  mb-12 overflow-scroll"                            
-                            placeholder="Write your blog content..."
-                            value={content}                            
-                            modules={modules}
-                            formats={formats}
-                            onChange={(value) => dispatch(setBlogContent(value))}
-                        />
-                    </div>                    
+                    <hr className="w-full opacity-10 my-5"/>                                        
+                    {/* <div id="textEditor" className="font-gelasio">                        
+                    </div>  */}
+                    <ReactQuill
+                        theme="snow"
+                        className="h-auto  mb-12 overflow-scroll"                            
+                        placeholder="Write your blog content..."
+                        value={content}                            
+                        modules={modules}
+                        formats={formats}
+                        onChange={(value) => dispatch(setBlogContent(value))}
+                    />                   
                 </form>
                 <BlogViewer/>
             </section>

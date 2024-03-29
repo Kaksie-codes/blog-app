@@ -2,25 +2,24 @@ import AnimationWrapper from "../libs/page-animation"
 import { Toaster, toast } from "react-hot-toast"
 import Tag from "./Tag"
 import { useDispatch, useSelector } from "react-redux";
-import { setBlogTitle, setEditorMode, setUploadedImage, setBlogDescription, setTags, setBanner, setBlogContent } from "../redux/blogpost/blogPostSlice";
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage"
-import { app } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { setBlogTitle, setEditorMode, setBlogDescription, setTags, setBanner, setBlogContent } from "../redux/blogpost/blogPostSlice";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 
 
 const PublishForm = () => {
-  const { title, content, banner, tags, description, uploadedImage, draft } = useSelector((state: any) => state.blogPost) || {};
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const [disabled, setDisabled] = useState(false);
+  const { blog_id } = useParams();
+  const { title, content, banner, tags, description, draft } = useSelector((state: any) => state.blogPost) || {};
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [disabled, setDisabled] = useState(false);
    
   let characterLimit = 200;
   let tagsLimit = 10;
   const descriptionCharactersLeft = characterLimit - description.length;
   const tagsLeft = tagsLimit - tags.length;
 
-console.log('disabled >>',disabled)
+
   const handleKeyDown = (e:any) => {    
     if(e.keyCode === 13){
         e.preventDefault();
@@ -43,31 +42,6 @@ console.log('disabled >>',disabled)
     }
 }
 
-  const uploadImage = async () => {
-    try {
-      // Get storage reference and generate unique filename
-      const storage = getStorage(app);
-      const fileName = new Date().getTime() + '-' + uploadedImage.name;
-      const storageRef = ref(storage, fileName);
-
-      // Upload image to storage
-      const uploadTask = uploadBytesResumable(storageRef, uploadedImage);
-
-      // Wait for the upload to complete
-      await uploadTask;
-
-      // Get download URL for the uploaded image
-      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-
-      // Update the state with image URL
-     dispatch(setBanner(downloadURL))
-      
-  } catch (error:any) {
-      console.error("Image upload failed:", error);
-      return toast.error('Sorry, Could not publish blog post'); 
-  }
-}
-
   const publishBlogPost = async (e:any) => {
     e.preventDefault(); 
     let loading;
@@ -86,8 +60,7 @@ console.log('disabled >>',disabled)
         return toast.error('Enter at least 1 tag to help us rank your blog')
       }
 
-      setDisabled(true);
-      await uploadImage();
+      setDisabled(true);      
 
       let blogObject = {
         draft,
@@ -99,31 +72,32 @@ console.log('disabled >>',disabled)
       }
       
       // loading = toast.loading('Publishing...');    
-  
-      const res = await fetch(`/api/post/create-post`, {
+      if(banner.length){
+        const res = await fetch(`/api/post/create-post`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(blogObject),
+          body: JSON.stringify({...blogObject, id: blog_id}),
       });
 
       const data = await res.json();
       toast.success('Post Published Successfully'); 
-      console.log(data);
-      setDisabled(false); 
+      console.log(data);      
       toast.dismiss(loading);          
       setTimeout(() => {
         if(data){
-          dispatch(setBanner(''));
-          dispatch(setUploadedImage(''));
+          dispatch(setBanner(''));          
           dispatch(setBlogDescription(''));
           dispatch(setBlogTitle(''));
           dispatch(setBlogContent(''));
           dispatch(setTags([]));
           dispatch(setEditorMode('editor')); 
+          setDisabled(false); 
         }  
         // Navigate after 2 seconds        
         navigate('/');
-    }, 3000);           
+    }, 3000);  
+      }
+              
   }catch(err){ 
       console.log('error >>', err);
       setDisabled(false);
@@ -147,8 +121,8 @@ console.log('disabled >>',disabled)
           <div className="center max-w-[550px]">
             <p className="text-dark-grey mb-1">Preview</p>
             {
-              uploadedImage &&  <div className="w-full aspect-video rounded-lg overflow-hidden bg-grey mt-4">
-              <img src={URL.createObjectURL(uploadedImage)} alt="banner image" />
+              banner &&  <div className="w-full aspect-video rounded-lg overflow-hidden bg-grey mt-4">
+              <img src={banner} alt="banner image" />
             </div>
             }
            
@@ -208,7 +182,7 @@ console.log('disabled >>',disabled)
               onClick={publishBlogPost}
               className={`btn-dark px-8 ${disabled ? 'cursor-not-allowed' : ''}`}>
                 {disabled ? 'Publishing...' : 'Publish'}
-              </button>
+            </button>
           </div>
         </section>
     </AnimationWrapper>

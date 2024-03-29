@@ -7,7 +7,7 @@ import BlogCard from "../components/BlogCard";
 import Nodata from "../components/Nodata";
 import LoadMore from "../components/LoadMore";
 
-interface Blog {
+export interface Blog {
   activity: {
     total_likes: number;
     total_comments: number;
@@ -20,13 +20,16 @@ interface Blog {
       profile_img: string;
       username: string;
     };
+    _id: string
   };
-  banner?: string;
+  banner: string;
   blog_id: string;
-  description?: string;
+  description: string;
+  content: string[]
   publishedAt: string;
-  tags?: string[];
+  tags: string[];
   title: string;
+  _id:string
 }
 
 export interface BlogApiResponse {
@@ -108,8 +111,8 @@ const Home = () => {
       });
       const { data } = await res.json();
       setBlogs(data);
-      console.log('pageState', pageState);
-      console.log('catBlog >>', data);
+      // console.log('pageState', pageState);
+      // console.log('catBlog >>', data);
     } catch (error) {
       console.log('error', error);
     }
@@ -124,7 +127,7 @@ const Home = () => {
       setPageState(category);
     }
   };
-  console.log('blogs >>>', blogs)
+  // console.log('blogs >>>', blogs)
   return (
     <AnimationWrapper>
       <section className="h-cover container xl:px-[5vw] pb-4 flex justify-center">
@@ -192,7 +195,7 @@ const Home = () => {
                 </div>
                 
               </div>
-              <div className="border px-2 border-grey rounded-lg"> 
+              <div className="border px-2 border-grey pb-4 rounded-lg"> 
               <h1 className="font-medium py-4 text-xl px-2">
                   Trending
                   <i className="fi fi-rr-arrow-trend-up"></i>

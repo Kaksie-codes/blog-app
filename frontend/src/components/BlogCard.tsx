@@ -19,7 +19,7 @@ const BlogCard = ({ content }:{ content:any }) => {
                         />
                     </div>                    
                     <div className="flex flex-col gap-0">
-                        <p className="line-clamp-1 text-dark-grey font-bold ">{fullname}</p>
+                        <p className="line-clamp-1 font-bold ">{fullname}</p>
                         <p className="line-clamp-1 ">@{username}</p>
                     </div>
                 </div>

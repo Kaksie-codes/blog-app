@@ -8,24 +8,28 @@ import Editor from './pages/Editor'
 import Home from './pages/Home'
 import Search from './pages/Search'
 import PageNotFound from './pages/PageNotFound'
-
+import BlogPage from './pages/BlogPage'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
  
 
   return (
-    <>      
+    <>    
+      <Toaster/>  
       <Routes>
         <Route path='/' element={<Navbar/>}>
           <Route index element={<Home/>}/>
           <Route path='signin' element={<UserSignIn/>}/>
           <Route path='signup' element={<UserSignUp/>}/>
           <Route path='profile' element={<Profile/>}/> 
-          <Route path='search/:query' element={<Search/>}/> 
+          <Route path='search/:query' element={<Search/>}/>
+          <Route path='blogs/:blog_id' element={<BlogPage/>}/> 
           <Route path='users/:id' element={<Profile/>}/> 
           <Route path='*' element={<PageNotFound/>}/>          
         </Route>        
         <Route path='/editor' element={<Editor/>}/> 
+        <Route path='/editor/:blog_id' element={<Editor/>}/> 
       </Routes>
     </>
   )

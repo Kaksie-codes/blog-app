@@ -4,6 +4,12 @@ import blogPostReducer from './blogpost/blogPostSlice'
 import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
+// Define root state type
+export type RootState = ReturnType<typeof rootReducer>;
+
+// Define dispatch function type
+export type AppDispatch = typeof store.dispatch;
+
 const rootReducer = combineReducers({
     user: userReducer,
     blogPost: blogPostReducer

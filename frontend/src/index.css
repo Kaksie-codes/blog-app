@@ -39,17 +39,7 @@
         border: 2px solid;
       }
       
-      /* .onto::-webkit-scrollbar-thumb {
-        @apply bg-transparent;  
-        border: 2px solid;
-      } */
-      /* .onto::-webkit-scrollbar {
-        @apply hidden;
-      } */
-      /* .onto:hover::-webkit-scrollbar{
-        width: 10px ;
-        @apply block border-0;
-      } */
+     
 
       ::-webkit-scrollbar-thumb {
         border-color: transparent;  
@@ -165,4 +155,31 @@
 .cdx-settings-button[data-tune='withBackground'],
 .cdx-settings-button[data-tune='stretched'] {
   display: none;
+}
+
+/* .blog-content{
+    background-color: azure;
+} */
+.blog-content h1, 
+.blog-content h2, 
+.blog-content h3{
+    @apply font-bold mt-4 mb-3;
+}
+.blog-content h1{
+    @apply text-4xl font-bold mt-4 mb-3;    
+}
+.blog-content h2{
+    @apply text-3xl font-bold !important;    
+}
+.blog-content h3{
+    @apply text-xl font-bold;    
+}
+.blog-content p{
+    @apply first-letter:text-3xl first-letter:pl-6 mt-1 text-[20px] !important;
+}
+.blog-content ul{    
+    @apply text-[18px] pl-10 list-disc !important;
+}
+.blog-content pre{
+    @apply text-[18px] text-white bg-black p-4 !important;
 }

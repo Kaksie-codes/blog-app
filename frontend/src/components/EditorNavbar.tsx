@@ -4,17 +4,17 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { setEditorMode } from "../redux/blogpost/blogPostSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
+// import { useState } from "react";
 
 const EditorNavbar = () => {
     const { title, content, banner, tags, description, uploadedImage, draft } = useSelector((state: any) => state.blogPost) || {}; 
     const dispatch = useDispatch(); 
-    const [disabled, setDisabled] = useState(false);
+    // const [disabled, setDisabled] = useState(false);
     const navigate = useNavigate();
 
     const handlePublish = () => {
         //validate form
-        if(!uploadedImage){
+        if(!banner){
             // return alert('Upload a blog banner to publish it')
             return toast.error('Upload a blog banner to publish it')
         }

@@ -6,12 +6,12 @@ const commentSchema = new Schema({
     blog_id: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'blogs'
+        ref: 'BlogPost'
     },
     blog_author: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'users', // Assuming the author of the blog is a user
+        ref: 'User', // Assuming the author of the blog is a user
     },
     comment: {
         type: String,
@@ -19,12 +19,12 @@ const commentSchema = new Schema({
     },
     children: [{
         type: Schema.Types.ObjectId,
-        ref: 'comments'
+        ref: 'Comment'
     }],
     commented_by: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'users'
+        ref: 'User'
     },
     isReply: {
         type: Boolean,
@@ -32,7 +32,7 @@ const commentSchema = new Schema({
     },
     parent: {
         type: Schema.Types.ObjectId,
-        ref: 'comments'
+        ref: 'Comment'
     }
 },
 {

@@ -1,26 +1,27 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-
 interface BlogPostState {
-    title: string;    
-    uploadedImage : File | null; 
-    banner:string;
+    title: string; 
+    banner:string | null;
     content: string[];
     tags: string[]; 
     description: string;
     editorMode: string; 
     draft:boolean;
+    uploadProgress: number;
+    uploadError: string | null
 }
 
 const initialState: BlogPostState = {
-    title: '', 
-    uploadedImage : null,
-    banner:'', 
+    title: '',    
+    banner: null, 
     content: [], 
     tags: [], 
     description: '', 
     editorMode: 'editor' ,
-    draft: false,  
+    draft: false, 
+    uploadProgress: 0,
+    uploadError: null
 }
 
 const blogSlice = createSlice({
@@ -29,6 +30,12 @@ const blogSlice = createSlice({
     reducers: {         
         setBlogTitle: (state, action) => {
             state.title = action.payload;
+        },
+        setUploadError: (state, action) => {
+            state.uploadError = action.payload;
+        },
+        setUploadProgress: (state, action) => {
+            state.uploadProgress = action.payload;
         },
         setEditorMode: (state, action) => {
             state.editorMode = action.payload;
@@ -47,22 +54,20 @@ const blogSlice = createSlice({
         },
         setDraft: (state, action) => {
             state.draft = action.payload;
-        },
-        setUploadedImage: (state, action) => {
-            state.uploadedImage = action.payload;
-        },        
+        },             
     }
 })
 
 
-export const { 
-    setUploadedImage, 
+export const {    
     setBlogTitle, 
     setBlogContent, 
     setBlogDescription,
     setTags,
     setEditorMode,
     setBanner,
-    setDraft
+    setDraft,
+    setUploadError,
+    setUploadProgress
  } = blogSlice .actions;
 export default blogSlice .reducer;
