@@ -8,17 +8,7 @@ export default {
     container: {
       center: true,
       padding: "1rem",
-    },
-    colors: {
-      'white': '#FFFFFF',
-      'black': '#242424',
-      'grey': '#F3F3F3',
-      'dark-grey': '#6B6B6B',
-      'red': '#FF4E4E',
-      'transparent': 'transparent',
-      'twitter': '#1DA1F2',
-      'purple': '#8B46FF'
-  },
+    },    
     fontSize: {
       'sm': '12px',
       'base': '14px',
@@ -29,6 +19,16 @@ export default {
       '5xl': '50px',
   },
     extend: {
+      colors: {
+        'white': '#FFFFFF',
+        'black': '#242424',
+        'grey': '#F3F3F3',
+        'dark-grey': '#6B6B6B',
+        'red': '#FF4E4E',
+        'transparent': 'transparent',
+        'twitter': '#1DA1F2',
+        'purple': '#8B46FF'
+    },
       fontFamily: {
         inter: ["'Inter'", "sans-serif"],
         gelasio: ["'Gelasio'", "serif"]

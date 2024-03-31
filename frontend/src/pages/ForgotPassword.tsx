@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import InputBox from "../components/InputBox";
 import { useState } from "react";
 import { FormData } from "./UserSignUp";
+import VerifyOTP from "../components/VerifyOTP";
 
 
 const ForgotPassword = () => {
@@ -76,7 +77,7 @@ const handleSubmit = async (e: any) => {
         ) : (
             <AnimationWrapper>
             <section className="container xl:px-[5vw] h-cover flex items-center justify-center">            
-                <div className="w-[80%] max-w-[400px]">
+                {/* <div className="w-[80%] max-w-[400px]">
                     <form className="w-full" >
                         <h1 className="text-4xl font-gelasio capitalize text-center  mb-24 ">
                             Forgot Password
@@ -85,8 +86,7 @@ const handleSubmit = async (e: any) => {
                             classNames={`bg-grey border-grey focus:bg-transparent`}
                             name="email"
                             type='email'
-                            placeholder="Email"
-                            id='email'
+                            placeholder="Email"                            
                             onChange={handleChange}
                             icon="fi-rr-envelope"
                             value={email}
@@ -104,7 +104,8 @@ const handleSubmit = async (e: any) => {
                             }
                         </button>                                       
                     </form>
-                    </div>
+                </div> */}
+               <VerifyOTP otpLength={4}/>
             </section>
         </AnimationWrapper>
         )

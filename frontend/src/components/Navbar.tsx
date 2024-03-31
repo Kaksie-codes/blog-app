@@ -1,27 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
 import logo from '../imgs/logo.png'
 import { Link, Outlet, useNavigate, } from 'react-router-dom'
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import UserNavigation from './UserNavigation'
+import { setAuthPageMode } from '../redux/auth/authSlice'
 
 const Navbar = () => {  
-    const navPanelRef  = useRef(null);
+    const navPanelRef = useRef<HTMLDivElement>(null); 
     const { userInfo } = useSelector((state:any) => state.auth);
     
     const profilePic = userInfo ? userInfo.profile_img : null;
     const [searchBoxVisibility, setSeachBoxVisibility] = useState<boolean>(false);
     const [isNavPanelVisible, setIsNavPanelVisible] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch()
 
-    const closeNav = (e:any) => {
-        // Check if the click occurred outside the navigation menu
-        if (navPanelRef.current && !navPanelRef.current.contains(e.target)) {
-            // Check if the clicked element or its parent has the toggle button class
-            if (!e.target.classList.contains('nav__toggle')) {
-                setIsNavPanelVisible(false);
-            }
+    const closeNav = (e: MouseEvent) => {
+    // Check if the click occurred outside the navigation menu
+    if (navPanelRef.current && !navPanelRef.current.contains(e.target as Node)) {
+        // Check if the clicked element or its parent has the toggle button class
+        if (!(e.target as HTMLElement).classList.contains('nav__toggle')) {
+            setIsNavPanelVisible(false);
         }
-    };
+    }
+};
+
 
     const handleSearch = (e:any) => {
         let query = e.target.value;
@@ -81,12 +84,20 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link to={'/signin'} className='btn-dark py-2'>
+                                <button onClick={() => {
+                                    dispatch(setAuthPageMode('sign-in'));
+                                    navigate('/auth')
+                                }}
+                                    className='btn-dark py-2'>
                                     Sign In
-                                </Link>
-                                <Link to={'/signup'} className='btn-light py-2 hidden md:block'>
+                                </button>
+                                <button onClick={() => {
+                                    dispatch(setAuthPageMode('sign-up'));
+                                    navigate('/auth')
+                                }}
+                                     className='btn-light py-2 hidden md:block'>
                                     Sign Up
-                                </Link>
+                                </button>
                             </>
                         )
                     }

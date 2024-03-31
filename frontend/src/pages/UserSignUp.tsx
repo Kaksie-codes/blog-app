@@ -24,7 +24,7 @@ const UserSignUp = () => {
     const { userInfo } = useSelector((state:any) => state.auth);
     
 
-    const [formData, setformData] = useState({        
+    const [signUpData, setSignUpData] = useState({        
         username: "", 
         email:"", 
         password:"", 
@@ -42,34 +42,34 @@ const UserSignUp = () => {
 
     const handleChange = (e:any) => {        
         const { value, id } = e.target;
-        setformData({            
-            ...formData,
+        setSignUpData({            
+            ...signUpData,
             [id]: value.trim()                 
         }) 
     }
 
     const validateForm = () => {
         const validationErrors: Partial<FormData> = {};
-        if(!formData.username.trim()){
+        if(!signUpData.username.trim()){
             validationErrors.username = 'Username is required';            
-        }else if(formData.username.length < 3){
+        }else if(signUpData.username.length < 3){
             validationErrors.username = 'Username should not be less than three characters';  
         } 
-        if(!formData.email.trim()){
+        if(!signUpData.email.trim()){
             validationErrors.email = 'Email is required'
-        }else if(!emailRegex.test(formData.email)){
+        }else if(!emailRegex.test(signUpData.email)){
             validationErrors.email = 'Email is invalid'
         }
 
-        if(!formData.password.trim()){
+        if(!signUpData.password.trim()){
             validationErrors.password = 'Password is required'
-        }else if(!passwordRegex.test(formData.password)){
+        }else if(!passwordRegex.test(signUpData.password)){
             validationErrors.password = 'Password should contain an Uppercase, a lower'
         }
 
-        if(!formData.passwordCheck.trim()){
+        if(!signUpData.passwordCheck.trim()){
             validationErrors.passwordCheck = 'Password confirmation is required'
-        }else if(formData.passwordCheck !== formData.password){
+        }else if(signUpData.passwordCheck !== signUpData.password){
             validationErrors.passwordCheck = 'Passwords do not match'
         }
 
@@ -99,7 +99,7 @@ const UserSignUp = () => {
             const res = await fetch(`/api/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(signUpData),
             });
             const result = await res.json(); 
             const { user } = result          
@@ -139,7 +139,7 @@ const UserSignUp = () => {
                                 id='username'
                                 onChange={handleChange}
                                 icon="fi-rr-user"
-                                value={formData.username}
+                                value={signUpData.username}
                                 errorMessage={validationErrors.username}
                             />
                             <InputBox
@@ -150,7 +150,7 @@ const UserSignUp = () => {
                                 id='email'
                                 onChange={handleChange}
                                 icon="fi-rr-envelope"
-                                value={formData.email}
+                                value={signUpData.email}
                                 errorMessage={validationErrors.email}
                             />
                             <InputBox
@@ -161,7 +161,7 @@ const UserSignUp = () => {
                                 id='password'
                                 onChange={handleChange}
                                 icon="fi-rr-key"
-                                value={formData.password}
+                                value={signUpData.password}
                                 errorMessage={validationErrors.password}
                             />                    
                             <InputBox
@@ -172,7 +172,7 @@ const UserSignUp = () => {
                                 id='passwordCheck'
                                 onChange={handleChange}
                                 icon="fi-rr-key"
-                                value={formData.passwordCheck}
+                                value={signUpData.passwordCheck}
                                 errorMessage={validationErrors.passwordCheck}
                             />                         
                             <button
