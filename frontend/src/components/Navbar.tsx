@@ -6,9 +6,9 @@ import UserNavigation from './UserNavigation'
 
 const Navbar = () => {  
     const navPanelRef  = useRef(null);
-    const { currentUser } = useSelector((state:any) => state.user);
-    const accessToken = currentUser ? currentUser.accessToken : null;
-    const profilePic = currentUser ? currentUser.profile_img : null;
+    const { userInfo } = useSelector((state:any) => state.auth);
+    
+    const profilePic = userInfo ? userInfo.profile_img : null;
     const [searchBoxVisibility, setSeachBoxVisibility] = useState<boolean>(false);
     const [isNavPanelVisible, setIsNavPanelVisible] = useState(false);
     const navigate = useNavigate();
@@ -64,7 +64,7 @@ const Navbar = () => {
                         <p>Write</p>
                     </Link>
                     {
-                        accessToken ? (
+                        userInfo ? (
                             <>
                                 <Link to={'/dashboard/notifications'}>
                                     <button className='w-12 h-12 bg-grey rounded-full relative hover:bg-black/10 '>

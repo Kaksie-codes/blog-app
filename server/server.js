@@ -16,6 +16,7 @@ dotenv.config();
 
 //this middleware helps the backend receive json data from the frontend
 server.use(express.json());
+server.use(express.urlencoded({extended: true}));
 
 // Use cookie-parser middleware to parse cookies
 server.use(cookieParser());

@@ -1,5 +1,5 @@
  import { Router } from "express";
- import { verifyToken } from "../middleware/verifyToken.js";
+ import { verifyToken } from "../middleware/auth.middleware.js";
  import { createComment } from "../controllers/comment.controller.js";
 
 // Initialize the router

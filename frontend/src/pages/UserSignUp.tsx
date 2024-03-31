@@ -2,24 +2,27 @@ import { Link, Navigate, useNavigate } from "react-router-dom"
 import InputBox from "../components/InputBox"
 import AnimationWrapper from "../libs/page-animation"
 import { useState } from "react"
-import { signInStart, signInFailure, signInSuccess } from "../redux/user/userSlice"
+import { setCredentials } from "../redux/auth/authSlice"
 import { useDispatch, useSelector } from "react-redux"
 import Oauth from "../components/Oauth"
+// import { toast } from "react-toastify"
+import { toast } from "react-hot-toast"
 
 
-interface FormData {    
-    username: string;
-    email: string;
-    password: string;
-    passwordCheck:string;    
+export interface FormData {    
+    username?: string;
+    email?: string;
+    password?: string;
+    passwordCheck?:string;    
 }
 
 const UserSignUp = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [isLoading, setIsloading] = useState(false)
 
-    const { isLoading, currentUser } = useSelector((state) => state.user);
-    const accessToken = currentUser ? currentUser.accessToken : null;
+    const { userInfo } = useSelector((state:any) => state.auth);
+    
 
     const [formData, setformData] = useState({        
         username: "", 
@@ -45,12 +48,13 @@ const UserSignUp = () => {
         }) 
     }
 
-    const validateForm = () => {        
-        const validationErrors: Partial<FormData> = {};       
+    const validateForm = () => {
+        const validationErrors: Partial<FormData> = {};
         if(!formData.username.trim()){
-            validationErrors.username = 'Username is required'
-        }
-
+            validationErrors.username = 'Username is required';            
+        }else if(formData.username.length < 3){
+            validationErrors.username = 'Username should not be less than three characters';  
+        } 
         if(!formData.email.trim()){
             validationErrors.email = 'Email is required'
         }else if(!emailRegex.test(formData.email)){
@@ -60,7 +64,7 @@ const UserSignUp = () => {
         if(!formData.password.trim()){
             validationErrors.password = 'Password is required'
         }else if(!passwordRegex.test(formData.password)){
-            validationErrors.password = 'Password is invalid'
+            validationErrors.password = 'Password should contain an Uppercase, a lower'
         }
 
         if(!formData.passwordCheck.trim()){
@@ -70,40 +74,54 @@ const UserSignUp = () => {
         }
 
         setValidationErrors(validationErrors as FormData);
+
+         // If there are any validation errors, return false
+         return Object.keys(validationErrors).length === 0;
     }
+   
 
     const handleSubmit = async (e:any) => {
         e.preventDefault();
-        validateForm();
-        dispatch(signInStart());
+        setIsloading(true);
+
+       // Check if the form is valid
+        const isValidForm = validateForm();
+
+        // If the form is not valid, stop form submission
+        if (!isValidForm) {
+            setIsloading(false);
+            return;
+        }
+
+        // console.log('formData >>', formData)
+        setIsloading(true)
         try{ 
             const res = await fetch(`/api/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
-
-            if (!res.ok) {
-                throw new Error('Failed to submit form');
-            }
-
-            const data = await res.json();
-            // if(data.error){
-            //     console.log('data error >>>', data.error);
-            // }
-            console.log(data);            
-            dispatch(signInSuccess(data));
-            navigate('/profile')          
+            const result = await res.json(); 
+            const { user } = result          
+            // console.log('user >>', user); 
+            if(result.success == false){
+                toast.error(result.message);
+                setIsloading(false)  
+            }else{
+                dispatch(setCredentials(user));
+                setIsloading(false)
+                navigate('/profile') 
+            }     
         }catch(err){
             console.log('error >>', err);
-            dispatch(signInFailure(err));
+            setIsloading(false);
         }    
     }
 
   return (
     <>
         {
-            accessToken ? (
+            userInfo ? (
                 <Navigate to={'/'}/>
             ) : (
                 <AnimationWrapper>

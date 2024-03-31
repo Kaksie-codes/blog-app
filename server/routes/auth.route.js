@@ -1,18 +1,55 @@
 import { Router } from 'express';
-import { signupUser, signinUser, signoutUser, googleAuth, getMe } from '../controllers/auth.controller.js';
-import { verifyToken } from '../middleware/verifyToken.js';
+import { 
+    signupUser, 
+    signinUser, 
+    signoutUser, 
+    googleAuth, 
+    generateOTP, 
+    verifyOTP, 
+    resetPassword,
+    resendOTP,
+    adminRoute,  
+    verifyUser  
+} from '../controllers/auth.controller.js';
+// import verifyUser from '../middleware/user.middleware.js';
+import { protect } from '../middleware/auth.middleware.js';
+import isAdmin from '../middleware/admin.middleware.js';
 
 // Initialize the router
 const router = Router();
 
 // Signup
 router.post('/signup', signupUser);
+
 // Signin
 router.post('/signin', signinUser);
+
 // Signout
 router.get('/signout', signoutUser);
+
+// generate OTP
+router.post('/generateOTP', generateOTP);
+
+// verify OTP
+router.post('/verifyOTP', verifyOTP);
+
+// verify OTP
+router.get('/verifyUser', protect, verifyUser);
+
+// Create or Reset Session
+router.get('/resendOTP', resendOTP);
+
 // Google Auth
 router.post('/google-auth', googleAuth);
-router.get('/get', verifyToken,  getMe);
+
+// private routes
+router.post('/resetPassword', protect, resetPassword);
+
+// Admin routes
+router.get('/admin', protect, isAdmin,  adminRoute);
+
+
+
+
 
 export default router;

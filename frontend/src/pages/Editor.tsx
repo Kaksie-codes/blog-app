@@ -15,8 +15,7 @@ const Editor = () => {
   const { editorMode } = useSelector((state:any) => state.blogPost);
   const dispatch = useDispatch();
   
-  const { currentUser } = useSelector((state:any) => state.user);
-  const accessToken = currentUser ? currentUser.accessToken : null;
+  
 
   useEffect(() => {
     if(!blog_id){
@@ -55,10 +54,7 @@ const Editor = () => {
 
   return (
     <>
-    {
-      !accessToken ? (
-        <Navigate to={'/signin'}/>
-      ) : (
+     {      
         isLoading ? (
           <Loader/>
         ) : (
@@ -67,10 +63,8 @@ const Editor = () => {
           ) : (
             <PublishForm/>
           )
-        )
-       
-      )
-    }      
+        ) 
+     }      
     </>
   )
 }

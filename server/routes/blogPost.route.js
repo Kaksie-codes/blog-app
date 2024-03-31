@@ -7,13 +7,13 @@ import {
     searchBlogPosts, 
     getBlogPost, 
     likeBlogPost } from '../controllers/blogPost.controller.js';
-import { verifyToken1, verifyToken } from '../middleware/verifyToken.js';
+import { verifyToken, protect } from '../middleware/auth.middleware.js';
 
 // Initialize the router
 const router = Router();
 
 // Create Post
-router.post('/create-post', verifyToken1, createBlog);
+router.post('/create-post', protect, createBlog);
 router.post('/latest-blogs', getLatestBlogPosts);
 router.get('/trending-blogs', getTrendingBlogs);
 router.post('/search-blogs', searchBlogPosts);
