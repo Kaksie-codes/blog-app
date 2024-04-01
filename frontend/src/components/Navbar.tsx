@@ -10,6 +10,8 @@ const Navbar = () => {
     const { userInfo } = useSelector((state:any) => state.auth);
     
     const profilePic = userInfo ? userInfo.profile_img : null;
+    const username = userInfo ? userInfo.username : null;
+    const fullname = userInfo ? userInfo.fullname : null;
     const [searchBoxVisibility, setSeachBoxVisibility] = useState<boolean>(false);
     const [isNavPanelVisible, setIsNavPanelVisible] = useState(false);
     const navigate = useNavigate();
@@ -22,8 +24,19 @@ const Navbar = () => {
         if (!(e.target as HTMLElement).classList.contains('nav__toggle')) {
             setIsNavPanelVisible(false);
         }
+      }
+    };
+
+    function capitalizeFirstLetter(name:string) {
+        // Check if the string is not empty
+        if (name && name.length > 0) {
+            // Extract the first character, capitalize it, and concatenate with the rest of the string
+            return name.charAt(0).toUpperCase()
+        } else {
+            // Return an empty string or handle the case when the input is empty
+            return '';
+        }
     }
-};
 
 
     const handleSearch = (e:any) => {
@@ -74,11 +87,27 @@ const Navbar = () => {
                                         <i className='fi fi-rr-bell text-2xl flex items-center justify-center'></i>
                                     </button>
                                 </Link>
-                                <div className="relative nav__toggle" onClick={() => setIsNavPanelVisible(!isNavPanelVisible)} ref={navPanelRef}>
-                                    <button className='w-12 h-12 mt-1 '>
-                                        <img
-                                            src={profilePic} alt="profile image" className='rounded-full h-full w-full object-cover cursor-pointer' />
-                                    </button>
+                                <div className="relative nav__toggle cursor-pointer" onClick={() => setIsNavPanelVisible(!isNavPanelVisible)} ref={navPanelRef}>
+                                    <div className='w-12 h-12 mt-1'>
+                                        {
+                                            profilePic.length ? (
+                                                <img
+                                                    src={profilePic} alt="profile image" className='rounded-full h-full w-full object-cover cursor-pointer'
+                                                />
+                                            ) : (
+                                                fullname && fullname.length ? (
+                                                    <div className='h-full w-full mt-1 rounded-full border-[2px] border-blue text-2xl font-bold flex items-center justify-center'>
+                                                        {capitalizeFirstLetter(fullname)}
+                                                    </div>
+                                                ) : (
+                                                    <div className='h-full w-full mt-1 rounded-full border-[2px] border-blue text-2xl font-bold flex items-center justify-center'>
+                                                        {capitalizeFirstLetter(username)}
+                                                    </div>
+                                                )
+                                                
+                                            )
+                                        }
+                                    </div>                                    
                                     {isNavPanelVisible && <UserNavigation/>}
                                 </div>
                             </>

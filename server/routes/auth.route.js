@@ -9,7 +9,8 @@ import {
     resetPassword,
     resendOTP,
     adminRoute,  
-    verifyUser  
+    verifyUser,
+    resendVerificationEmail  
 } from '../controllers/auth.controller.js';
 // import verifyUser from '../middleware/user.middleware.js';
 import { protect } from '../middleware/auth.middleware.js';
@@ -32,6 +33,8 @@ router.post('/generateOTP', generateOTP);
 
 // verify OTP
 router.post('/verifyOTP', verifyOTP);
+
+router.get('/resendVerificationMail', protect, resendVerificationEmail);
 
 // verify OTP
 router.get('/verifyUser', protect, verifyUser);

@@ -184,7 +184,7 @@
     @apply text-[18px] text-white bg-black p-4 !important;
 }
 
-.spin-button::-webkit-outer-spin-button,
+/* .spin-button::-webkit-outer-spin-button,
 .spin-button::-webkit-inner-spin-button{
     appearance: none;
-}
+} */

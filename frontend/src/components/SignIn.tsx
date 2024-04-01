@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { setCredentials, setAuthPageMode } from "../redux/auth/authSlice";
 import toast from "react-hot-toast";
-import { FormData } from "../pages/UserSignUp";
 import Oauth from "./Oauth";
 import InputBox from "./InputBox";
 import AnimationWrapper from "../libs/page-animation";
+import { FormData } from "../pages/UserAuth";
 
 
 const SignIn = () => {
@@ -98,15 +98,14 @@ const handleSubmit = async (e: any) => {
             userInfo ? (
                 <Navigate to={'/'}/>
             ) : (
-                <div className="w-[50%]">
+                <div className={`"w-full lg:w-[50%]  ${authPageMode == 'sign-in' ? 'block' : 'hidden'} lg:block`}>
                     <AnimationWrapper>
                         <div className="">
                             <form className="" >
                                 <h1 className="text-4xl mb-3 font-gelasio capitalize text-center">
                                     Welcome back
                                 </h1>
-                                <InputBox
-                                    classNames={`bg-grey border-grey focus:bg-transparent`}
+                                <InputBox                                    
                                     name="email"
                                     type='email'
                                     placeholder="Email"
@@ -116,8 +115,7 @@ const handleSubmit = async (e: any) => {
                                     value={signInData.email}
                                     errorMessage={validationErrors.email}
                                 />
-                                <InputBox
-                                    classNames={``}
+                                <InputBox                                    
                                     name="password"
                                     type='password'
                                     placeholder="Password"
@@ -146,7 +144,7 @@ const handleSubmit = async (e: any) => {
                             <p className="text-center w-full mt-2">
                                 <Link
                                     className=" text-black text-xl underline "
-                                    to={'/forgot-password'}>
+                                    to={'/reset-password'}>
                                     Forgot Password
                                 </Link>
                             </p>

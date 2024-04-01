@@ -11,7 +11,7 @@ const userSchema = new Schema({
             type: String,
             lowercase: true,
             required: false,
-            minlength: [3, 'fullname must be 3 letters long'],
+            // minlength: [3, 'fullname must be 3 letters long'],
         },
         username: {
             type: String,
@@ -33,9 +33,10 @@ const userSchema = new Schema({
         },
         profile_img: {
             type: String,
-            default: () => {
-                return `https://api.dicebear.com/6.x/${profile_imgs_collections_list[Math.floor(Math.random() * profile_imgs_collections_list.length)]}/svg?seed=${profile_imgs_name_list[Math.floor(Math.random() * profile_imgs_name_list.length)]}`
-            } 
+            default: '',
+            // default: () => {
+            //     return `https://api.dicebear.com/6.x/${profile_imgs_collections_list[Math.floor(Math.random() * profile_imgs_collections_list.length)]}/svg?seed=${profile_imgs_name_list[Math.floor(Math.random() * profile_imgs_name_list.length)]}`
+            // } 
         },
     },
     social_links: {

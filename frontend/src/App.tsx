@@ -1,8 +1,6 @@
 import './App.css'
 import Navbar from './components/Navbar'
 import { Routes, Route } from 'react-router-dom'
-import UserSignIn from './pages/UserAuth'
-import UserSignUp from './pages/UserSignUp'
 import Profile from './pages/Profile'
 import Editor from './pages/Editor'
 import Home from './pages/Home'
@@ -17,7 +15,6 @@ import PrivatePage from './pages/PrivatePage'
 import OnlyAdminPrivateRoutes from './components/OnlyAdminPrivateRoutes'
 import AdminDashboard from './pages/AdminDashboard'
 import ForgotPassword from './pages/ForgotPassword'
-import ResetPassword from './pages/OTPS'
 import VerifyUser from './pages/VerifyUser'
 import UserAuth from './pages/UserAuth'
 
@@ -32,9 +29,7 @@ function App() {
         <Route path='/' element={<Navbar/>}>
           <Route index element={<Home/>}/>
           
-          {/* <Route path='signup' element={<UserSignUp/>}/> */}
-          <Route path='forgot-password' element={<ForgotPassword/>}/>
-          <Route path='reset-password' element={<ResetPassword/>}/>          
+          {/* <Route path='signup' element={<UserSignUp/>}/> */} 
           <Route path='profile' element={<Profile/>}/> 
           <Route path='search/:query' element={<Search/>}/>
           <Route path='blogs/:blog_id' element={<BlogPage/>}/> 
@@ -55,6 +50,8 @@ function App() {
         </Route>
 
         <Route path='/auth' element={<UserAuth/>}/>
+        <Route path='reset-password' element={<ForgotPassword/>}/>
+        
                 {/*Protected Routes  */}
         <Route path='' element={<PrivateRoute/>}>
           <Route path='/editor' element={<Editor/>}/> 

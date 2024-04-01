@@ -8,13 +8,16 @@ export interface CurrentUser{
 
 interface UserState {
     userInfo: CurrentUser | null; 
-    authPageMode: string 
+    authPageMode: string;
+    resetPageMode: string;
+    verified: boolean;
 }
 
 const initialState: UserState = {
     userInfo:null,
-    authPageMode: 'sign-in'
-    
+    authPageMode: 'sign-in',
+    resetPageMode: 'input-email',  
+    verified: false
 }
 
 const authSlice = createSlice({
@@ -29,9 +32,15 @@ const authSlice = createSlice({
         },
         setAuthPageMode: (state, action) => {
             state.authPageMode = action.payload
-        }
+        },
+        setResetPageMode: (state, action) => {
+            state.resetPageMode = action.payload
+        },
+        setVerificationStatus: (state, action) => {
+            state.verified = action.payload
+        },
     }
 })
 
-export const { setCredentials, signOut, setAuthPageMode } = authSlice.actions
+export const { setCredentials, signOut, setAuthPageMode, setResetPageMode, setVerificationStatus } = authSlice.actions
 export default authSlice.reducer

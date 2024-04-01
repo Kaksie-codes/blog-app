@@ -6,8 +6,7 @@ const InputBox = ({
   // id, 
   onChange,
   value, 
-  placeholder,
-  classNames,
+  placeholder,  
   icon,
   errorMessage
 } : {
@@ -16,8 +15,7 @@ const InputBox = ({
   // id: any,
   onChange: any,
   value:any,
-  placeholder:string,
-  classNames:string,
+  placeholder:string, 
   icon:string,
   errorMessage?:string
 }) => {
@@ -33,7 +31,7 @@ const InputBox = ({
             // id={id}
             onChange={onChange}
             value={value}
-            className={` ${errorMessage?.length ? 'border-red' : 'border-grey'} bg-grey focus:bg-transparent ${type === 'password' ? 'pr-12' : ''} w-[100%] rounded-md p-4  pl-12 border placeholder:text-black`}
+            className={`w-full ${errorMessage?.length ? 'border-red' : 'border-grey'} bg-grey focus:bg-transparent ${type === 'password' ? 'pr-12' : ''} w-[100%] rounded-md p-4  pl-12 border placeholder:text-black`}
             />
             <i className={`fi ${icon} absolute input-icon`}></i>
           {

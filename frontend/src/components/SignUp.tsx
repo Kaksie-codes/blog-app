@@ -1,21 +1,19 @@
-import { Link, Navigate, useNavigate } from "react-router-dom"
+import { Navigate } from "react-router-dom"
 import AnimationWrapper from "../libs/page-animation"
 import InputBox from "./InputBox"
-import { setAuthPageMode, setCredentials } from "../redux/auth/authSlice";
-import { toast } from "react-toastify";
+import { setAuthPageMode, setCredentials, signOut } from "../redux/auth/authSlice";
+// import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { useState } from "react";
-import { FormData } from "../pages/UserSignUp";
+import { FormData } from "../pages/UserAuth"; 
 import { useDispatch, useSelector } from "react-redux";
 import Oauth from "./Oauth";
 
 
-const SignUp = () => {
-    const navigate = useNavigate();
+const SignUp = () => {    
     const dispatch = useDispatch();
-    const [isLoading, setIsloading] = useState(false)
-
-    const { userInfo } = useSelector((state:any) => state.auth);
-    
+    const [isLoading, setIsloading] = useState(false);
+    const { userInfo, verified, authPageMode } = useSelector((state:any) => state.auth);    
 
     const [signUpData, setSignUpData] = useState({        
         username: "", 
@@ -95,15 +93,24 @@ const SignUp = () => {
                 body: JSON.stringify(signUpData),
             });
             const result = await res.json(); 
-            const { user } = result          
+            const { user, success, message } = result          
             // console.log('user >>', user); 
-            if(result.success == false){
-                toast.error(result.message);
-                setIsloading(false)  
+            if(success == false){
+                toast.error(message);
+                setIsloading(false); 
             }else{
-                dispatch(setCredentials(user));
-                setIsloading(false)
-                navigate('/profile') 
+                toast.success(message)                
+                setIsloading(false);
+                setSignUpData({        
+                    username: "", 
+                    email:"", 
+                    password:"", 
+                    passwordCheck:""}) 
+                setTimeout(() => {
+                    dispatch(setCredentials(user));                    
+                    dispatch(signOut());
+                    dispatch(setAuthPageMode('sign-in'));
+                }, 3000)               
             }     
         }catch(err){
             console.log('error >>', err);
@@ -113,19 +120,17 @@ const SignUp = () => {
   return (
     <>
         {
-            userInfo ? (
+            userInfo && verified ? (
                 <Navigate to={'/'}/>
             ) : (
-                <div className="w-[50%]">
+                <div className={`lg:w-[50%] lg:block ${authPageMode == 'sign-up' ? 'block' : 'hidden'}`}>
                     <AnimationWrapper>
-                    
                         <div className="">
                             <form className="" onSubmit={handleSubmit}>
                                 <h1 className="text-4xl mb-3 font-gelasio capitalize text-center">
                                     Create Account
                                 </h1>
-                                <InputBox
-                                    classNames={`bg-grey ${validationErrors.username ? 'border-[#ff3860]' : 'border-grey'} focus:bg-transparent`}
+                                <InputBox                                  
                                     name="username"
                                     type='text'
                                     placeholder="Username"
@@ -135,8 +140,7 @@ const SignUp = () => {
                                     value={signUpData.username}
                                     errorMessage={validationErrors.username}
                                 />
-                                <InputBox
-                                    classNames={`bg-grey ${validationErrors.email ? 'border-[#ff3860]' : 'border-grey'} focus:bg-transparent`}
+                                <InputBox                                    
                                     name="email"
                                     type='email'
                                     placeholder="Email"
@@ -146,8 +150,7 @@ const SignUp = () => {
                                     value={signUpData.email}
                                     errorMessage={validationErrors.email}
                                 />
-                                <InputBox
-                                    classNames={`bg-grey ${validationErrors.password ? 'border-[#ff3860]' : 'border-grey'} focus:bg-transparent`}
+                                <InputBox                                    
                                     name="password"
                                     type='password'
                                     placeholder="Password"
@@ -157,8 +160,7 @@ const SignUp = () => {
                                     value={signUpData.password}
                                     errorMessage={validationErrors.password}
                                 />
-                                <InputBox
-                                    classNames={`bg-grey ${validationErrors.passwordCheck ? 'border-[#ff3860]' : 'border-grey'} focus:bg-transparent`}
+                                <InputBox                                   
                                     name="passwordCheck"
                                     type='password'
                                     placeholder="Confirm Password"

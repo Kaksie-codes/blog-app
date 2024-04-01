@@ -5,7 +5,6 @@ import ResetOTP from '../models/resetOTP.model.js';
 import jwt from 'jsonwebtoken';
 import handleError from '../utils/error.js';
 import generateToken from '../utils/generateToken.js';
-import otpGenerator from 'otp-generator'
 import { generateAndSendPasswordResetOTP, sendVerificationEmail } from '../utils/mail.js'
 import crypto from 'crypto'
 
@@ -57,7 +56,8 @@ const signupUser = async (req, res, next) => {
         const newUser = new User({
             personal_info:{            
                 username,
-                email, 
+                email,
+                fullname: '', 
                 password: hashedPassword            
             }        
         });
@@ -65,20 +65,23 @@ const signupUser = async (req, res, next) => {
         await newUser.save();
              
 
-        const { personal_info: { username:user_username, email:user_email, profile_img}, role, _id} = newUser
+        const { personal_info: { username:user_username, email:user_email, profile_img}, role, _id, verified} = newUser
 
         generateToken(res, _id);
 
         await sendVerificationEmail(newUser);   
 
         return res.status(200).json({
+            success: true,
             status: 'verification pending', 
+            statusCode:200,
             message: `verification link sent to your email'`,
             user:{
                 username: user_username,                
                 profile_img, 
                 userId:_id,
-                role
+                role,
+                verified
             },            
         })         
     }catch(error){
@@ -89,8 +92,43 @@ const signupUser = async (req, res, next) => {
     }    
 }
 
+// @desc Login a User
+// @route GET /api/auth/resendVerificationMail
+// @access Public
+const resendVerificationEmail = async (req, res, next) => {
+try {
+    const { _id: userId } = req.user; 
 
+    // check if user exists
+    const user = await User.findById(userId);
 
+    if(!user){
+       return  next(handleError(403, 'User dosent exist'))
+    }
+    generateToken(res, userId);
+
+    await sendVerificationEmail(user); 
+
+    const { personal_info: { username:user_username, email:user_email, profile_img}, role, _id, verified} = user
+
+    return res.status(200).json({
+        success: true,
+        status: 'verification pending', 
+        statusCode:200,
+        message: `verification link sent to your email'`,
+        user:{
+            username: user_username,                
+            profile_img, 
+            userId:_id,
+            role,
+            verified
+        },            
+    })         
+
+}catch(error){
+    return next(error);
+}
+}
 
 // @desc Login a User
 // @route POST /api/auth/signup
@@ -186,7 +224,11 @@ const resetPassword = async (req, res, next) => {
         // Clear JWT cookie
         res.clearCookie('jwt');
 
-        res.status(200).json({ status: 'SUCCESS', message: 'Password reset successfully.' })
+        res.status(200).json({ 
+            success: true,
+            statusCode: 200, 
+            message: 'Password reset successfully.' 
+        })
     } catch (error) {
         return next(error)        
     }
@@ -212,13 +254,14 @@ const generateOTP = async (req, res, next) => {
             await generateAndSendPasswordResetOTP(user);
         }
         return res.status(200).json({
+            success: true,
             status:'SUCCESS',
-            status:'Password reset OTP sent to user',
+            message:'Password reset OTP sent to user',
         })        
     } catch (error) {
         return next(error);        
     }
-}
+} 
 
 
 // @desc Verify OTP
@@ -226,15 +269,15 @@ const generateOTP = async (req, res, next) => {
 // @access Public
 const verifyOTP = async (req, res, next) => {    
     try {
-        let { userId, OTP } = req.body
+        let { email, OTP } = req.body
 
         // Check if user provided details
-        if(!userId || !OTP){
+        if(!email || !OTP){
             return next(handleError(403, 'Empty OTP details are not allowed'));
         }
 
        // Find the user based on the userId
-        const user = await User.findById(userId);
+        const user = await User.findOne({"personal_info.email": email});
 
         // User doesn't exist
         if(!user){
@@ -242,7 +285,7 @@ const verifyOTP = async (req, res, next) => {
         }
 
         // If User exists in database, check for the userId in the ResetOTP collections
-        const userVerificationRecords = await ResetOTP.findOne({owner:userId});
+        const userVerificationRecords = await ResetOTP.findOne({owner: user._id});
 
         if(!userVerificationRecords){
             //no record found
@@ -252,7 +295,7 @@ const verifyOTP = async (req, res, next) => {
             const { expiresAt, OTP:savedOTP } = userVerificationRecords;
             if(expiresAt < Date.now()){
                 // User OTP record has expired, delete ResetOTP
-                await ResetOTP.deleteMany({owner:userId});
+                await ResetOTP.deleteMany({owner:user._id});
                 return next(handleError(403, 'OTP has expired. Please request again.'))
             }else{
                 // compare generated OTP to the hashed OTP in th database
@@ -262,22 +305,19 @@ const verifyOTP = async (req, res, next) => {
                     return next(handleError(403, 'Invalid code passed, check your inbox.'))
                 }else{
                     // success valid OTP
-                    const verifiedUser = await User.findOneAndUpdate({_id: userId}, { verified: true});
+                    const verifiedUser = await User.findOneAndUpdate({_id: user._id}, { verified: true});
 
                     //  delete the VerificationOTP
-                    await ResetOTP.deleteMany({owner:userId});
+                    await ResetOTP.deleteMany({owner:user._id});
 
                     // Upon successful OTP verification, generate and store the JWT token in cookies
-                    generateToken(res, userId);
-                    const {personal_info: {username, email, profile_img}, role} = verifiedUser;
+                    generateToken(res, user._id);
+                    // const {personal_info: {username,  profile_img}, role} = verifiedUser;
                     return res.status(200).json({
-                        status: 'Success', 
-                        message: `user '${username}' with email '${email}' was successfully VERIFIED`,                
-                        user:{
-                            username,                                           
-                            profile_img,
-                            role
-                        }                
+                        success: true, 
+                        statusCode: 200,
+                        message: `OTP was successfully VERIFIED`,            
+                                 
                     })     
                 }
             }
@@ -399,7 +439,11 @@ const verifyUser = async (req, res, next) => {
         // Delete verification token from the database
         await VerificationToken.deleteOne({ owner: userId  });
 
-        return res.status(200).json({ success: true, message: 'User successfully verified' });
+        return res.status(200).json({ 
+            success: true, 
+            message: 'User successfully verified',
+            userId
+         });
     } catch (error) {
         return next(error);
     }
@@ -415,5 +459,6 @@ export  {
     resendOTP,
     adminRoute,
     resetPassword,
-    verifyUser
+    verifyUser,
+    resendVerificationEmail
 }

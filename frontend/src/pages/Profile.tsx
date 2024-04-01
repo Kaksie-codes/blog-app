@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import AnimationWrapper from "../libs/page-animation";
 import Loader from "../components/Loader";
 import { useSelector } from "react-redux";
@@ -68,7 +68,7 @@ const Profile = () => {
   const { social_links , joinedAt }  = profile
   const { _id: userId } = profile;
   const activeTabRef = useRef<HTMLButtonElement>(null);
-  const { currentUser: {username} } = useSelector((state:any) => state.user);  
+  const { userInfo: {username} } = useSelector((state:any) => state.auth);  
  
 
   const getProfile = async() => {
