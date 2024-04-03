@@ -1,5 +1,4 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
-import userReducer from './user/userSlice'
 import blogPostReducer from './blogpost/blogPostSlice'
 import authReducer from './auth/authSlice'
 import { persistReducer, persistStore } from 'redux-persist'
@@ -11,10 +10,9 @@ export type RootState = ReturnType<typeof rootReducer>;
 // Define dispatch function type
 export type AppDispatch = typeof store.dispatch;
 
-const rootReducer = combineReducers({
-    user: userReducer,
+const rootReducer = combineReducers({ 
+    auth: authReducer,
     blogPost: blogPostReducer,
-    auth: authReducer
 })
 
 const persistConfig = {

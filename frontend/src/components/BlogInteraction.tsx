@@ -13,18 +13,18 @@ const BlogInteraction = ({
 }) => {
     // const { blog_id } = useParams();
     let {activity: { total_comments, total_likes}, _id } = blog;
-    let { title, blog_id:blogId } = blog;
-    let { author : {personal_info: { username:author_username }}} = blog;
+    let { title, slug } = blog;
+    let { author : {personal_info: { username: author_username }}} = blog;
     // const { currentUser: { username, accessToken} } = useSelector((state:any) => state.user);
-    const { currentUser } = useSelector((state: any) => state.user);
-    const username = currentUser ? currentUser.username : ''; 
-    const accessToken = currentUser ? currentUser.accessToken : ''; 
+    const { userInfo } = useSelector((state: any) => state.auth);
+    const username = userInfo ? userInfo.username : ''; 
+    // const accessToken = currentUser ? currentUser.accessToken : ''; 
     const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
     const [likesCount, setLikesCount] = useState(total_likes)
 
     //  console.log('_id >>>', _id)
     const handleLike = async () => {
-        if (!accessToken) {
+        if (!userInfo) {
             toast.error("Please log in to like this post");
             return;
         }else{
@@ -67,7 +67,7 @@ const BlogInteraction = ({
     }
 
     useEffect(() => {
-        if(accessToken){
+        if(userInfo){
             getLikesCount()
         }        
     }, [])
@@ -97,7 +97,7 @@ const BlogInteraction = ({
             </div>
             <div className="flex gap-6 items-center justify-center">
                 {
-                    username == author_username && <Link to={`/editor/${blogId}`} className="underline hover:text-purple">Edit</Link>
+                    username == author_username && <Link to={`/editor/${slug}`} className="underline hover:text-purple">Edit</Link>
                 }
                 <Link to={`https://twitter.com/intent/tweet?text=Read ${title}&url=${location.href}`} target="_blank">
                     <i className="fi fi-brands-twitter text-xl hover:text-twitter"></i>

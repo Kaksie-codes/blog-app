@@ -28,7 +28,7 @@ const SignIn = () => {
     })   
 
     const handleChange = (e:any) => {        
-        const { value, id, name } = e.target;
+        const { value, name } = e.target;
         setSignInData({            
             ...signInData,
             [name]: value.trim()                 
@@ -98,10 +98,10 @@ const handleSubmit = async (e: any) => {
             userInfo ? (
                 <Navigate to={'/'}/>
             ) : (
-                <div className={`"w-full lg:w-[50%]  ${authPageMode == 'sign-in' ? 'block' : 'hidden'} lg:block`}>
+                <div className={` w-full lg:w-[50%]  ${authPageMode == 'sign-in' ? 'block' : 'hidden'} lg:block`}>
                     <AnimationWrapper>
-                        <div className="">
-                            <form className="" >
+                        <div className="flex flex-col items-center">
+                            <form className="w-full" >
                                 <h1 className="text-4xl mb-3 font-gelasio capitalize text-center">
                                     Welcome back
                                 </h1>
@@ -139,7 +139,7 @@ const handleSubmit = async (e: any) => {
                             <div className="relative w-full my-4 flex items-center gap-2 opacity-10 uppercase text-black font-bold">
                                     <hr className="w-1/2 border-black"/>
                                     <hr className="w-1/2 border-black"/>
-                            </div>
+                            </div> 
                             <Oauth/>
                             <p className="text-center w-full mt-2">
                                 <Link
@@ -148,7 +148,7 @@ const handleSubmit = async (e: any) => {
                                     Forgot Password
                                 </Link>
                             </p>
-                            <p className="mt-4 text-dark-grey text-xl text-center md:hidden">
+                            <p className="mt-4 text-dark-grey text-xl text-center lg:hidden">
                                 Don't have an account ?
                                 <button 
                                     className="underline text-black text-xl ml-1"

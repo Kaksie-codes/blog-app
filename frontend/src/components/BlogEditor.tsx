@@ -109,7 +109,7 @@ const BlogEditor = () => {
                 <form>
                     <Toaster/>
                     <UploadBanner                       
-                    />
+                    /> 
                     <textarea
                         placeholder="Blog Title"
                         value={title}
@@ -128,6 +128,7 @@ const BlogEditor = () => {
                         modules={modules}
                         formats={formats}
                         onChange={(value) => dispatch(setBlogContent(value))}
+                        // onChange={(value) => console.log('content >>',value)}
                     />                   
                 </form>
                 <BlogViewer/>

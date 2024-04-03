@@ -34,9 +34,11 @@ const InputBox = ({
             className={`w-full ${errorMessage?.length ? 'border-red' : 'border-grey'} bg-grey focus:bg-transparent ${type === 'password' ? 'pr-12' : ''} w-[100%] rounded-md p-4  pl-12 border placeholder:text-black`}
             />
             <i className={`fi ${icon} absolute input-icon`}></i>
-          {
-            type === 'password' && <i className={`"fi ${passwordVisible ? 'fi-rr-eye' : 'fi-rr-eye-crossed'} input-icon left-[auto] right-4 cursor-pointer"`} onClick={() => setPassWordVisible(!passwordVisible)}></i>
-          }
+          <div className="cursor-pointer">
+            {
+              type === 'password' && <i className={`"fi ${passwordVisible ? 'fi-rr-eye' : 'fi-rr-eye-crossed'} input-icon left-[auto] right-4 cursor-pointer"`} onClick={() => setPassWordVisible(!passwordVisible)}></i>
+            }
+          </div>
       </div>
       {errorMessage && <p className="text-[#ff3860] absolute -bottom-[2px]">{errorMessage}</p>}
     </div>

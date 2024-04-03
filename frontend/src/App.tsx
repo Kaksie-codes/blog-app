@@ -32,11 +32,11 @@ function App() {
           {/* <Route path='signup' element={<UserSignUp/>}/> */} 
           <Route path='profile' element={<Profile/>}/> 
           <Route path='search/:query' element={<Search/>}/>
-          <Route path='blogs/:blog_id' element={<BlogPage/>}/> 
+          <Route path='blogs/:slug' element={<BlogPage/>}/> 
+          <Route path='users/:id/verify/:token' element={<VerifyUser/>}/>
 
                    {/*Protected Routes  */}
-          <Route path='' element={<PrivateRoute/>}>
-            <Route path='verify/:token' element={<VerifyUser/>}/>
+          <Route path='' element={<PrivateRoute/>}>             
             <Route path='private' element={<PrivatePage/>}/>
             <Route path='users/:id' element={<Profile/>}/> 
           </Route>
@@ -55,7 +55,7 @@ function App() {
                 {/*Protected Routes  */}
         <Route path='' element={<PrivateRoute/>}>
           <Route path='/editor' element={<Editor/>}/> 
-          <Route path='/editor/:blog_id' element={<Editor/>}/> 
+          <Route path='/editor/:slug' element={<Editor/>}/> 
         </Route>
         
       </Routes>

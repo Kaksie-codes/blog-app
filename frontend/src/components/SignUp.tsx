@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom"
 import AnimationWrapper from "../libs/page-animation"
 import InputBox from "./InputBox"
-import { setAuthPageMode, setCredentials, signOut } from "../redux/auth/authSlice";
+import { setAuthPageMode } from "../redux/auth/authSlice";
 // import { toast } from "react-toastify";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
@@ -73,6 +73,7 @@ const SignUp = () => {
 
     const handleSubmit = async (e:any) => {
         e.preventDefault();
+        // dispatch(signOut());
         setIsloading(true);
 
        // Check if the form is valid
@@ -93,7 +94,7 @@ const SignUp = () => {
                 body: JSON.stringify(signUpData),
             });
             const result = await res.json(); 
-            const { user, success, message } = result          
+            const { success, message } = result          
             // console.log('user >>', user); 
             if(success == false){
                 toast.error(message);
@@ -106,9 +107,7 @@ const SignUp = () => {
                     email:"", 
                     password:"", 
                     passwordCheck:""}) 
-                setTimeout(() => {
-                    dispatch(setCredentials(user));                    
-                    dispatch(signOut());
+                setTimeout(() => {                      
                     dispatch(setAuthPageMode('sign-in'));
                 }, 3000)               
             }     
@@ -117,16 +116,17 @@ const SignUp = () => {
             setIsloading(false);
         }    
     }
+
   return (
     <>
         {
             userInfo && verified ? (
                 <Navigate to={'/'}/>
             ) : (
-                <div className={`lg:w-[50%] lg:block ${authPageMode == 'sign-up' ? 'block' : 'hidden'}`}>
+                <div className={`lg:w-[50%] lg:block w-full ${authPageMode == 'sign-up' ? 'block' : 'hidden'}`}>
                     <AnimationWrapper>
-                        <div className="">
-                            <form className="" onSubmit={handleSubmit}>
+                        <div className="text-center flex flex-col items-center">
+                            <form className="w-full" onSubmit={handleSubmit}>
                                 <h1 className="text-4xl mb-3 font-gelasio capitalize text-center">
                                     Create Account
                                 </h1>
@@ -143,7 +143,7 @@ const SignUp = () => {
                                 <InputBox                                    
                                     name="email"
                                     type='email'
-                                    placeholder="Email"
+                                    placeholder="Email" 
                                     // id='email'
                                     onChange={handleChange}
                                     icon="fi-rr-envelope"
@@ -173,7 +173,7 @@ const SignUp = () => {
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="btn-dark center mt-3"
+                                    className={`${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'} btn-dark center mt-3`}
                                 >
                                     {isLoading ? <span  className="animate-pulse">Signing up...</span> : <span>Sign up</span>}
                     
@@ -184,7 +184,7 @@ const SignUp = () => {
                                     <hr className="w-1/2 border-black"/>
                             </div>
                             <Oauth/>
-                            <p className=" text-dark-grey text-xl mt-4 text-center md:hidden">                                
+                            <p className=" text-dark-grey text-xl mt-4 text-center lg:hidden">                                
                                 Already a member ?
                                 <button 
                                     className="underline text-black text-xl ml-1"

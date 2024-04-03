@@ -62,27 +62,17 @@ const signupUser = async (req, res, next) => {
             }        
         });
 
+        // save the user
         await newUser.save();
-             
-
-        const { personal_info: { username:user_username, email:user_email, profile_img}, role, _id, verified} = newUser
-
-        generateToken(res, _id);
-
+        
+        // send verification link to the user
         await sendVerificationEmail(newUser);   
 
         return res.status(200).json({
             success: true,
             status: 'verification pending', 
             statusCode:200,
-            message: `verification link sent to your email'`,
-            user:{
-                username: user_username,                
-                profile_img, 
-                userId:_id,
-                role,
-                verified
-            },            
+            message: `verification link sent to your email'`,                     
         })         
     }catch(error){
         if(error.code === 11000){
@@ -93,11 +83,11 @@ const signupUser = async (req, res, next) => {
 }
 
 // @desc Login a User
-// @route GET /api/auth/resendVerificationMail
+// @route GET /api/auth/resendVerificationMail/:id
 // @access Public
 const resendVerificationEmail = async (req, res, next) => {
 try {
-    const { _id: userId } = req.user; 
+    const { id: userId } = req.params; 
 
     // check if user exists
     const user = await User.findById(userId);
@@ -142,17 +132,25 @@ const signinUser = async (req, res, next) => {
         if(!user){
             return next(handleError(400, "User not found" ));            
         }
-
+     
+        
         //check if the user is not signed in with google
         if(!user.google_auth){
+            
+            const { verified } = user
+
+            if(!verified){
+                // Check if user is verified
+                await sendVerificationEmail(user); 
+                return next(handleError(403, "User not Verified, verification link sent to your email" ));   
+            }
+
             // comapare new password with encrypted password
             const validated = await bcrypt.compare(password, user.personal_info.password);
 
             // If passwords dont match
             if(!validated){
                 return next(handleError(403, "Wrong Credentials" ));                 
-            }else{
-                
             }
     
             // generate Access Token 
@@ -161,8 +159,9 @@ const signinUser = async (req, res, next) => {
            const { personal_info: { username, fullname, profile_img}, role } = user
             // const expiryTime = new Date(Date.now() + 360000) //1 hour
             return res.status(200).json({
+                success: true,
                 status: 'Success', 
-                message: `user '${username}' with email '${email}' was successfully logged in`,                
+                message: `Successfully signed in`,                
                 user:{
                     username, 
                     fullname,               
@@ -170,7 +169,9 @@ const signinUser = async (req, res, next) => {
                     role
                 }                
             })            
-        }  
+        }else{
+            return next(handleError(403, "Already registered using Google" )); 
+        } 
     }catch(error){
         return next(error);
     }
@@ -360,14 +361,25 @@ const googleAuth = async (req, res, next) => {
             // Check if the existing user was not signed up with Google
             if (!user.google_auth) {
                 next(handleError(403, "This email was signed up without Google. Please log in with password to access the account"));
-            }else{
-                //generate Access Token
-                const accessToken = jwt.sign({id: user._id}, process.env.SECRET_ACCESS_KEY);
+            }else{    
+                const {_id:userId, personal_info: {username, profile_img, fullname}, role } = user            
+                 // generate an access token
+                generateToken(res, userId);
                 
-                const expiryTime = new Date(Date.now() + 360000) //1 hour
-
-                // Respond with the user information and access token
-                return res.cookie('access_token', accessToken, { httpOnly: true, expires: expiryTime }).status(200).json(formatDataToSend(user));
+                 // Respond with the user information
+                return res.status(200).json({
+                    success: true,
+                    
+                    statusCode:200,
+                    message: `Successfully Signed in'`,
+                    user:{
+                        username,                
+                        profile_img, 
+                        userId,
+                        fullname,
+                        role,                
+                    },            
+                }) 
             }            
         } else {
             // If user does not exist, create a new user with Google authentication            
@@ -378,21 +390,32 @@ const googleAuth = async (req, res, next) => {
                     fullname: name,
                     username,
                     email,
-                    profile_img: photo
+                    profile_img: photo,
+                    role: 'user',
                 },
-                google_auth: true
+                google_auth: true,
+                verified: true
             });
 
             // Save the new user to the database
             await user.save();
+            const {_id:userId, role } = user;
 
-        //generate Access Token
-        const accessToken = jwt.sign({id: user._id}, process.env.SECRET_ACCESS_KEY);
+            // generate an access token
+            generateToken(res, userId);
         
-        const expiryTime = new Date(Date.now() + 360000) //1 hour
-
         // Respond with the user information
-        return res.cookie('access_token', accessToken, { httpOnly: true, expires: expiryTime }).status(200).json(formatDataToSend(user));
+        return res.status(200).json({
+            success: true,            
+            statusCode:200,
+            message: `Successfully Signed Up'`,
+            user:{
+                username,                
+                profile_img:photo, 
+                userId,
+                role,                
+            },            
+        })         
         }        
     } catch (error) {
         next(error);        
@@ -404,20 +427,20 @@ const googleAuth = async (req, res, next) => {
 // @access Protected
 const verifyUser = async (req, res, next) => {
     try {
-        const { _id: userId } = req.user;
-        const { token: userToken } = req.query;
+        const { id: userId, token:userToken } = req.params;
+        // const { token: userToken } = req.query;
 
         // check if user exists
         const user = await User.findById(userId);
 
         if(!user){
-           return  next(handleError(403, 'User dosent exist'))
+           return  next(handleError(403, 'Invalid link'))
         }
 
         const verificationToken = await VerificationToken.findOne({owner: userId });
 
         if(!verificationToken){
-            return  next(handleError(403, 'User is already verified'))
+            return  next(handleError(403, 'Invalid Link'))
         }
 
         // user OTP record exists                
@@ -434,15 +457,25 @@ const verifyUser = async (req, res, next) => {
             return  next(handleError(403, 'Invalid verification token'))
         }
 
-        await User.updateOne({_id: userId}, {verified:true})
+        await User.updateOne({_id: userId}, {verified:true});
 
         // Delete verification token from the database
         await VerificationToken.deleteOne({ owner: userId  });
 
+        const { personal_info: { username:user_username, profile_img}, role, _id, verified} = user
+
+        generateToken(res, _id);
+
         return res.status(200).json({ 
             success: true, 
             message: 'User successfully verified',
-            userId
+            userId,
+            user:{
+                username: user_username,                
+                profile_img, 
+                userId,
+                role,                
+            },        
          });
     } catch (error) {
         return next(error);

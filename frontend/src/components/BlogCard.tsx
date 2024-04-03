@@ -1,23 +1,25 @@
 import { Link } from "react-router-dom";
 import { getDay } from "../libs/date";
+import { capitalizeFirstLetter } from "../libs/capitalizeLetter";
+import Avatar from "./Avatar";
 
 
 const BlogCard = ({ content }:{ content:any }) => {
-    const { author, publishedAt, tags, title, description, banner, activity, blog_id:id } = content;
+    const { author, publishedAt, tags, title, description, banner, activity, slug } = content;
     const {personal_info: {fullname, username, profile_img}} = author;
     const { total_likes } = activity;
+    // console.log('content >>', content)
   return (
-    <Link to={`/blogs/${id}`} className="flex relative items-center gap-8 border-b border-grey pb-5 mb-4">
+    <Link to={`/blogs/${slug}`} className="flex relative items-center gap-8 border-b border-grey pb-5 mb-4">
         <div className="w-full">
             <div className="flex gap-2 mb-7 items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full md:w-10 md:h-10 overflow-hidden">
-                        <img
-                            src={profile_img}
-                            alt="profile image"
-                            className="w-full h-full object-cover"
-                        />
-                    </div>                    
+                    <Avatar
+                        parentStyles="w-6 h-6 rounded-full md:w-10 md:h-10 overflow-hidden"
+                        username={username}
+                        fullname={fullname}
+                        profileImg={profile_img}
+                    />                                    
                     <div className="flex flex-col gap-0">
                         <p className="line-clamp-1 font-bold ">{fullname}</p>
                         <p className="line-clamp-1 ">@{username}</p>

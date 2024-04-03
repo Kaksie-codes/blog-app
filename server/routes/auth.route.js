@@ -34,10 +34,11 @@ router.post('/generateOTP', generateOTP);
 // verify OTP
 router.post('/verifyOTP', verifyOTP);
 
-router.get('/resendVerificationMail', protect, resendVerificationEmail);
+// resend verification Mail
+router.get('/resendVerificationMail/:id', resendVerificationEmail);
 
-// verify OTP
-router.get('/verifyUser', protect, verifyUser);
+// verify User
+router.get('/:id/verify/:token', verifyUser);
 
 // Create or Reset Session
 router.get('/resendOTP', resendOTP);

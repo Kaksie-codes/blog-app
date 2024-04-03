@@ -16,13 +16,13 @@ const CommentField = ({
 }) => {
     
     const [comment, setComment] = useState('');
-    const { currentUser } = useSelector((state: any) => state.user);
+    const { userInfo } = useSelector((state: any) => state.auth);
     // const username = currentUser ? currentUser.username : ''; 
-    const accessToken = currentUser ? currentUser.accessToken : '';
+    // const accessToken = currentUser ? currentUser.accessToken : '';
     // let { title, banner, content, publishedAt,_id } = blog;
 
     const handleComment = () => {
-        if(!accessToken){
+        if(!userInfo){
             return toast.error('log in to leave a comment')
         }
 

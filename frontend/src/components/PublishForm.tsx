@@ -8,7 +8,7 @@ import { useState } from "react";
 
 
 const PublishForm = () => {
-  const { blog_id } = useParams();
+  const { slug } = useParams();
   const { title, content, banner, tags, description, draft } = useSelector((state: any) => state.blogPost) || {};
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const PublishForm = () => {
         e.preventDefault();
     }    
   }
-  
+   
   const createTag = (e: any) => {
     if (e.keyCode === 13 || e.keyCode === 188) {
         e.preventDefault();
@@ -70,23 +70,23 @@ const PublishForm = () => {
         content,
         tags
       }
-      
+      console.log('blogObject >>>', blogObject)
       // loading = toast.loading('Publishing...');    
       if(banner.length){
         const res = await fetch(`/api/post/create-post`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({...blogObject, id: blog_id}),
+          body: JSON.stringify({...blogObject, slug}),
       });
 
       const data = await res.json();
       toast.success('Post Published Successfully'); 
-      console.log(data);      
+      // console.log(data);      
       toast.dismiss(loading);          
       setTimeout(() => {
         if(data){
           dispatch(setBanner(''));          
-          dispatch(setBlogDescription(''));
+          dispatch(setBlogDescription('')); 
           dispatch(setBlogTitle(''));
           dispatch(setBlogContent(''));
           dispatch(setTags([]));

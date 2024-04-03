@@ -2,15 +2,21 @@ import { GoogleAuthProvider, signInWithPopup, getAuth } from 'firebase/auth';
 import GoogleIcon from '../imgs/google.png'
 import { app } from '../firebase';
 import { useDispatch } from 'react-redux';
-import { signInSuccess } from '../redux/user/userSlice';
+
+import { setCredentials } from '../redux/auth/authSlice';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const Oauth = () => {
     const dispatch = useDispatch();
-    const handleClick = async () => {
+    const [isLoading, setIsloading] = useState<boolean>(false); 
+
+    const handleClick = async () => { 
         try{
+            setIsloading(true);
             const provider = new GoogleAuthProvider();
             const auth = getAuth(app);
-            const result = await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, provider); 
             const res = await fetch(`/api/auth/google-auth`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -21,17 +27,28 @@ const Oauth = () => {
                 }),
             })
             const data = await res.json();
-            console.log(data);
-            dispatch(signInSuccess(data));
+            const { user, success, message} = data
+            if(!success){
+                toast.error(message);
+            }else{
+                toast.success(message);
+                setTimeout(() => {
+                    dispatch(setCredentials(user));
+                }, 3000)
+            }            
         }catch(err){
-            console.log(`could'nt log in with google`, err);
+            console.log(`could'nt log in with google`, err);            
+        }finally{
+            setIsloading(false);
         }
     }
     // ?.replace("s96-c", "s384-c")
   return (
-    <button  onClick={handleClick}
-    className="btn-dark flex items-center justify-center gap-4 w-[90%] center">
-        Continue with Google
+    <button
+        disabled={isLoading}  
+        onClick={handleClick}
+        className={`${isLoading ? 'cursor-not-allowed' : 'cursor-pointer'} btn-dark flex items-center justify-center gap-4 w-[90%] center"`}>
+         {isLoading ? 'Signing In...' : 'Continue with Google'}
         <img src={GoogleIcon} alt="google icon" className="w-5" />
     </button>
   )

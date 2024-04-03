@@ -4,6 +4,8 @@ import { Link, Outlet, useNavigate, } from 'react-router-dom'
 import { useDispatch, useSelector } from "react-redux"
 import UserNavigation from './UserNavigation'
 import { setAuthPageMode } from '../redux/auth/authSlice'
+import { capitalizeFirstLetter } from '../libs/capitalizeLetter'
+import Avatar from './Avatar'
 
 const Navbar = () => {  
     const navPanelRef = useRef<HTMLDivElement>(null); 
@@ -27,16 +29,7 @@ const Navbar = () => {
       }
     };
 
-    function capitalizeFirstLetter(name:string) {
-        // Check if the string is not empty
-        if (name && name.length > 0) {
-            // Extract the first character, capitalize it, and concatenate with the rest of the string
-            return name.charAt(0).toUpperCase()
-        } else {
-            // Return an empty string or handle the case when the input is empty
-            return '';
-        }
-    }
+   
 
 
     const handleSearch = (e:any) => {
@@ -87,27 +80,13 @@ const Navbar = () => {
                                         <i className='fi fi-rr-bell text-2xl flex items-center justify-center'></i>
                                     </button>
                                 </Link>
-                                <div className="relative nav__toggle cursor-pointer" onClick={() => setIsNavPanelVisible(!isNavPanelVisible)} ref={navPanelRef}>
-                                    <div className='w-12 h-12 mt-1'>
-                                        {
-                                            profilePic.length ? (
-                                                <img
-                                                    src={profilePic} alt="profile image" className='rounded-full h-full w-full object-cover cursor-pointer'
-                                                />
-                                            ) : (
-                                                fullname && fullname.length ? (
-                                                    <div className='h-full w-full mt-1 rounded-full border-[2px] border-blue text-2xl font-bold flex items-center justify-center'>
-                                                        {capitalizeFirstLetter(fullname)}
-                                                    </div>
-                                                ) : (
-                                                    <div className='h-full w-full mt-1 rounded-full border-[2px] border-blue text-2xl font-bold flex items-center justify-center'>
-                                                        {capitalizeFirstLetter(username)}
-                                                    </div>
-                                                )
-                                                
-                                            )
-                                        }
-                                    </div>                                    
+                                <div className="relative nav__toggle cursor-pointer" onClick={() => setIsNavPanelVisible(!isNavPanelVisible)} ref={navPanelRef}>                                    
+                                    <Avatar
+                                        parentStyles='w-12 h-12 mt-1'
+                                        profileImg={profilePic}
+                                        username={username}
+                                        fullname={fullname}
+                                    />                              
                                     {isNavPanelVisible && <UserNavigation/>}
                                 </div>
                             </>

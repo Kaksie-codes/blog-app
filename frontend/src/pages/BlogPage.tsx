@@ -8,6 +8,8 @@ import BlogInteraction from "../components/BlogInteraction";
 import BlogCard from "../components/BlogCard";
 import BlogContent from "../components/BlogContent";
 import CommentsContainer from "../components/CommentsContainer";
+import Avatar from "../components/Avatar";
+
 
 export const blogStructure = {
     activity:{
@@ -24,8 +26,8 @@ export const blogStructure = {
         }
     },
     banner: '',
-    blog_id: '',
-    content: [''],
+    slug: '',
+    content: '',
     description: '',
     publishedAt: '',
     tags: [''],
@@ -35,28 +37,28 @@ export const blogStructure = {
   
 
 const BlogPage = () => {
-    const { blog_id } = useParams();
+    const { slug } = useParams();
     const [blog, setBlog] = useState<Blog>(blogStructure);
     const [similarBlogs, setSimilarBlogs] = useState<Blog[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [commentsWrapper, setCommentsWrapper] = useState<boolean>(false);
-    const [totalParentsCommentsLoaded, setTotalParentsCommentsLoaded] = useState(0);
+    // const [totalParentsCommentsLoaded, setTotalParentsCommentsLoaded] = useState(0);
 
     let { title, banner, content, publishedAt,_id } = blog;
     let { author : {personal_info: {fullname, username:author_username, profile_img}}} = blog;
     
-
+    // console.log('fetched blog', blog)
     const fetchBlogPost = async() => {
         try{ 
             const res = await fetch('/api/post/get-blog', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({blog_id})
+                body: JSON.stringify({slug})
             })
             const { blogPost } = await res.json();
             // console.log('blogPost', blogPost.content)
             if(blogPost != null){                
-                setBlog(blogPost);
+                setBlog(blogPost); 
                 setIsLoading(false)
                 fetchRelatedBlogs(blogPost.tags);                
             }
@@ -66,13 +68,15 @@ const BlogPage = () => {
         } 
     }
 
+
+    
     const fetchRelatedBlogs = async (tags: string[]) => {
         try {
             if (tags && tags.length > 0) {
                 const res = await fetch('/api/post/search-blogs', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tag: tags[0], limit: 2, eliminate_blog: blog_id })
+                    body: JSON.stringify({ tag: tags[0], limit: 2, eliminate_blog: slug })
                 });
                 const { results } = await res.json();
                 // console.log('similar blogPost', results);
@@ -88,7 +92,7 @@ const BlogPage = () => {
 
     useEffect(() => {
         fetchBlogPost();
-    },[blog_id])
+    },[slug])
 
   return (
     <AnimationWrapper>
@@ -107,12 +111,17 @@ const BlogPage = () => {
                         <h2 className="">{title}</h2>
                         <div className="flex max-sm:flex-col my-8 justify-between">
                             <div className="flex gap-5 items-start">
-                                <img src={profile_img} alt="profile image"  className="w-12 h-12 rounded-full" />
+                                <Avatar
+                                    parentStyles="w-12 h-12"
+                                    fullname={fullname}
+                                    username={author_username}
+                                    profileImg={profile_img}
+                                />                            
                                 <p className="Capitalize">
                                     <span className="text-xl font-bold">{fullname}</span>
                                     <br />
                                     @
-                                    <Link to={`/users/${author_username}`} className="underline">
+                                    <Link to={`/users/${author_username}`} className="">
                                             {author_username}
                                     </Link>
                                 </p>

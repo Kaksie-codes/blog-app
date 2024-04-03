@@ -37,7 +37,7 @@ mongoose.connect(process.env.MONGO_URL, {autoIndex:true})
 .catch(err => console.log('error', err));
 
 server.use('/api/auth', authRoutes);
-server.use('/api/post', blogPostRoutes);
+server.use('/api/post', blogPostRoutes); 
 server.use('/api/users', userRoutes);
 server.use('/api/comment', commentRoutes);
 

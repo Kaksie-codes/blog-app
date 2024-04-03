@@ -20,12 +20,11 @@ export interface Blog {
       profile_img: string;
       username: string;
     };
-    _id: string
   };
   banner: string;
-  blog_id: string;
+  slug: string;
   description: string;
-  content: string[]
+  content: string
   publishedAt: string;
   tags: string[];
   title: string;
@@ -33,7 +32,7 @@ export interface Blog {
 }
 
 export interface BlogApiResponse {
-  results: Blog[];
+  data: Blog[];
   currentPage: number;
   totalBlogs: number;
   totalPages: number;
@@ -44,20 +43,9 @@ const Home = () => {
   const [blogs, setBlogs] = useState<BlogApiResponse | null>(null);
   const [trendingBlogs, setTrendingBlogs] = useState<Blog[] | null>(null);
   const [pageState, setPageState] = useState('home');
+  const [blogCategories, setBlogCategories] = useState<string[]>(['']);
   const activeTabRef = useRef<HTMLButtonElement>(null);
   
-
-  let categories = [
-    'programming',
-    // 'relationship',
-    'Tech',
-    // 'Social Media',
-    // 'Cooking',
-    // 'Finance',
-    // 'Cryptocurrencies',
-    // 'travel',
-    'love'
-  ];
 
   useEffect(() => {
     if (activeTabRef.current) {
@@ -73,6 +61,10 @@ const Home = () => {
     }
   }, [pageState]);
 
+  useEffect(() => {
+    fetchCategories();
+  }, [blogCategories])
+
   const fetchLatestBlogs = async (page:number = 1) => {
     try {      
       const res = await fetch(`/api/post/latest-blogs`, {
@@ -80,8 +72,8 @@ const Home = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ page: page })
       });
-      const { results, currentPage, totalBlogs, totalPages } = await res.json();      
-      setBlogs({ results, currentPage, totalBlogs, totalPages });
+      const { data, currentPage, totalBlogs, totalPages } = await res.json();      
+      setBlogs({ data, currentPage, totalBlogs, totalPages });
     } catch (error) {
       console.log('error', error);
     }
@@ -99,6 +91,18 @@ const Home = () => {
       console.log('error', error);
     }
   };
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(`/api/post/get-categories`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const { tags } = await res.json();
+      setBlogCategories(tags);
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
 
   const fetchBlogsbyCategory = async () => {
     try {
@@ -109,15 +113,15 @@ const Home = () => {
           "tag": pageState
         })
       });
-      const { data } = await res.json();
-      setBlogs(data);
+      const { data, currentPage, totalBlogs, totalPages }  = await res.json();
+      setBlogs({ data, currentPage, totalBlogs, totalPages });
       // console.log('pageState', pageState);
       // console.log('catBlog >>', data);
     } catch (error) {
       console.log('error', error);
     }
   };
-  const getBlogsbyCategory = (e: any) => {
+  const setMode = (e: any) => {
     let category = e.target.textContent.toLowerCase();
     setBlogs(null);
     // Toggle the pageState if the same category is clicked again
@@ -144,8 +148,8 @@ const Home = () => {
                 ) : (
                 <>
                   {
-                    blogs.results.length ? (
-                      blogs.results.map((blog: any, index: number) => (
+                    blogs && blogs.data.length ? (
+                      blogs.data.map((blog: any, index: number) => (
                         <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
                           <BlogCard content={blog} />
                         </AnimationWrapper>
@@ -175,30 +179,32 @@ const Home = () => {
             }
             </>
           </InpageNavigation>
-        </div>
-        <div className="h-cover w-[40%]">
-          <div className="p-4 md:px-8
-          max-md:items-center gap-5 md:full  md:pl-8 md:sticky md:pt-10">
-            <div className="relative flex flex-col gap-8 w-full h-full">
-              <div className="bg-grey w-full sticky left-0 p-4 rounded-lg top-[80px]">
-                <h1 className="font-medium mb-4 text-xl">Stories from all interests</h1>
-                <div className="flex gap-3 ">
-                  {categories.map((category, index) => (
-                    <button
-                      className={`tag ${pageState === category.toLowerCase() ? 'bg-black text-white' : 'bg-white text-dark-grey '}`}
-                      onClick={(e) => getBlogsbyCategory(e)}
-                      key={index}
-                    >
-                      {category}
-                    </button>
-                  ))}
+        </div>        
+        <div className="p-4 pt-0 md:px-8 w-[40%] hidden 
+          max-md:items-center gap-5 md:full  md:pl-8 md:sticky md:block">
+            <div className="relative flex flex-col gap-4 w-full h-full">
+              <div className="w-full sticky left-0 pb-4  top-[80px] pt-5 bg-white z-20">
+                <div className="bg-grey rounded-lg p-4">
+                  <h1 className="font-bold mb-4 text-2xl">Stories from all interests</h1>
+                  <div className="flex gap-3 ">
+                    {
+                      blogCategories.map((category, index) => (
+                        <button
+                        className={`tag ${pageState === category.toLowerCase() ? 'bg-black text-white' : 'bg-white text-dark-grey '}`}
+                        onClick={(e) => setMode(e)}
+                        key={index}
+                      >
+                        {category}
+                      </button>
+                      ))
+                    }                   
+                  </div>                
                 </div>
-                
               </div>
-              <div className="border px-2 border-grey pb-4 rounded-lg"> 
-              <h1 className="font-medium py-4 text-xl px-2">
+              <div className="border border-grey pb-4 rounded-lg bg-grey"> 
+              <h1 className="py-4 text-2xl px-4 font-bold">
                   Trending
-                  <i className="fi fi-rr-arrow-trend-up"></i>
+                  <i className="fi fi-rr-arrow-trend-up font-bold"></i>
                 </h1>               
                 {trendingBlogs == null ? (
                   <Loader />
@@ -216,8 +222,7 @@ const Home = () => {
               }
               </div>
             </div>
-          </div>
-        </div>
+        </div>      
       </section>
     </AnimationWrapper>
   );

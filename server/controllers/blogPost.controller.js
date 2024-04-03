@@ -9,7 +9,7 @@ const createBlog = async (req, res, next) => {
     
     let authorId = req.user.id;
     // let authorId = req.user;
-    let { title, description, banner, tags, content, draft, id } = req.body;
+    let { title, description, banner, tags, content, draft, slug } = req.body;
 
     if (authorId) {
         // res.status(200).json({ success: true, message: 'Blog post created successfully', data: req.user.id });
@@ -35,21 +35,21 @@ const createBlog = async (req, res, next) => {
         let lowerCaseTags = tags.map(tags => tags.toLowerCase()); 
 
         // If a blog_id already exist store it inside blogId else generate a new Id
-        let blog_id = id || generateSlug(title);              
+        let blog_slug = slug || generateSlug(title);              
         
-        try { 
-            
-            if(id){
+        try {  
+             
+            if(slug){
             // Logic to update the blog post if te id already exists
-                const updatedBlogPost = await BlogPost.findOneAndUpdate({blog_id}, { title, description, banner, content, tags, draft: draft ? draft : false});
+                const updatedBlogPost = await BlogPost.findOneAndUpdate({slug:blog_slug}, { title, description, banner, content, tags, draft: draft ? draft : false});
 
-                res.status(200).json({ success: true, message: 'Blog post updated successfully', data: blog_id });
+                res.status(200).json({ success: true, message: 'Blog post updated successfully', data: blog_slug });
             }else{
             // Logic to create the blog post            
             const newBlogPost = new BlogPost({
                 ...req.body,
                 tags: lowerCaseTags,                
-                blog_id,
+                slug: blog_slug,
                 author: authorId,
                 draft: Boolean(draft)
               });
@@ -59,7 +59,7 @@ const createBlog = async (req, res, next) => {
 
             await User.findOneAndUpdate({_id: authorId}, { $inc: {"account_info.total_posts": incrementVal}, $push: { 'blogPosts' : savedPost._id }})
             
-            res.status(200).json({ success: true, message: 'Blog post created successfully', data: blog_id });
+            res.status(200).json({ success: true, message: 'Blog post created successfully', data: savedPost });
             }
             
         } catch (error) {
@@ -119,7 +119,6 @@ const getLikeStatus = async (req, res, next) => {
     }
 }
 
-
 const getLatestBlogPosts = async (req, res, next) => { 
     try{
         let maxLimit = 5;
@@ -132,14 +131,14 @@ const getLatestBlogPosts = async (req, res, next) => {
         const latestBlogPosts = await BlogPost.find({ draft: false})
         .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
         .sort({"publishedAt": -1})
-        .select("blog_id title description banner activity tags publishedAt -_id")
+        .select("slug title description banner activity tags publishedAt -_id")
         .skip((page - 1) * maxLimit)
         .limit(maxLimit);
         
         res.status(200).json({ 
             success: true, 
             message: 'latest Blogs', 
-            results: latestBlogPosts,
+            data: latestBlogPosts,
             currentPage:page,
             totalBlogs: totalBlogs,
             totalPages: totalPages  
@@ -149,13 +148,12 @@ const getLatestBlogPosts = async (req, res, next) => {
     }    
 }
 
-
 const getTrendingBlogs = async (req, res, next) => {
     try{
         const trendingBlogPosts = await BlogPost.find({ draft: false})
         .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
         .sort({"activity.total_read": -1, "activity.total_likes": -1, "publishedAt": -1})
-        .select("blog_id title publishedAt -_id")
+        .select("slug title publishedAt -_id")
         .limit(5);
         res.status(200).json({ success: true, message: 'trending Blogs', data: trendingBlogPosts});
     }catch(error){
@@ -172,7 +170,7 @@ const searchBlogPosts = async (req, res, next) => {
         let searchQuery
         if(tag){
             console.log('tag', tag)
-            searchQuery = { tags:tag, draft:false, blog_id:{ $ne: eliminate_blog} };  
+            searchQuery = { tags:tag, draft:false, slug:{ $ne: eliminate_blog} };  
         }else if(query){
             searchQuery = { title: new RegExp(query, 'i'), draft:false };  
         }else if(authorId){
@@ -190,8 +188,8 @@ const searchBlogPosts = async (req, res, next) => {
 
        res.status(200).json({ 
             success: true, 
-            message: `Search result for ${tag ? tag : query}'`, 
-            results: searchedBlogs,
+            message: `Search result for ${tag ? tag : query}`, 
+            data: searchedBlogs,
             currentPage:page,
             totalBlogs: totalBlogs,
             totalPages: totalPages  
@@ -201,13 +199,13 @@ const searchBlogPosts = async (req, res, next) => {
     }
 }
 
-const getBlogPost = async (req, res, next) => {    
+const getBlogPost = async (req, res, next) => {     
     try{
-        const { blog_id, draft, mode } = req.body;
+        const { slug, draft, mode } = req.body;
         let incrementVal = mode != 'edit' ? 1 : 0
-        const blogPost =  await BlogPost.findOneAndUpdate({ blog_id }, {$inc: {"activity.total_reads": incrementVal}})
+        const blogPost =  await BlogPost.findOneAndUpdate({ slug }, {$inc: {"activity.total_reads": incrementVal}})
         .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname _id")
-        .select("title description content banner activity publishedAt blog_id tags")
+        .select("title description content banner activity publishedAt slug tags")
 
         await User.findOneAndUpdate({"personal_info.username": blogPost.author.personal_info.username}, {
             $inc: {"account_info.total_reads": incrementVal}
@@ -223,6 +221,35 @@ const getBlogPost = async (req, res, next) => {
     }
 }
 
+const getAllTags = async (req, res, next) => {
+    try {
+      // Fetch all blog posts
+      const blogPosts = await BlogPost.find();
+  
+      // Create an empty array to store all tags
+      let allTags = [];
+  
+      // Loop through each blog post
+      blogPosts.forEach((post) => {
+        // Concatenate tags of each blog post to allTags array
+        allTags = allTags.concat(post.tags.map(tag => tag.toLowerCase()));
+      });
+   
+      // Remove duplicate tags
+      const uniqueTags = [...new Set(allTags)];
+  
+      // Send the unique tags as response 
+      res.status(200).json({ 
+        success: true,
+        message: 'successfully fetched all tags',
+        tags: uniqueTags 
+    });
+    } catch (error) {
+      // If there's an error, send error response
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
 
 
 export {  
@@ -232,5 +259,6 @@ export {
     searchBlogPosts,
     getBlogPost,
     likeBlogPost,
-    getLikeStatus
+    getLikeStatus,
+    getAllTags
 } 

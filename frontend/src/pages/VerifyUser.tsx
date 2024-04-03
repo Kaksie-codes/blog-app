@@ -3,13 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../components/Loader";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { setVerificationStatus } from "../redux/auth/authSlice";
+import { setVerificationStatus, setCredentials } from "../redux/auth/authSlice";
 
 
 const VerifyUser = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
-    const { token }= useParams();
+    const { token, id }= useParams();
     const navigate = useNavigate();
     const [userId, setUserId] = useState<string>('');
     const [status, setStatus] = useState<boolean>(false);
@@ -20,7 +20,7 @@ const VerifyUser = () => {
     const resendVerificationEmail = async() => {
         try {
             setIsLoading(true);
-            const res = await fetch(`/api/auth/resendVerificationMail`, {
+            const res = await fetch(`/api/auth/resendVerificationMail/${id}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             })
@@ -46,21 +46,22 @@ const VerifyUser = () => {
     useEffect(() => {
         const verifyUser = async () => {
             try {
-                const res = await fetch(`/api/auth/verifyUser?token=${token}`, {
+                const res = await fetch(`/api/auth/${id}/verify/${token}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 })
 
-                const { message:statusMessage, userId, success} = await res.json();
+                const { message:statusMessage, userId, success, user} = await res.json();
 
                 if(success == false){
                     setStatus(false);
-                    toast.error(statusMessage);
-                    dispatch(setVerificationStatus(true));                   
+                    toast.error(statusMessage);                                      
                 }else{
                     setUserId(userId);                    
                     setStatus(true);
                     toast.success(statusMessage);
+                    dispatch(setVerificationStatus(true));
+                    dispatch(setCredentials(user)) 
                 }
                 // setMessage(statusMessage);
                 setStatus(status)
@@ -70,8 +71,17 @@ const VerifyUser = () => {
             }
         }
 
-        verifyUser();
+        if (!verified) {
+            verifyUser();
+        }
     }, [])
+
+    useEffect(() => {
+        if (verified) {
+            setLoading(false);
+        }
+    }, [verified])
+
   return (
     <div className="grid place-items-center h-cover">
         {
