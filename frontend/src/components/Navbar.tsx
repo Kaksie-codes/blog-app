@@ -4,7 +4,6 @@ import { Link, Outlet, useNavigate, } from 'react-router-dom'
 import { useDispatch, useSelector } from "react-redux"
 import UserNavigation from './UserNavigation'
 import { setAuthPageMode } from '../redux/auth/authSlice'
-import { capitalizeFirstLetter } from '../libs/capitalizeLetter'
 import Avatar from './Avatar'
 
 const Navbar = () => {  
@@ -29,9 +28,6 @@ const Navbar = () => {
       }
     };
 
-   
-
-
     const handleSearch = (e:any) => {
         let query = e.target.value;
         if(e.keyCode == 13 && query.length){
@@ -39,7 +35,6 @@ const Navbar = () => {
         }
     }
     
-
     useEffect(() => {    
         document.addEventListener('click', closeNav);
         return () => {        

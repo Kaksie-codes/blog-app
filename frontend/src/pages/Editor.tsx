@@ -1,4 +1,4 @@
-import { Navigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import BlogEditor from "../components/BlogEditor";
 import PublishForm from "../components/PublishForm";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,10 +6,8 @@ import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import { setBlogContent, setBlogTitle, setBanner, setBlogDescription, setTags } from "../redux/blogpost/blogPostSlice";
 
-// import Cookies from 'js-cookie'
-
 const Editor = () => {
-  const { blog_id } = useParams();
+  const { slug } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [blog, setBlog] = useState(null);
   const { editorMode } = useSelector((state:any) => state.blogPost);
@@ -18,7 +16,7 @@ const Editor = () => {
   
 
   useEffect(() => {
-    if(!blog_id){
+    if(!slug){
       return setIsLoading(false);
     }
     fetchBlogPost();
@@ -29,7 +27,7 @@ const Editor = () => {
         const res = await fetch('/api/post/get-blog', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({blog_id, draft:true, mode: 'edit'})
+            body: JSON.stringify({slug, draft:true, mode: 'edit'})
         })
         const { blogPost } = await res.json();
         console.log('blogPost', blogPost.content);
@@ -38,7 +36,7 @@ const Editor = () => {
         if(blogPost != null){                
             setBlog(blogPost);
           const { content, title, banner, description, tags } = blogPost;
-          dispatch(setBlogContent(content[0]));
+          dispatch(setBlogContent(content));
           dispatch(setBanner(banner));
           dispatch(setBlogTitle(title));
           dispatch(setBlogDescription(description));

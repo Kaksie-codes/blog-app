@@ -14,7 +14,7 @@ const UploadBanner = () => {
     const [image, setImage] = useState<File | null>(null); 
 
 
-const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     
     if (file) {

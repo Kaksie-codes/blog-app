@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import PrivateRoute from './components/PrivateRoute'
 import PrivatePage from './pages/PrivatePage'
 import OnlyAdminPrivateRoutes from './components/OnlyAdminPrivateRoutes'
-import AdminDashboard from './pages/AdminDashboard'
+// import AdminDashboard from './pages/AdminDashboard'
 import ForgotPassword from './pages/ForgotPassword'
 import VerifyUser from './pages/VerifyUser'
 import UserAuth from './pages/UserAuth'
@@ -43,7 +43,7 @@ function App() {
 
                   {/* Admin private Routes */}
           <Route path='' element={<OnlyAdminPrivateRoutes/>}>
-            <Route path='admin' element={<AdminDashboard/>}/>
+            {/* <Route path='admin' element={<AdminDashboard/>}/> */}
           </Route>
 
           <Route path='*' element={<PageNotFound/>}/>          

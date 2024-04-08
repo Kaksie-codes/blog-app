@@ -44,7 +44,7 @@ const PublishForm = () => {
 
   const publishBlogPost = async (e:any) => {
     e.preventDefault(); 
-    let loading;
+    
     try{ 
       if(!title.length){
         setDisabled(false);
@@ -82,7 +82,7 @@ const PublishForm = () => {
       const data = await res.json();
       toast.success('Post Published Successfully'); 
       // console.log(data);      
-      toast.dismiss(loading);          
+               
       setTimeout(() => {
         if(data){
           dispatch(setBanner(''));          

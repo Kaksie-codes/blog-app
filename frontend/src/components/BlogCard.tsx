@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { getDay } from "../libs/date";
-import { capitalizeFirstLetter } from "../libs/capitalizeLetter";
 import Avatar from "./Avatar";
 
 

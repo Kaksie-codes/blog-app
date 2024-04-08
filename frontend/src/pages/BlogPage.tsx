@@ -9,6 +9,8 @@ import BlogCard from "../components/BlogCard";
 import BlogContent from "../components/BlogContent";
 import CommentsContainer from "../components/CommentsContainer";
 import Avatar from "../components/Avatar";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 
 export const blogStructure = {
@@ -16,7 +18,8 @@ export const blogStructure = {
         total_comments: 0,
         total_likes: 0,
         total_parent_comments: 0,
-        total_reads: 0
+        total_reads: 0,
+        likes: []
     },
     author: {
         personal_info:{
@@ -46,6 +49,46 @@ const BlogPage = () => {
 
     let { title, banner, content, publishedAt,_id } = blog;
     let { author : {personal_info: {fullname, username:author_username, profile_img}}} = blog;
+    let {activity: { total_comments, total_likes, likes} } = blog;
+      
+    const { userInfo } = useSelector((state: any) => state.auth);        
+    const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
+    const [likesCount, setLikesCount] = useState(total_likes);
+
+    useEffect(() => {
+        // Check if the user's ID exists in the array of liked users
+        if (userInfo) {
+            setIsLikedByUser(likes.includes(userInfo.userId));
+            setLikesCount(total_likes);
+        }
+    }, [userInfo, likes]);
+    
+    const handleLike = async () => {
+        if (!userInfo) {
+            toast.error("Please log in to like this post");
+            return;
+        }
+            
+        try {
+            const res = await fetch(`/api/post/like-blog`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ _id})
+            });
+    
+            const { data, success, message } = await res.json();
+            
+            if(success){
+                setLikesCount(data.likesCount);
+                setIsLikedByUser(data.likes.includes(userInfo.userId));
+                toast.success(message);
+            }                     
+        } catch (error) {
+            console.error("Error toggling like:", error);
+            toast.error("Failed to toggle like. Please try again later.");
+        }
+    };
+    
     
     // console.log('fetched blog', blog)
     const fetchBlogPost = async() => {
@@ -62,13 +105,11 @@ const BlogPage = () => {
                 setIsLoading(false)
                 fetchRelatedBlogs(blogPost.tags);                
             }
-            console.log('blogPost', blogPost);
+            // console.log('blogPost', blogPost);
         }catch(error){
             console.log(error);            
         } 
     }
-
-
     
     const fetchRelatedBlogs = async (tags: string[]) => {
         try {
@@ -132,8 +173,11 @@ const BlogPage = () => {
                             </p>
                         </div>
                     </div>
-                    {
-                        _id  && <BlogInteraction                                    
+                    { 
+                        _id  && <BlogInteraction 
+                                    handleLike={handleLike}   
+                                    likesCount={likesCount}  
+                                    isLikedByUser ={isLikedByUser}                              
                                     setCommentsWrapper={setCommentsWrapper}
                                     blog={blog}
                                 />
@@ -142,7 +186,10 @@ const BlogPage = () => {
                         <BlogContent content={content}/>
                     </div>
                     {
-                        _id  && <BlogInteraction                                    
+                        _id  && <BlogInteraction
+                                    handleLike={handleLike}   
+                                    likesCount={likesCount}  
+                                    isLikedByUser ={isLikedByUser }                              
                                     setCommentsWrapper={setCommentsWrapper}
                                     blog={blog}
                                 />

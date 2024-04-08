@@ -1,77 +1,27 @@
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Blog } from "../pages/Home"
 import { useSelector } from "react-redux";
-import { Toaster, toast } from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
 
-const BlogInteraction = ({ 
+const BlogInteraction = ({
+    handleLike, 
+    likesCount,
+    isLikedByUser,
     blog,   
     setCommentsWrapper
     } : { 
+    handleLike: any,
+    likesCount: number,
+    isLikedByUser : boolean,
     blog:Blog,    
     setCommentsWrapper:any   
-}) => {
-    // const { blog_id } = useParams();
-    let {activity: { total_comments, total_likes}, _id } = blog;
+}) => {    
+    let {activity: { total_comments } } = blog;
     let { title, slug } = blog;
-    let { author : {personal_info: { username: author_username }}} = blog;
-    // const { currentUser: { username, accessToken} } = useSelector((state:any) => state.user);
+    let { author : {personal_info: { username: author_username }}} = blog;    
     const { userInfo } = useSelector((state: any) => state.auth);
-    const username = userInfo ? userInfo.username : ''; 
-    // const accessToken = currentUser ? currentUser.accessToken : ''; 
-    const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
-    const [likesCount, setLikesCount] = useState(total_likes)
-
-    //  console.log('_id >>>', _id)
-    const handleLike = async () => {
-        if (!userInfo) {
-            toast.error("Please log in to like this post");
-            return;
-        }else{
-            setIsLikedByUser(!isLikedByUser);
-            sendLikesStatus()
-            setLikesCount(prevCount => !isLikedByUser ? prevCount + 1 : prevCount - 1); 
-        }       
-    };
-
-    const sendLikesStatus = async () => {
-        try {
-            const res = await fetch(`/api/post/like-blog`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ _id, isLikedByUser})
-            });
-
-            const { liked_by_user } = await res.json();
-            // console.log('like by user >>>', liked_by_user)            
-        } catch (error) {
-            console.error("Error liking post:", error);
-            toast.error("Failed to like the post. Please try again later.");
-        }
-    }
-    const getLikesCount = async () => {
-        try {
-            const res = await fetch(`/api/post/isliked-by-user`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ _id})
-            });
-
-            const { result } = await res.json();
-            console.log('got user like >>>', result) 
-            setIsLikedByUser(Boolean(result))           
-        } catch (error) {
-            console.error("Error liking post:", error);
-            toast.error("Failed to like the post. Please try again later.");
-        }
-    }
-
-    useEffect(() => {
-        if(userInfo){
-            getLikesCount()
-        }        
-    }, [])
- 
+    const username = userInfo ? userInfo.username : '';     
+      
 
   return (
     <div>

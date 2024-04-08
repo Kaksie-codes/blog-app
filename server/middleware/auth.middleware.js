@@ -18,7 +18,7 @@ const protect = async (req, res, next) => {
             // Get user from the token
             req.user = await User.findById(decoded.userId).select('-personal_info.password');
             // console.log('user >>', req.user)
-            // run the next middleware
+            // run the next middleware 
             next()
         }catch(error){
             // console.log(error);

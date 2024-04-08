@@ -54,7 +54,7 @@ const sendVerificationEmail = async (user) => {
         await VerificationToken.deleteOne({ owner: userId  });
         
         // Generate a random string for verification token
-        const unhashedToken = crypto.randomBytes(32).toString('hex');
+        const unhashedToken = crypto.randomBytes(32).toString('hex'); 
 
         // Hash the verification token
         const hashedToken = crypto.createHash('sha256').update(unhashedToken).digest('hex');
@@ -114,7 +114,7 @@ const sendEmail = async (mailOptions) => {
 
         // Send email using async/await
         const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent:', info);
+        // console.log('Email sent:', info);
     } catch (error) {
         console.log('Error sending email:', error);
     }

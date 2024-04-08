@@ -63,7 +63,7 @@ const signupUser = async (req, res, next) => {
         });
 
         // save the user
-        await newUser.save();
+        await newUser.save(); 
         
         // send verification link to the user
         await sendVerificationEmail(newUser);   
@@ -164,7 +164,8 @@ const signinUser = async (req, res, next) => {
                 message: `Successfully signed in`,                
                 user:{
                     username, 
-                    fullname,               
+                    fullname, 
+                    userId: user._id,              
                     profile_img,
                     role
                 }                
@@ -426,7 +427,7 @@ const googleAuth = async (req, res, next) => {
 // @route POST /api/auth/google-auth'
 // @access Protected
 const verifyUser = async (req, res, next) => {
-    try {
+    try { 
         const { id: userId, token:userToken } = req.params;
         // const { token: userToken } = req.query;
 

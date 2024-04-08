@@ -27,7 +27,7 @@ const blogPostSchema = new Schema({ // Use `new Schema` correctly
     },
     tags: {
         type: [String],
-        // required: true
+        // required: true 
     },
     author: {
         type: Schema.Types.ObjectId,
@@ -51,6 +51,11 @@ const blogPostSchema = new Schema({ // Use `new Schema` correctly
             type: Number,
             default: 0
         },
+        likes: [{ 
+            type: Schema.Types.ObjectId, 
+            ref: 'User',
+            default: [],
+        }]
     },
     comments: {
         type: [Schema.Types.ObjectId],

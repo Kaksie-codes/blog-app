@@ -1,14 +1,13 @@
 import { Router } from 'express';
 import { 
     createBlog, 
-    getLatestBlogPosts, 
-    getLikeStatus, 
+    getLatestBlogPosts,     
     getTrendingBlogs, 
     searchBlogPosts, 
     getBlogPost, 
     likeBlogPost,
     getAllTags } from '../controllers/blogPost.controller.js';
-import { verifyToken, protect } from '../middleware/auth.middleware.js';
+import { protect } from '../middleware/auth.middleware.js';
 
 // Initialize the router
 const router = Router();
@@ -20,7 +19,6 @@ router.get('/trending-blogs', getTrendingBlogs);
 router.post('/search-blogs', searchBlogPosts); 
 router.post('/get-blog', getBlogPost);
 router.get('/get-categories', getAllTags);
-router.post('/like-blog', verifyToken, likeBlogPost);
-router.post('/isliked-by-user', verifyToken, getLikeStatus);
+router.post('/like-blog', protect, likeBlogPost);
 
 export default router;

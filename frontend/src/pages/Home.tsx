@@ -13,6 +13,7 @@ export interface Blog {
     total_comments: number;
     total_reads: number;
     total_parent_comments: number;
+    likes: string[],
   };
   author: {
     personal_info: {

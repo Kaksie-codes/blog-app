@@ -8,8 +8,8 @@ import 'react-quill/dist/quill.snow.css';
 import BlogViewer from "./BlogViewer";
 import { Toaster } from "react-hot-toast";
 import { setBlogTitle, setBlogContent } from "../redux/blogpost/blogPostSlice";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+// import { useEffect } from "react";
+// import { useParams } from "react-router-dom";
 // import EditorJS from "@editorjs/editorjs";
 // import { tools } from "./Tools";
 // import parse from 'html-react-parser'

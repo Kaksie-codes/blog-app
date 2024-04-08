@@ -73,51 +73,47 @@ const createBlog = async (req, res, next) => {
 };
 
 
-const likeBlogPost = async (req, res, next) => {
-   
-    let user_id = req.user.id;
-    let { _id, isLikedByUser } = req.body
-    let incrementval = isLikedByUser ? -1 : 1
+const likeBlogPost = async (req, res, next) => {    
+    let userId = req.user.id;    
+    let { _id:blogPostId } = req.body
     try {
-       const likedBlogPost = await  BlogPost.findOneAndUpdate({_id}, {$inc: {"activity.total_likes": incrementval}});
+    //    const likedBlogPost = await  BlogPost.findOneAndUpdate({blogPostId}, {$inc: {"activity.total_likes": incrementval}});
+        const blogPost = await BlogPost.findById(blogPostId);
 
-       if(isLikedByUser){
-        let like = new Notification({
-            type: 'like',
-            blogPost:_id,
-            notification_for: likedBlogPost.author,
-            user: user_id
-        })
-        like.save();
-        return res.status(200).json({liked_by_user: true})
-       }else{
-        await Notification.findOneAndDelete({user: user_id, blog:_id, type: "like"})
-        return  res.status(200).json({ liked_by_user: false})
-        // .then(data => {
-        //   return  res.status(200).json({ liked_by_user: false})
-        // })
-        // .catch(err){
-        //    return next(err)
-        // }
-       }
+        if (!blogPost) {
+            return next(handleError(404, 'BlogPost not found'))
+        }       
+
+        // Check if the user has already liked the post
+        const userLiked = blogPost.activity.likes.includes(userId);
+
+        if (!userLiked) {
+            // If the user has not liked the post, add the like
+            blogPost.activity.likes.push(userId);
+            blogPost.activity.total_likes += 1;
+        } else {
+            // If the user has already liked the post, remove the like
+            const index = blogPost.activity.likes.indexOf(userId);
+            blogPost.activity.likes.splice(index, 1);
+            blogPost.activity.total_likes -= 1;
+        }
+
+        await blogPost.save();
+
+        return res.status(200).json({ 
+            success: true, 
+            message: "Like Status toggled successfully", 
+            data: {
+                likesCount: blogPost.activity.total_likes, 
+                likes: blogPost.activity.likes, 
+            }            
+        });   
     } catch (error) {
         console.error("Error liking post:", error);
         return next(error);        
     }
 };
 
-const getLikeStatus = async (req, res, next) => {
-    let user_id = req.user.id;
-    const { _id } = req.body
-    console.log('request body >>>',req.body)
-    try{
-        const notification = await  Notification.exists({user: user_id, type: "like", blogPost: _id})
-        res.status(200).json({result: notification})
-    }catch(error){
-        console.error("Error reading like status:", error);
-        return next(error); 
-    }
-}
 
 const getLatestBlogPosts = async (req, res, next) => { 
     try{
@@ -169,7 +165,7 @@ const searchBlogPosts = async (req, res, next) => {
 
         let searchQuery
         if(tag){
-            console.log('tag', tag)
+            // console.log('tag', tag)
             searchQuery = { tags:tag, draft:false, slug:{ $ne: eliminate_blog} };  
         }else if(query){
             searchQuery = { title: new RegExp(query, 'i'), draft:false };  
@@ -246,9 +242,9 @@ const getAllTags = async (req, res, next) => {
     });
     } catch (error) {
       // If there's an error, send error response
-      res.status(500).json({ message: error.message });
+      return next(error);      
     }
-  };
+};
   
 
 
@@ -258,7 +254,6 @@ export {
     getTrendingBlogs,
     searchBlogPosts,
     getBlogPost,
-    likeBlogPost,
-    getLikeStatus,
+    likeBlogPost,   
     getAllTags
 } 

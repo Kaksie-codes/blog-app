@@ -1,15 +1,17 @@
-import { Link } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import logo from '../imgs/logo.png'
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { setEditorMode } from "../redux/blogpost/blogPostSlice";
+import { setBanner, setBlogContent, setBlogDescription, setBlogTitle, setEditorMode, setTags } from "../redux/blogpost/blogPostSlice";
 import { useDispatch, useSelector } from "react-redux";
-// import { useState } from "react";
+import { useState } from "react";
+
 
 const EditorNavbar = () => {
-    const { title, content, banner, tags, description, uploadedImage, draft } = useSelector((state: any) => state.blogPost) || {}; 
+    const { slug } = useParams();
+    const { title, content, banner, tags, description, draft } = useSelector((state: any) => state.blogPost) || {}; 
     const dispatch = useDispatch(); 
-    // const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(false);
     const navigate = useNavigate();
 
     const handlePublish = () => {
@@ -31,19 +33,57 @@ const EditorNavbar = () => {
         dispatch(setEditorMode('publish'));        
     }
 
-    const handleSaveDraft = (e:any) => {
+    const handleSaveDraft = async (e:any) => {
         e.preventDefault();
 
-        if(e.target.className.includes('disable')){
-            return 
-        }
-        if(!title.length){
-            return toast.error('Write Blog title before saving it to draft')
-        }    
+        try {
+            // if(e.target.className.includes('disable')){
+            //     return 
+            // }
+            if(!title.length){
+                return toast.error('Write Blog title before saving it to draft')
+            }    
+            setDisabled(true);   
+            
+            let blogObject = {
+                draft: true,
+                title,
+                banner,
+                description,
+                content,
+                tags
+            }
 
-        let loadingToast = toast.loading('Saving draft....')
-      navigate('/')
-        e.target.classList.add('disable');
+            const res = await fetch(`/api/post/create-post`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({...blogObject, slug}),
+            })
+
+            const data = await res.json();
+            toast.success('Draft saved Successfully'); 
+
+            setTimeout(() => {
+                if(data){
+                  dispatch(setBanner(''));          
+                  dispatch(setBlogDescription('')); 
+                  dispatch(setBlogTitle(''));
+                  dispatch(setBlogContent(''));
+                  dispatch(setTags([]));
+                  dispatch(setEditorMode('editor')); 
+                  setDisabled(false); 
+                }  
+                // Navigate after 2 seconds        
+                navigate('/');
+            }, 3000); 
+          
+            
+            //   e.target.classList.add('disable');
+        }catch(error){
+            console.log('error >>', error);
+            setDisabled(false);
+            return toast.error('Sorry, Could not save draft'); 
+        }
     }
 
   return (
@@ -60,8 +100,8 @@ const EditorNavbar = () => {
                 <button className="btn-dark py-2" onClick={handlePublish}>
                     Publish
                 </button>
-                <button className="btn-light py-2" onClick={handleSaveDraft}>
-                    Save Draft
+                <button className={`btn-light py-2 ${disabled ? 'cursor-not-allowed' : ''}`} onClick={handleSaveDraft}>                    
+                    {disabled ? 'Saving Draft...' : 'Save Draft'}
                 </button>
             </div>
         </div>
