@@ -25,7 +25,7 @@ const blogPostSchema = new Schema({ // Use `new Schema` correctly
         type: String,
         // required: true
     },
-    tags: {
+    tags: { 
         type: [String],
         // required: true 
     },

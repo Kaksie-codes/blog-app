@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { 
-    createBlog, 
+    createBlog,     
     getLatestBlogPosts,     
     getTrendingBlogs, 
     searchBlogPosts, 
@@ -20,5 +20,6 @@ router.post('/search-blogs', searchBlogPosts);
 router.post('/get-blog', getBlogPost);
 router.get('/get-categories', getAllTags);
 router.post('/like-blog', protect, likeBlogPost);
+
 
 export default router;

@@ -21,6 +21,7 @@ export interface Blog {
       profile_img: string;
       username: string;
     };
+    _id: string
   };
   banner: string;
   slug: string;
@@ -29,6 +30,7 @@ export interface Blog {
   publishedAt: string;
   tags: string[];
   title: string;
+  comments: any;
   _id:string
 }
 

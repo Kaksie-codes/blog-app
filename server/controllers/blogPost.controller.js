@@ -1,5 +1,6 @@
 import BlogPost from '../models/blogPost.model.js'
 import User from '../models/user.model.js'
+import Comment from '../models/Comment.model.js'
 import Notification from '../models/Notification.model.js';
 import handleError from '../utils/error.js';
 import generateSlug from '../utils/generateSlug.js';
@@ -72,7 +73,6 @@ const createBlog = async (req, res, next) => {
     }
 };
 
-
 const likeBlogPost = async (req, res, next) => {    
     let userId = req.user.id;    
     let { _id:blogPostId } = req.body
@@ -113,7 +113,6 @@ const likeBlogPost = async (req, res, next) => {
         return next(error);        
     }
 };
-
 
 const getLatestBlogPosts = async (req, res, next) => { 
     try{
@@ -198,15 +197,28 @@ const searchBlogPosts = async (req, res, next) => {
 const getBlogPost = async (req, res, next) => {     
     try{
         const { slug, draft, mode } = req.body;
-        let incrementVal = mode != 'edit' ? 1 : 0
+        let incrementVal = mode != 'edit' ? 1 : 0;
+
+        // Find the blog post by slug and update the total_reads count
         const blogPost =  await BlogPost.findOneAndUpdate({ slug }, {$inc: {"activity.total_reads": incrementVal}})
         .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname _id")
-        .select("title description content banner activity publishedAt slug tags")
+        .select("title description content banner activity publishedAt slug tags comments")
 
+        // Update the total_reads count for the author
         await User.findOneAndUpdate({"personal_info.username": blogPost.author.personal_info.username}, {
             $inc: {"account_info.total_reads": incrementVal}
         })
 
+        if (!blogPost) {
+            return next(handleError(404, 'Blog post not found'));
+        }
+
+        // Populate the comments with the actual comment objects
+         // Fetch comments separately
+         const comments = await Comment.find({ blog_id: blogPost._id })
+         .populate('commented_by', 'personal_info.username');
+
+        
         if(blogPost.draft && !draft){
             next(handleError(500, 'You cannot access draft blogPosts'))
         }
@@ -247,7 +259,7 @@ const getAllTags = async (req, res, next) => {
 };
   
 
-
+ 
 export {  
     createBlog, 
     getLatestBlogPosts,
@@ -255,5 +267,5 @@ export {
     searchBlogPosts,
     getBlogPost,
     likeBlogPost,   
-    getAllTags
+    getAllTags,    
 } 

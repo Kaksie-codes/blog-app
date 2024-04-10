@@ -6,14 +6,17 @@ import CommentField from "./CommentField"
 
 const CommentsContainer = ({ 
     blog,   
+    setBlog,
     setCommentsWrapper,
-    commentsWrapper
+    commentsWrapper 
 } : { 
-    blog: Blog,   
+    blog: Blog,
+    setBlog: any,   
     commentsWrapper:boolean,
     setCommentsWrapper:any
 }) => {    
-    const { author: {_id:author_id, }, title, _id} = blog
+    const { author: {_id:authorId} , title, _id} = blog
+    // console.log('blog >>>', blog)
   return (
     <div className={`max-sm:w-full fixed ${commentsWrapper ? 'top-0 sm:right-0' : 'top-[100%] sm:right-[-100%]'} duration-700 max-sm:right-0 sm:top-0 w-[30%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden`}>
         <div className="relative">
@@ -26,7 +29,7 @@ const CommentsContainer = ({
             </button>
         </div>
         <hr className="border-grey my-8 w-[120%] -ml-10" />
-        <CommentField action="Comment" author_id={author_id} blog_id={_id}/>
+        <CommentField action="Comment" authorId={authorId} blogId={_id} blog={blog} setBlog={setBlog}/>
     </div>
   )
 }

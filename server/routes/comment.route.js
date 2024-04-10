@@ -1,11 +1,14 @@
  import { Router } from "express";
- import { verifyToken } from "../middleware/auth.middleware.js";
- import { createComment } from "../controllers/comment.controller.js";
+ import { protect } from "../middleware/auth.middleware.js";
+ import { createComment, getAllCommentsByBlogId } from "../controllers/comment.controller.js";
 
 // Initialize the router
 const router = Router();
 
 // Create a Comment
-router.post('/create', verifyToken, createComment);
+router.post('/create-comment', protect, createComment);
+
+// Get Comments by BlogId
+router.get('/get-comments-byId/:blogId', getAllCommentsByBlogId);
 
 export default router;

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Blog } from "../pages/Home"
 import { useSelector } from "react-redux";
-import { Toaster } from "react-hot-toast";
 
 const BlogInteraction = ({
     handleLike, 
@@ -24,8 +23,7 @@ const BlogInteraction = ({
       
 
   return (
-    <div>
-        <Toaster/>
+    <div>        
         <hr className="border-grey my-2"/>
         <div className="flex gap-6 justify-between">
             <div className="flex gap-3 items-center">

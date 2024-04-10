@@ -26,7 +26,8 @@ export const blogStructure = {
             fullname: '',
             username: '',
             profile_img: ''
-        }
+        },
+        _id: ''
     },
     banner: '',
     slug: '',
@@ -35,6 +36,7 @@ export const blogStructure = {
     publishedAt: '',
     tags: [''],
     title: '',
+    comments: '',
     _id: ''
 }   
   
@@ -45,7 +47,7 @@ const BlogPage = () => {
     const [similarBlogs, setSimilarBlogs] = useState<Blog[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [commentsWrapper, setCommentsWrapper] = useState<boolean>(false);
-    // const [totalParentsCommentsLoaded, setTotalParentsCommentsLoaded] = useState(0);
+    const [totalParentsCommentsLoaded, setTotalParentsCommentsLoaded] = useState(0);
 
     let { title, banner, content, publishedAt,_id } = blog;
     let { author : {personal_info: {fullname, username:author_username, profile_img}}} = blog;
@@ -68,7 +70,7 @@ const BlogPage = () => {
             toast.error("Please log in to like this post");
             return;
         }
-            
+
         try {
             const res = await fetch(`/api/post/like-blog`, {
                 method: "POST",
@@ -90,7 +92,7 @@ const BlogPage = () => {
     };
     
     
-    // console.log('fetched blog', blog)
+    console.log('fetched blog', blog)
     const fetchBlogPost = async() => {
         try{ 
             const res = await fetch('/api/post/get-blog', {
@@ -143,7 +145,8 @@ const BlogPage = () => {
             ) : (
                 <div className="max-w-[900px] center py-10 container">
                     <CommentsContainer
-                        blog={blog}                        
+                        blog={blog} 
+                        setBlog={setBlog}                       
                         commentsWrapper={commentsWrapper} 
                         setCommentsWrapper={setCommentsWrapper}
                     />
