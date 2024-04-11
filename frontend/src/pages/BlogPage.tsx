@@ -47,16 +47,19 @@ const BlogPage = () => {
     const [similarBlogs, setSimilarBlogs] = useState<Blog[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [commentsWrapper, setCommentsWrapper] = useState<boolean>(false);
-    const [totalParentsCommentsLoaded, setTotalParentsCommentsLoaded] = useState(0);
+    const [comments, setComments] = useState<any[]>([]);
+    
+    // const [totalParentsCommentsLoaded, setTotalParentsCommentsLoaded] = useState(0);
 
     let { title, banner, content, publishedAt,_id } = blog;
     let { author : {personal_info: {fullname, username:author_username, profile_img}}} = blog;
     let {activity: { total_comments, total_likes, likes} } = blog;
-      
+    const [totalComments, setTotalComments] = useState<number>(total_comments);
     const { userInfo } = useSelector((state: any) => state.auth);        
     const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
     const [likesCount, setLikesCount] = useState(total_likes);
 
+    console.log('id >>', _id)
     useEffect(() => {
         // Check if the user's ID exists in the array of liked users
         if (userInfo) {
@@ -64,7 +67,23 @@ const BlogPage = () => {
             setLikesCount(total_likes);
         }
     }, [userInfo, likes]);
-    
+
+    const fetchComments = async (_id:string) => {
+        try{
+            const res = await fetch(`/api/comment/get-comments-byId/${_id}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }               
+            }); 
+            const {total_comments, comments:blog_comments } = await res.json();
+
+            setComments(blog_comments);
+            setTotalComments(total_comments);
+            
+        }catch(error) {
+            console.log(error)
+        }
+    }
+    console.log("Comments >>", comments)
     const handleLike = async () => {
         if (!userInfo) {
             toast.error("Please log in to like this post");
@@ -92,7 +111,7 @@ const BlogPage = () => {
     };
     
     
-    console.log('fetched blog', blog)
+    // console.log('fetched blog', blog)
     const fetchBlogPost = async() => {
         try{ 
             const res = await fetch('/api/post/get-blog', {
@@ -105,7 +124,8 @@ const BlogPage = () => {
             if(blogPost != null){                
                 setBlog(blogPost); 
                 setIsLoading(false)
-                fetchRelatedBlogs(blogPost.tags);                
+                fetchRelatedBlogs(blogPost.tags);  
+                fetchComments(blogPost._id); // Add this line to fetch comments                              
             }
             // console.log('blogPost', blogPost);
         }catch(error){
@@ -134,7 +154,7 @@ const BlogPage = () => {
     };
 
     useEffect(() => {
-        fetchBlogPost();
+        fetchBlogPost();        
     },[slug])
 
   return (
@@ -149,6 +169,8 @@ const BlogPage = () => {
                         setBlog={setBlog}                       
                         commentsWrapper={commentsWrapper} 
                         setCommentsWrapper={setCommentsWrapper}
+                        comments={comments}
+                        onCommentCreated={fetchComments}
                     />
                     <img src={banner} alt="banner image" className="aspect-video bg-grey" />
                     <div className="mt-12">
@@ -183,6 +205,7 @@ const BlogPage = () => {
                                     isLikedByUser ={isLikedByUser}                              
                                     setCommentsWrapper={setCommentsWrapper}
                                     blog={blog}
+                                    totalComments={totalComments}
                                 />
                     }
                     <div className="my-12 font-gelasio blog-page-content">                        
@@ -195,6 +218,7 @@ const BlogPage = () => {
                                     isLikedByUser ={isLikedByUser }                              
                                     setCommentsWrapper={setCommentsWrapper}
                                     blog={blog}
+                                    totalComments={totalComments}
                                 />
                     }
                     {

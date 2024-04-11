@@ -10,21 +10,23 @@ const CommentField = ({
     authorId,
     blogId,
     setBlog,
-    blog
+    blog,
+    onCommentCreated
 }: {
     action:string,
     authorId: string,
     blogId:string,
     setBlog:any,
-    blog: Blog
+    blog: Blog,
+    onCommentCreated: (_id: string) => Promise<void>;
 }) => {
     
     const [comment, setComment] = useState('');
     const { userInfo } = useSelector((state: any) => state.auth);
-    const { fullname, profile_img, username} = userInfo
+    // const { fullname, profile_img, username} = userInfo
     // const username = userInfo ? userInfo.username : ''; 
     // const accessToken = currentUser ? currentUser.accessToken : '';
-    let { title, banner, comments, content, publishedAt,_id } = blog;
+    // let { title, banner, comments, content, publishedAt,_id } = blog;
 
     const handleComment = () => {
         if(!userInfo){
@@ -52,20 +54,7 @@ const CommentField = ({
             if(success){
                 toast.success(message);
                 setComment("");
-                data.commented_by = {userInfo: {
-                    username,
-                    profile_img,
-                    fullname
-                }}
-            
-                let newCommentArray;
-                data.childrenLevel = 0;
-                newCommentArray = [data]
-
-                let parentCommentIncrementVal = 1;
-
-                setBlog({...blog, comments: {...comments, results: newCommentArray}})
-
+                onCommentCreated(blogId);                
             }else{
                 toast.error(message);
             }

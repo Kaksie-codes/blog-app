@@ -7,13 +7,15 @@ const BlogInteraction = ({
     likesCount,
     isLikedByUser,
     blog,   
-    setCommentsWrapper
+    setCommentsWrapper,
+    totalComments
     } : { 
     handleLike: any,
-    likesCount: number,
+    likesCount: number, 
     isLikedByUser : boolean,
     blog:Blog,    
-    setCommentsWrapper:any   
+    setCommentsWrapper:any   ,
+    totalComments: number
 }) => {    
     let {activity: { total_comments } } = blog;
     let { title, slug } = blog;
@@ -40,7 +42,7 @@ const BlogInteraction = ({
                         onClick={() => setCommentsWrapper((prevVal:boolean) => !prevVal)}>
                         <i className="fi fi-rr-comment-dots"></i>
                     </button>
-                    <p>{total_comments}</p>
+                    <p>{totalComments}</p>
                 </div>
             </div>
             <div className="flex gap-6 items-center justify-center">

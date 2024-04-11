@@ -96,6 +96,7 @@ const getAllCommentsByBlogId = async (req, res, next) => {
                 },
                 isReply: comment.isReply,
                 parent: comment.parent,
+                childrenLevel: 0,
                 commentedAt: comment.commentedAt
             };
 
