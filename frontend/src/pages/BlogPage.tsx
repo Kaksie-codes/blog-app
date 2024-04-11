@@ -39,7 +39,20 @@ export const blogStructure = {
     comments: '',
     _id: ''
 }   
-  
+export interface CommentResponse {
+    _id: string,
+    blog_id: string,
+    blog_author: string,
+    comment: string,
+    commented_by: {
+        _id: string,
+        username: string,
+    },
+    isReply: string,
+    parent: string,
+    childrenLevel: number,
+    commentedAt: string
+} 
 
 const BlogPage = () => {
     const { slug } = useParams();
@@ -47,9 +60,9 @@ const BlogPage = () => {
     const [similarBlogs, setSimilarBlogs] = useState<Blog[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [commentsWrapper, setCommentsWrapper] = useState<boolean>(false);
-    const [comments, setComments] = useState<any[]>([]);
-    
-    // const [totalParentsCommentsLoaded, setTotalParentsCommentsLoaded] = useState(0);
+    const [comments, setComments] = useState<CommentResponse[]>([]);    
+    const [page, setPage] = useState(1);
+    const [totalParentsComments, setTotalParentsComments] = useState(0);
 
     let { title, banner, content, publishedAt,_id } = blog;
     let { author : {personal_info: {fullname, username:author_username, profile_img}}} = blog;
@@ -59,7 +72,7 @@ const BlogPage = () => {
     const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
     const [likesCount, setLikesCount] = useState(total_likes);
 
-    console.log('id >>', _id)
+    // console.log('id >>', _id)
     useEffect(() => {
         // Check if the user's ID exists in the array of liked users
         if (userInfo) {
@@ -70,14 +83,19 @@ const BlogPage = () => {
 
     const fetchComments = async (_id:string) => {
         try{
-            const res = await fetch(`/api/comment/get-comments-byId/${_id}`, {
+            const res = await fetch(`/api/comment/get-comments-byId/${_id}?page=${page}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }               
             }); 
             const {total_comments, comments:blog_comments } = await res.json();
 
-            setComments(blog_comments);
+            // Concatenate the new page of comments to the previous comments array
+            setComments(prevComments => [...prevComments, ...blog_comments.filter((blog_comments:CommentResponse )=> !blog_comments.isReply)]);
             setTotalComments(total_comments);
+            // Calculate the total number of parent comments
+            const totalParentComments = blog_comments.filter((blog_comments:CommentResponse )=> !blog_comments.isReply).length;
+            console.log('totalParentComments >>', totalParentComments);
+            setTotalParentsComments(totalParentComments)
             
         }catch(error) {
             console.log(error)
@@ -157,6 +175,10 @@ const BlogPage = () => {
         fetchBlogPost();        
     },[slug])
 
+    useEffect(() => {
+        fetchComments(blog._id);
+    }, [page]);
+
   return (
     <AnimationWrapper>
         {
@@ -171,6 +193,8 @@ const BlogPage = () => {
                         setCommentsWrapper={setCommentsWrapper}
                         comments={comments}
                         onCommentCreated={fetchComments}
+                        totalParentsComments={totalParentsComments}
+                        setPage={setPage}
                     />
                     <img src={banner} alt="banner image" className="aspect-video bg-grey" />
                     <div className="mt-12">

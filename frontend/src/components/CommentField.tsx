@@ -1,7 +1,7 @@
-import { useState } from "react"
 import { toast} from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Blog } from "../pages/Home";
+import { Dispatch, SetStateAction, useState } from 'react'; 
 // import { blogStructure } from "../pages/BlogPage";
 
 
@@ -9,16 +9,22 @@ const CommentField = ({
     action,
     authorId,
     blogId,
-    setBlog,
+    // setBlog,
     blog,
-    onCommentCreated
+    onCommentCreated,
+    index = undefined,
+    replyingTo = undefined,
+    setIsReplying
 }: {
     action:string,
     authorId: string,
     blogId:string,
-    setBlog:any,
-    blog: Blog,
+    // setBlog:any,
+    blog?: Blog,
     onCommentCreated: (_id: string) => Promise<void>;
+    index?: number | undefined,
+    replyingTo?: string | undefined,
+    setIsReplying?: Dispatch<SetStateAction<boolean>>;
 }) => {
     
     const [comment, setComment] = useState('');
@@ -47,7 +53,9 @@ const CommentField = ({
                 body: JSON.stringify({
                     blogId, 
                     blog_author: authorId,
-                    comment
+                    comment,
+                    replying_to: replyingTo,
+
                 })
             })
             const { success, data, message } = await res.json();
