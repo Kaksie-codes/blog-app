@@ -89,8 +89,14 @@ const BlogPage = () => {
             }); 
             const {total_comments, comments:blog_comments } = await res.json();
 
+            // If it's the first page, set the comments directly
+            if (page === 1) {
+                setComments(blog_comments.filter((blog_comments:CommentResponse )=> !blog_comments.isReply));
+            } else {
             // Concatenate the new page of comments to the previous comments array
-            setComments(prevComments => [...prevComments, ...blog_comments.filter((blog_comments:CommentResponse )=> !blog_comments.isReply)]);
+                setComments(prevComments => [...prevComments, ...blog_comments.filter((blog_comments:CommentResponse )=> !blog_comments.isReply)]);
+            }
+            
             setTotalComments(total_comments);
             // Calculate the total number of parent comments
             const totalParentComments = blog_comments.filter((blog_comments:CommentResponse )=> !blog_comments.isReply).length;

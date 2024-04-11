@@ -85,58 +85,165 @@
 }
 
 
+// const getAllCommentsByBlogId = async (req, res, next) => {
+//     try {
+//         const { blogId } = req.params; // Assuming blogId is passed as a parameter
+//         const { page } = req.query; // Get page number from query parameters
+//         const pageSize = 6; // Number of comments per page
+
+//         // Calculate skip value based on page number
+//         const skip = (page - 1) * pageSize;
+
+//         // Fetch all comments based on the blog_id
+//         const comments = await Comment.find({ blog_id: blogId }).skip(skip)
+//         .limit(pageSize);
+
+//          // Fetch total number of comments in the database
+//          const totalCommentsCount = await Comment.countDocuments({ blog_id: blogId });
+
+//         // Array to hold comment details with user information
+//         const commentsWithUserDetails = [];
+
+//         // Iterate through each comment to fetch user details
+//         for (const comment of comments) {
+//             // Fetch user details based on commenter's ID
+//             const user = await User.findById(comment.commented_by);
+
+//             // Construct comment object with user details
+//             const commentWithUser = {
+//                 _id: comment._id,
+//                 blog_id: comment.blog_id,
+//                 blog_author: comment.blog_author,
+//                 comment: comment.comment,
+//                 commented_by: {
+//                     _id: user._id,
+//                     username: user.personal_info.username, // Assuming username is needed
+//                     // Add other user details as needed
+//                 },
+//                 isReply: comment.isReply,
+//                 parent: comment.parent,
+//                 childrenLevel: 0,
+//                 commentedAt: comment.commentedAt
+//             };
+
+//             commentsWithUserDetails.push(commentWithUser);
+//         }
+
+//         // Return comments along with total number of comments
+//         res.status(200).json({
+//             total_comments: totalCommentsCount,
+//             comments: commentsWithUserDetails
+//         });
+//     } catch (error) {
+//         return next(error)
+//     }
+// };
+
 const getAllCommentsByBlogId = async (req, res, next) => {
     try {
         const { blogId } = req.params; // Assuming blogId is passed as a parameter
-        const { page } = req.query; // Get page number from query parameters
-        const pageSize = 6; // Number of comments per page
 
-        // Calculate skip value based on page number
-        const skip = (page - 1) * pageSize;
-
-        // Fetch all comments based on the blog_id
-        const comments = await Comment.find({ blog_id: blogId }).skip(skip)
-        .limit(pageSize);
-
-         // Fetch total number of comments in the database
-         const totalCommentsCount = await Comment.countDocuments({ blog_id: blogId });
+        // Fetch all parent comments based on the blog_id and isReply property
+        const parentComments = await Comment.find({ blog_id: blogId, isReply: false });
 
         // Array to hold comment details with user information
-        const commentsWithUserDetails = [];
+        const commentsWithChildren = [];
 
-        // Iterate through each comment to fetch user details
-        for (const comment of comments) {
+        // Iterate through each parent comment
+        for (const parentComment of parentComments) {
             // Fetch user details based on commenter's ID
-            const user = await User.findById(comment.commented_by);
+            const user = await User.findById(parentComment.commented_by);
 
-            // Construct comment object with user details
-            const commentWithUser = {
-                _id: comment._id,
-                blog_id: comment.blog_id,
-                blog_author: comment.blog_author,
-                comment: comment.comment,
+            // Construct parent comment object with user details
+            const parentCommentWithUser = {
+                _id: parentComment._id,
+                blog_id: parentComment.blog_id,
+                blog_author: parentComment.blog_author,
+                comment: parentComment.comment,
                 commented_by: {
                     _id: user._id,
                     username: user.personal_info.username, // Assuming username is needed
                     // Add other user details as needed
                 },
-                isReply: comment.isReply,
-                parent: comment.parent,
+                isReply: parentComment.isReply,
+                parent: parentComment.parent,
                 childrenLevel: 0,
-                commentedAt: comment.commentedAt
+                commentedAt: parentComment.commentedAt
             };
 
-            commentsWithUserDetails.push(commentWithUser);
+            // Fetch child comments for the parent comment
+            const childComments = await getChildrenComments(parentComment._id);
+
+            // Recursively fetch and append child comments' children
+            const parentWithChildren = await appendChildren(parentCommentWithUser, childComments);
+
+            // Add the parent comment with its children to the final array
+            commentsWithChildren.push(parentWithChildren);
         }
 
-        // Return comments along with total number of comments
+        // Return comments with children
         res.status(200).json({
-            total_comments: totalCommentsCount,
-            comments: commentsWithUserDetails
+            total_comments: parentComments.length,
+            comments: commentsWithChildren
         });
     } catch (error) {
-        return next(error)
+        return next(error);
     }
+};
+
+// Function to fetch children comments recursively
+const getChildrenComments = async (parentId) => {
+    const childComments = await Comment.find({ parent: parentId });
+
+    // Array to hold all children comments
+    const allChildren = [];
+
+    // Iterate through each child comment
+    for (const childComment of childComments) {
+        // Fetch user details based on commenter's ID
+        const user = await User.findById(childComment.commented_by);
+
+        // Construct child comment object with user details
+        const childCommentWithUser = {
+            _id: childComment._id,
+            blog_id: childComment.blog_id,
+            blog_author: childComment.blog_author,
+            comment: childComment.comment,
+            commented_by: {
+                _id: user._id,
+                username: user.personal_info.username, // Assuming username is needed
+                // Add other user details as needed
+            },
+            isReply: childComment.isReply,
+            parent: childComment.parent,
+            childrenLevel: 0,
+            commentedAt: childComment.commentedAt
+        };
+
+        // Recursively fetch and append child comments' children
+        const childWithChildren = await appendChildren(childCommentWithUser, childComments);
+
+        // Add the child comment with its children to the array
+        allChildren.push(childWithChildren);
+    }
+
+    return allChildren;
+};
+
+// Function to recursively append children to the comment object
+const appendChildren = async (comment, allComments) => {
+    const children = allComments.filter(child => child.parent.toString() === comment._id.toString());
+
+    // If there are children comments, append them to the comment object
+    if (children.length > 0) {
+        comment.childrenComments = [];
+        for (const child of children) {
+            const childWithChildren = await appendChildren(child, allComments);
+            comment.childrenComments.push(childWithChildren);
+        }
+    }
+
+    return comment;
 };
 
 

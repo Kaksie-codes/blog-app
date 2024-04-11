@@ -62,7 +62,8 @@ const CommentField = ({
             if(success){
                 toast.success(message);
                 setComment("");
-                onCommentCreated(blogId);                
+                onCommentCreated(blogId);
+                setIsReplying ? setIsReplying(false) : null                           
             }else{
                 toast.error(message);
             }
