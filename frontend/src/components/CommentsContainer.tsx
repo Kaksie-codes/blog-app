@@ -36,7 +36,7 @@ const CommentsContainer = ({
     };
 
   return (
-    <div className={`max-sm:w-full fixed ${commentsWrapper ? 'top-0 sm:right-0' : 'top-[100%] sm:right-[-100%]'} duration-700 max-sm:right-0 sm:top-0 w-[30%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden`}>
+    <div className={`max-sm:w-full fixed ${commentsWrapper ? 'top-0 sm:right-0' : 'top-[100%] sm:right-[-100%]'} duration-700 max-sm:right-0 sm:top-0 w-[50%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden`}>
         <div className="relative">
             <h1 className="text-xl font-medium">Comments</h1>
             <p className="text-lg mt-2 w-[70%] text-dark-grey line-clamp-1">{title}</p>
@@ -54,9 +54,7 @@ const CommentsContainer = ({
                     comments.map((comment:any, index:number) => {
                         return (
                             <AnimationWrapper key={index}>
-                                <CommentCard
-                                    index={index}
-                                    leftVal={comment.childrenLevel * 4}
+                                <CommentCard                                    
                                     commentData={comment}
                                     blog={blog}
                                     onCommentCreated={onCommentCreated}
@@ -69,7 +67,7 @@ const CommentsContainer = ({
                 )
             }
         </div>
-        {comments.length < totalParentsComments && (
+        {comments && comments.length < totalParentsComments && (
             <button className="text-dark-grey p-2 px-3 hover:bg-grey/30 rounded-md flex items-center gap-2"
             onClick={handleLoadMore}>
                 Load More

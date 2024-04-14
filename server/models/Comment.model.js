@@ -13,6 +13,9 @@ const commentSchema = new Schema({
         required: true,
         ref: 'User', // Assuming the author of the blog is a user
     },
+    comment_level:{
+        type: Number,
+    },
     comment: {
         type: String,
         required: true
@@ -30,9 +33,13 @@ const commentSchema = new Schema({
         type: Boolean,
         default: false // Assuming it defaults to false if not explicitly provided
     },
-    parent: {
+    parent_comment_id: {
         type: Schema.Types.ObjectId,
         ref: 'Comment'
+    },
+    parent_user_id: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     }
 },
 {

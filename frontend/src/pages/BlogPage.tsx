@@ -49,8 +49,7 @@ export interface CommentResponse {
         username: string,
     },
     isReply: string,
-    parent: string,
-    childrenLevel: number,
+    parent: string,    
     commentedAt: string
 } 
 
@@ -81,32 +80,53 @@ const BlogPage = () => {
         }
     }, [userInfo, likes]);
 
-    const fetchComments = async (_id:string) => {
-        try{
+    const fetchComments = async (_id: string) => {
+        try {
             const res = await fetch(`/api/comment/get-comments-byId/${_id}?page=${page}`, {
                 method: "GET",
-                headers: { "Content-Type": "application/json" }               
-            }); 
-            const {total_comments, comments:blog_comments } = await res.json();
-
+                headers: { "Content-Type": "application/json" }
+            });
+            const { total_comments, comments: blog_comments } = await res.json();
+    
+            // Function to recursively collect all descendants for a parent comment
+            const collectDescendants = (comment:any):any => {
+                const descendants = [];
+                for (const child of comment.childrenComments) {
+                    descendants.push(child);
+                    descendants.push(...collectDescendants(child));
+                }
+                return descendants;
+            };
+    
+            // Iterate through each comment
+            const processedComments = blog_comments.map(comment => {
+                // If comment level is 0, collect all descendants recursively
+                if (comment.comment_level === 0) {
+                    const allDescendants = collectDescendants(comment);
+                    return { ...comment, children: allDescendants };
+                } else {
+                    return comment; // For other comment levels, keep as is
+                }
+            });
+    
             // If it's the first page, set the comments directly
             if (page === 1) {
-                setComments(blog_comments.filter((blog_comments:CommentResponse )=> !blog_comments.isReply));
+                setComments(processedComments);
             } else {
-            // Concatenate the new page of comments to the previous comments array
-                setComments(prevComments => [...prevComments, ...blog_comments.filter((blog_comments:CommentResponse )=> !blog_comments.isReply)]);
+                // Concatenate the new page of comments to the previous comments array
+                setComments(prevComments => [...prevComments, ...processedComments]);
             }
-            
+    
             setTotalComments(total_comments);
             // Calculate the total number of parent comments
-            const totalParentComments = blog_comments.filter((blog_comments:CommentResponse )=> !blog_comments.isReply).length;
-            console.log('totalParentComments >>', totalParentComments);
-            setTotalParentsComments(totalParentComments)
-            
-        }catch(error) {
-            console.log(error)
+            const totalParentComments = processedComments.filter(comment => comment.comment_level === 0).length;
+            setTotalParentsComments(totalParentComments);
+    
+        } catch (error) {
+            console.log(error);
         }
     }
+    
     console.log("Comments >>", comments)
     const handleLike = async () => {
         if (!userInfo) {

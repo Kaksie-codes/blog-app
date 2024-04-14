@@ -11,4 +11,7 @@ router.post('/create-comment', protect, createComment);
 // Get Comments by BlogId
 router.get('/get-comments-byId/:blogId', getAllCommentsByBlogId);
 
+// // Get Comments by BlogId
+// router.get('/get-comments-byId', getAllCommentsByBlogId);
+
 export default router;
