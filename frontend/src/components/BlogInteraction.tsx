@@ -17,7 +17,7 @@ const BlogInteraction = ({
     setCommentsWrapper:any   ,
     totalComments: number
 }) => {    
-    let {activity: { total_comments } } = blog;
+    // let {activity: { total_comments } } = blog;
     let { title, slug } = blog;
     let { author : {personal_info: { username: author_username }}} = blog;    
     const { userInfo } = useSelector((state: any) => state.auth);

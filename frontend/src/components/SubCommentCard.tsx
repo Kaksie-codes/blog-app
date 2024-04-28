@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import CommentField from "./CommentField"
 import Avatar from "./Avatar";
 import { getTime } from "../libs/date";

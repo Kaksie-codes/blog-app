@@ -100,7 +100,7 @@ const Profile = () => {
         })
       });
       const { results, currentPage, totalBlogs, totalPages } = await res.json();      
-      setBlogs({ results, currentPage, totalBlogs, totalPages });
+      setBlogs({ data:results, currentPage, totalBlogs, totalPages });
       // console.log('pageState', pageState);
       console.log('Current user Blogs >>', results);
     } catch (error) {
@@ -155,8 +155,8 @@ const Profile = () => {
                         ) : (
                           <>
                             {
-                              blogs.results.length ? (
-                                blogs.results.map((blog: any, index: number) => (
+                              blogs.data.length ? (
+                                blogs.data.map((blog: any, index: number) => (
                                   <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
                                     <BlogCard content={blog} />
                                   </AnimationWrapper>

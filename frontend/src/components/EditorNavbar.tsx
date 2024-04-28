@@ -9,7 +9,7 @@ import { useState } from "react";
 
 const EditorNavbar = () => {
     const { slug } = useParams();
-    const { title, content, banner, tags, description, draft } = useSelector((state: any) => state.blogPost) || {}; 
+    const { title, content, banner, tags, description  } = useSelector((state: any) => state.blogPost) || {}; 
     const dispatch = useDispatch(); 
     const [disabled, setDisabled] = useState(false);
     const navigate = useNavigate();

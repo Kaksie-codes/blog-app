@@ -22,7 +22,7 @@ interface CommentsContainerProps {
 
 const CommentsContainer = ({ 
     blog,   
-    setBlog,
+    // setBlog,
     setCommentsWrapper,
     commentsWrapper,    
     fetchTotalCommentsCount,

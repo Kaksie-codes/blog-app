@@ -31,14 +31,14 @@ export interface Blog {
   tags: string[];
   title: string;
   comments: any;
-  _id:string
+  _id:string, 
 }
 
 export interface BlogApiResponse {
   data: Blog[];
   currentPage: number;
   totalBlogs: number;
-  totalPages: number;
+  totalPages: number;  
 }
 
 

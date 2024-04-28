@@ -31,7 +31,7 @@ const Search = () => {
             body: JSON.stringify({ page, query})
           });
           const { results, currentPage, totalBlogs, totalPages } = await res.json();      
-          setBlogs({ results, currentPage, totalBlogs, totalPages });
+          setBlogs({ data:results, currentPage, totalBlogs, totalPages });
         } catch (error) {
           console.log('error', error);
         }
@@ -94,8 +94,8 @@ const Search = () => {
                             ) : (
                           <>
                             {
-                                blogs && blogs.results && blogs.results.length ? (
-                                    blogs.results.map((blog: any, index: number) => (
+                                blogs && blogs.data && blogs.data.length ? (
+                                    blogs.data.map((blog: any, index: number) => (
                                         <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
                                             <BlogCard content={blog} />
                                         </AnimationWrapper>

@@ -12,6 +12,7 @@ const Editor = () => {
   const [blog, setBlog] = useState(null);
   const { editorMode } = useSelector((state:any) => state.blogPost);
   const dispatch = useDispatch();
+  console.log('blogs in editor page', blog)
   
   
 
