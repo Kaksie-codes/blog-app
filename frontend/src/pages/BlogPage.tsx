@@ -12,7 +12,6 @@ import Avatar from "../components/Avatar";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
-
 export const blogStructure = {
     activity:{
         total_comments: 0,
@@ -47,6 +46,12 @@ export interface CommentResponse {
     commented_by: {
         _id: string,
         username: string,
+        profile_img: string
+    },
+    parent_user: {
+        _id: string,
+        username: string,
+        profile_img: string
     },
     isReply: string,
     parent: string,    
@@ -59,11 +64,9 @@ const BlogPage = () => {
     const [similarBlogs, setSimilarBlogs] = useState<Blog[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [commentsWrapper, setCommentsWrapper] = useState<boolean>(false);
-    const [comments, setComments] = useState<CommentResponse[]>([]);    
-    const [page, setPage] = useState(1);
-    const [totalParentsComments, setTotalParentsComments] = useState(0);
+    
 
-    let { title, banner, content, publishedAt,_id } = blog;
+    let { title, banner, content, publishedAt,_id:blogId } = blog;
     let { author : {personal_info: {fullname, username:author_username, profile_img}}} = blog;
     let {activity: { total_comments, total_likes, likes} } = blog;
     const [totalComments, setTotalComments] = useState<number>(total_comments);
@@ -80,54 +83,19 @@ const BlogPage = () => {
         }
     }, [userInfo, likes]);
 
-    const fetchComments = async (_id: string) => {
+    const fetchTotalCommentsCount = async (blogId : string) => {
         try {
-            const res = await fetch(`/api/comment/get-comments-byId/${_id}?page=${page}`, {
+            const res = await fetch(`/api/comment/get-total-comments-count-byId/${blogId}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             });
-            const { total_comments, comments: blog_comments } = await res.json();
-    
-            // Function to recursively collect all descendants for a parent comment
-            const collectDescendants = (comment:any):any => {
-                const descendants = [];
-                for (const child of comment.childrenComments) {
-                    descendants.push(child);
-                    descendants.push(...collectDescendants(child));
-                }
-                return descendants;
-            };
-    
-            // Iterate through each comment
-            const processedComments = blog_comments.map(comment => {
-                // If comment level is 0, collect all descendants recursively
-                if (comment.comment_level === 0) {
-                    const allDescendants = collectDescendants(comment);
-                    return { ...comment, children: allDescendants };
-                } else {
-                    return comment; // For other comment levels, keep as is
-                }
-            });
-    
-            // If it's the first page, set the comments directly
-            if (page === 1) {
-                setComments(processedComments);
-            } else {
-                // Concatenate the new page of comments to the previous comments array
-                setComments(prevComments => [...prevComments, ...processedComments]);
-            }
-    
-            setTotalComments(total_comments);
-            // Calculate the total number of parent comments
-            const totalParentComments = processedComments.filter(comment => comment.comment_level === 0).length;
-            setTotalParentsComments(totalParentComments);
-    
+            const { total_comments } = await res.json(); 
+            setTotalComments(total_comments);     
         } catch (error) {
             console.log(error);
         }
-    }
-    
-    console.log("Comments >>", comments)
+    };
+
     const handleLike = async () => {
         if (!userInfo) {
             toast.error("Please log in to like this post");
@@ -138,7 +106,7 @@ const BlogPage = () => {
             const res = await fetch(`/api/post/like-blog`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ _id})
+                body: JSON.stringify({ blogId })
             });
     
             const { data, success, message } = await res.json();
@@ -152,8 +120,7 @@ const BlogPage = () => {
             console.error("Error toggling like:", error);
             toast.error("Failed to toggle like. Please try again later.");
         }
-    };
-    
+    };    
     
     // console.log('fetched blog', blog)
     const fetchBlogPost = async() => {
@@ -169,7 +136,7 @@ const BlogPage = () => {
                 setBlog(blogPost); 
                 setIsLoading(false)
                 fetchRelatedBlogs(blogPost.tags);  
-                fetchComments(blogPost._id); // Add this line to fetch comments                              
+                // fetchComments(blogPost._id); // Add this line to fetch comments                              
             }
             // console.log('blogPost', blogPost);
         }catch(error){
@@ -185,9 +152,9 @@ const BlogPage = () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ tag: tags[0], limit: 2, eliminate_blog: slug })
                 });
-                const { results } = await res.json();
+                const { data } = await res.json();
                 // console.log('similar blogPost', results);
-                setSimilarBlogs(results);
+                setSimilarBlogs(data);
             } else {
                 console.log('No tags found for the blog.');
             }
@@ -199,11 +166,11 @@ const BlogPage = () => {
 
     useEffect(() => {
         fetchBlogPost();        
-    },[slug])
+    },[slug])   
 
     useEffect(() => {
-        fetchComments(blog._id);
-    }, [page]);
+        fetchTotalCommentsCount(blogId);        
+    }, [blogId])
 
   return (
     <AnimationWrapper>
@@ -216,11 +183,8 @@ const BlogPage = () => {
                         blog={blog} 
                         setBlog={setBlog}                       
                         commentsWrapper={commentsWrapper} 
-                        setCommentsWrapper={setCommentsWrapper}
-                        comments={comments}
-                        onCommentCreated={fetchComments}
-                        totalParentsComments={totalParentsComments}
-                        setPage={setPage}
+                        setCommentsWrapper={setCommentsWrapper}                       
+                        fetchTotalCommentsCount={fetchTotalCommentsCount}                        
                     />
                     <img src={banner} alt="banner image" className="aspect-video bg-grey" />
                     <div className="mt-12">
@@ -249,7 +213,7 @@ const BlogPage = () => {
                         </div>
                     </div>
                     { 
-                        _id  && <BlogInteraction 
+                        blogId  && <BlogInteraction 
                                     handleLike={handleLike}   
                                     likesCount={likesCount}  
                                     isLikedByUser ={isLikedByUser}                              
@@ -262,7 +226,7 @@ const BlogPage = () => {
                         <BlogContent content={content}/>
                     </div>
                     {
-                        _id  && <BlogInteraction
+                       blogId  && <BlogInteraction
                                     handleLike={handleLike}   
                                     likesCount={likesCount}  
                                     isLikedByUser ={isLikedByUser }                              

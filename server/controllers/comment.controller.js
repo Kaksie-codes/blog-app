@@ -5,19 +5,20 @@
  import handleError from "../utils/error.js";
 
 
-const createComment = async (req, res, next) => {
+ const createComment = async (req, res, next) => {
     try {
         // Get user ID from middleware
         let userId = req.user.id;
 
         // Extract data from request body
-        let { blogId, comment, replying_to, blog_author } = req.body;
+        let { blogId, comment, replying_to, blog_author  } = req.body;
 
         // Check if the comment is empty
         if (!comment.length) {
             return next(handleError(403, 'Write something to leave a comment'));
         }
 
+       
         // Find the associated blog post
         const blogPost = await BlogPost.findById(blogId);
 
@@ -26,22 +27,31 @@ const createComment = async (req, res, next) => {
             return next(handleError(403, 'Blog Post does not exist'));
         }
 
+        // let repliedComment
+        // let parent_user_id
+
+        // if(replying_to){
+        //     repliedComment =  await Comment.findById(replying_to); 
+            
+        // }
+
+
         let parentComment;
-        let parent_user_id = null
+        let parent_user_id;
         let commentLevel = 0;
 
         // Set properties for a reply
         if (replying_to) {
             // Find the parent comment
             parentComment = await Comment.findById(replying_to);
-            parent_user_id = parentComment.commented_by;
-           
+
             if (!parentComment) {
                 return next(handleError(404, 'Parent comment not found'));
             }
 
             // Determine comment level based on parent comment's level
             commentLevel = parentComment.comment_level + 1;
+            parent_user_id = parentComment.commented_by
         }
 
         // Construct new comment object
@@ -51,21 +61,28 @@ const createComment = async (req, res, next) => {
             comment,
             commented_by: userId,
             isReply: !!replying_to, // Convert replying_to to boolean
-            parent_comment_id: replying_to,
-            parent_user_id,            
-            comment_level: commentLevel // Set the comment level
+            parent_comment_id: replying_to ? replying_to : null,
+            parent_user_id: parent_user_id ? parent_user_id : null,
+            comment_level: commentLevel, // Set the comment level
+            children: [] // Initialize children array
         };
 
         // Create a new comment
         let newComment = new Comment(newCommentObj);
-        const savedComment = await newComment.save();
-        const { comment: user_comment, commentedAt, children, _id: commentId } = savedComment;
 
-        // If replying to a comment, update parent comment's childrenComments array
+        // Check for duplicate child IDs before pushing
+        if (replying_to && parentComment.children.includes(newComment._id)) {
+            return next(handleError(400, 'Duplicate child ID detected'));
+        }
+
+        // Push new comment ID to parent's children array
         if (replying_to) {
-            parentComment.children.push(savedComment._id);
+            parentComment.children.push(newComment._id);
             await parentComment.save();
         }
+
+        // Save new comment
+        const savedComment = await newComment.save();
 
         // Update the associated blog post
         blogPost.comments.push(savedComment._id);
@@ -76,19 +93,13 @@ const createComment = async (req, res, next) => {
             blogPost: blogId,
             notification_for: blog_author,
             user: userId,
-            comment: commentId
+            comment: savedComment._id
         };
 
+        // Create notification for reply
         if (replying_to) {
             newNotificationObj.replied_on_comment = replying_to;
-
-            // if you are replying to a comment, add the commentId as a child to the parent Comment
-            const comment = await Comment.findByIdAndUpdate(
-                { _id: replying_to },
-                { $push: { children: commentId } }
-            );
-            // create a notification telling the owner of the comment that someone replied to his comment
-            newNotificationObj.notification_for = comment.commented_by;
+            newNotificationObj.notification_for = parentComment.commented_by;
         }
 
         const newNotification = new Notification(newNotificationObj);
@@ -98,143 +109,272 @@ const createComment = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             message: 'Successfully created a comment',
-            data: {
-                comment: user_comment,
-                commentedAt,
-                commentId,
-                userId,
-                children
-            }
+            comment: savedComment
         });
     } catch (error) {
         return next(error);
     }
 };
 
-
-
-const getAllCommentsByBlogId = async (req, res, next) => {
+const deleteComment = async (req, res, next) => {
     try {
-        const { blogId } = req.params; // Assuming blogId is passed as a parameter
+        // Get user ID from middleware
+        let userId = req.user.id;
 
-        const { page } = req.query; // Get page number from query parameters
-        const pageSize = 6; // Number of comments per page
+        let { commentId } = req.params;
+
+        // Find the comment to delete
+        const comment = await Comment.findById(commentId);
+
+        // Check if the comment exists
+        if (!comment) {
+            return next(handleError(404, 'Comment not found'));            
+        }
+
+        // Check if the user is authorized to delete the comment 
+        if (comment.commented_by && comment.blog_author &&
+            comment.commented_by.toString() !== userId &&
+            comment.blog_author.toString() !== userId) {
+            return next(handleError(403, 'Unauthorized to delete this comment'));
+        }
+
+        // Recursively delete descendants if the comment has children
+        if (comment.children.length > 0) {
+            await deleteDescendants(comment.children);
+        }
+
+        // Delete the comment
+        await Comment.findByIdAndDelete(commentId);
+
+        // Return success response
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Comment and its descendants deleted successfully' 
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
+const deleteDescendants = async (commentIds) => {
+    for (const commentId of commentIds) {
+        const comment = await Comment.findById(commentId);
+        if (comment) { // Check if comment exists
+            if (comment.children.length > 0) {
+                await deleteDescendants(comment.children);
+            }
+            await Comment.findByIdAndDelete(commentId);
+        } else {
+            console.log(`Comment with ID ${commentId} not found.`);
+        }
+    }
+};
+
+const getTotalCommentsCount = async (req, res, next) => {
+    try{
+        // Assuming blogId is passed as a parameter
+        const { blogId } = req.params;
+
+        // Fetch total number of comments in the database
+        const totalCommentsCount = await Comment.countDocuments({ blog_id: blogId });
+        
+        return  res.status(200).json({
+                total_comments: totalCommentsCount
+        })
+
+    }catch(error){
+        return next(error);
+    }
+}
+
+
+const getDescendantCommentsCount = async (commentId) => {
+    let count = 0;
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+        return 0;
+    }
+    // Recursively count the descendants of each child comment
+    for (const childId of comment.children) {
+        count++; // Increment count for the current child comment
+        count += await getDescendantCommentsCount(childId); // Recursively count descendants
+    }
+    return count;
+};
+
+
+
+const getCommentsByBlogId = async (req, res, next) => {
+    try {
+        // Assuming blogId is passed as a parameter
+        const { blogId } = req.params;
+
+        // Get page number from query parameters
+        const { page } = req.query;
+
+        // Number of comments per page
+        const pageSize = 6;
 
         // Calculate skip value based on page number
-        const skip = (page - 1) * pageSize;        
-
-        // Fetch all parent comments based on the blog_id and isReply property
-        const parentComments = await Comment.find({ blog_id: blogId, isReply: false }).skip(skip)
-            .limit(pageSize);
+        const skip = (page - 1) * pageSize;  
 
         // Fetch total number of comments in the database
         const totalCommentsCount = await Comment.countDocuments({ blog_id: blogId });
 
         // Array to hold comment details with user information
-        const commentsWithChildren = [];
+        const comments = [];
+        let descendantCommentsCount;
+
+
+        const parentComments = await Comment.find({ blog_id: blogId, isReply: false })
+        .skip(skip)
+        .limit(pageSize)
+        // .populate({
+        //     path: 'blog_author commented_by parent_user_id',
+        //     select: 'personal_info.username personal_info.profile_img'
+        // })
+        .sort({ commentedAt: -1 }); // Sort in descending order based on creation time
 
         // Iterate through each parent comment
         for (const parentComment of parentComments) {
-            
             // Fetch blog author details
             const blogAuthor = await User.findById(parentComment.blog_author);
 
             // Fetch user details of the commenter
             const user = await User.findById(parentComment.commented_by);
 
-            // Construct parent comment object with user details
-            const parentCommentWithUser = {
+            // Count descendant comments for each parent comment
+            descendantCommentsCount = await getDescendantCommentsCount(parentComment._id);
+
+            const commentData = {
                 _id: parentComment._id,
                 blog_id: parentComment.blog_id,
                 blog_author: {
                     _id: blogAuthor._id,
                     username: blogAuthor.personal_info.username,
+                    profile_img: blogAuthor.personal_info.profile_img
                     // Include other relevant blog author details here
+                },
+                activity:{
+                    total_likes: parentComment.activity.total_likes,
+                    likes: parentComment.activity.likes
                 },
                 comment: parentComment.comment,
                 comment_level: parentComment.comment_level,
                 commented_by: {
                     _id: parentComment.commented_by,
-                    username: user.personal_info.username
+                    username: user.personal_info.username,
+                    profile_img: user.personal_info.profile_img
                 },
                 isReply: parentComment.isReply,
-                parent_comment_id: parentComment.parent_comment_id,
-                commentedAt: parentComment.commentedAt
-            };
-
-
-            // Fetch all descendants (children, grandchildren, etc.) for the parent comment
-            const descendants = await getAllDescendants(parentComment._id);
-
-            // Add the parent comment with its descendants to the final array
-            parentCommentWithUser.childrenComments = descendants;
-            commentsWithChildren.push(parentCommentWithUser);
+                parent_user: parentComment.parent_user_id,
+                commentedAt: parentComment.commentedAt,
+                children: parentComment.children,                
+            }    
+            
+            comments.push(commentData)
         }
 
-        // Return comments with children
-        res.status(200).json({
-            total_comments: totalCommentsCount,
-            comments: commentsWithChildren
-        });
+    return  res.status(200).json({
+                total_comments: totalCommentsCount,
+                parent_comments: comments.length,
+                children: descendantCommentsCount,
+                comments
+                // parent_comments: parentComments.length,
+                // comments: parentComments                
+            });
     } catch (error) {
-        return next(error);
+        next(error);
     }
 };
 
+const getRepliesByParentId = async (req, res, next) => {
+    try {
+        const { parentCommentId } = req.params;
 
-const getAllDescendants = async (parentId) => {
-    // Sort in ascending order based on createdAt timestamp
-    const childComments = await Comment.find({ parent_comment_id: parentId }).sort({ createdAt: 1 });
+        // Check if the comment exists in the database
+        const comment = await Comment.findById(parentCommentId);
 
-    // Array to hold all descendants (children, grandchildren, etc.)
-    const descendants = [];
+        if (!comment) {
+            return next(handleError(404, 'Comment not found'));   
+        }
 
-    // Iterate through each child comment
-    for (const childComment of childComments) {  
+        let processedChildren = [];
+        const replies = [];
 
-        // Fetch blog author details
-        const blogAuthor = await User.findById(childComment.blog_author);
+        const fetchDescendants = async (comments) => {
+            for (const child of comments) {
+                const comment = await Comment.findById(child._id)
+                // .populate({
+                //     path: 'blog_author commented_by parent_user_id', // Include parent_user_id here
+                //     select: 'personal_info.username personal_info.profile_img'
+                // })
+                .sort({ commentedAt: -1 });
 
-        // Fetch the user details of the commenter
-        const user = await User.findById(childComment.commented_by);
+                // Fetch blog author details
+                const blogAuthor = await User.findById(comment.blog_author);
 
-        // Fetch the user details of the parent commenter
-        const parentReply = await User.findById(childComment.parent_user_id);
+                // Fetch user details of the commenter
+                const user = await User.findById(comment.commented_by);
 
-        // Construct child comment object with user details
-        const childCommentWithUser = {
-            _id: childComment._id,
-            blog_id: childComment.blog_id,
-            blog_author: {
-                _id: blogAuthor._id,
-                username: blogAuthor.personal_info.username,
-                // Include other relevant blog author details here
-            },
-            comment: childComment.comment,
-            comment_level: childComment.comment_level,
-            commented_by: {
-                _id: childComment.commented_by,
-                username: user.personal_info.username
-            },        
-            isReply: childComment.isReply,
-            parent_comment_id: childComment.parent_comment_id, 
-            parent_reply: {
-                _id: childComment.parent_user_id,
-                username: parentReply ? parentReply.personal_info.username : null // Handle if parentReply is null
-            },
-            commentedAt: childComment.commentedAt
+                // Fetch user details of the commenter
+                const parent_commenter = await User.findById(comment.parent_user_id);
+
+                // console.log('parent_commenter >>>', parent_commenter)
+
+                const childComment = {
+                    _id: comment._id,
+                    blog_id: comment.blog_id,
+                    blog_author: {
+                        _id: blogAuthor._id,
+                        username: blogAuthor.personal_info.username,
+                        profile_img: blogAuthor.personal_info.profile_img
+                        // Include other relevant blog author details here
+                    },
+                    activity:{
+                        total_likes: comment.activity.total_likes,
+                        likes: comment.activity.likes
+                    },
+                    comment: comment.comment,
+                    comment_level: comment.comment_level,
+                    commented_by: {
+                        _id: comment.commented_by,
+                        username: user.personal_info.username,
+                        profile_img: user.personal_info.profile_img
+                    },
+                    isReply: comment.isReply,                    
+                    parent_user: {
+                        _id: parent_commenter ?  comment.parent_user_id : null,
+                        username: parent_commenter ?  parent_commenter.personal_info.username : null,
+                        profile_img: parent_commenter ?  parent_commenter.personal_info.profile_img : null
+                    },
+                    commentedAt: comment.commentedAt
+                }
+
+
+                if (childComment) {
+                    processedChildren.push(childComment);
+                    if (comment.children.length > 0) {
+                        await fetchDescendants(comment.children);
+                    }
+                }
+            }
         };
 
-        // Recursively fetch all descendants of the child comment
-        const childDescendants = await getAllDescendants(childComment._id);
+        await fetchDescendants(comment.children);
 
-        // Add the child comment with its descendants to the array
-        childCommentWithUser.childrenComments = childDescendants;
-        descendants.push(childCommentWithUser);
+        // Return the replies (descendants) in the response
+        res.status(200).json({
+            replies_count: processedChildren.length,
+            replies: processedChildren
+        });
+    } catch (error) {
+        next(error);
     }
-
-    return descendants;
 };
+
+
+
 
 
 
@@ -242,5 +382,8 @@ const getAllDescendants = async (parentId) => {
 
  export{
     createComment,
-    getAllCommentsByBlogId
+    getCommentsByBlogId,
+    deleteComment,
+    getRepliesByParentId,
+    getTotalCommentsCount
  }

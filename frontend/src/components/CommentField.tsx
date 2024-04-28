@@ -8,20 +8,26 @@ import { Dispatch, SetStateAction, useState } from 'react';
 const CommentField = ({
     action,
     authorId,
+    parentId,
     blogId,
     // setBlog,
-    blog,
-    onCommentCreated,
-    index = undefined,
+    // blog,
+    fetchComments,
+    fetchTotalCommentsCount,
+    fetchReplies,
+    
     replyingTo = undefined,
     setIsReplying
 }: {
     action:string,
     authorId: string,
+    parentId?:string,
     blogId:string,
     // setBlog:any,
     blog?: Blog,
-    onCommentCreated: (_id: string) => Promise<void>;
+    fetchComments?: (_id: string) => Promise<void>;
+    fetchReplies?: (_id: string) => Promise<void>;
+    fetchTotalCommentsCount: (_id: string) => Promise<void>;
     index?: number | undefined,
     replyingTo?: string | undefined,
     setIsReplying?: Dispatch<SetStateAction<boolean>>;
@@ -38,14 +44,13 @@ const CommentField = ({
         if(!userInfo){
             return toast.error('log in to leave a comment')
         }
-
         if(!comment.length){
             return toast.error('Write Something to leave a comment...')
         }
         createComment()
     }
 
-    const createComment = async () => { 
+    const createComment = async () => {         
         try{ 
             const res = await fetch('/api/comment/create-comment', {
                 method: 'POST',
@@ -58,17 +63,23 @@ const CommentField = ({
 
                 })
             })
-            const { success, data, message } = await res.json();
+            const { success, message } = await res.json();
             if(success){
                 toast.success(message);
                 setComment("");
-                onCommentCreated(blogId);
+                if(fetchComments){
+                    fetchComments(blogId);
+                }
+                if(fetchReplies && parentId){
+                    fetchReplies(parentId);
+                }
+                
+                fetchTotalCommentsCount(blogId);
                 setIsReplying ? setIsReplying(false) : null                           
             }else{
                 toast.error(message);
             }
-            console.log('comment stats', data)
-            
+            // console.log('comment stats', data)            
         }catch(error){
             console.log(error);            
         } 

@@ -22,7 +22,8 @@ const commentSchema = new Schema({
     },
     children: [{
         type: Schema.Types.ObjectId,
-        ref: 'Comment'
+        ref: 'Comment',        
+        // unique: true // Enforce uniqueness
     }],
     commented_by: {
         type: Schema.Types.ObjectId,
@@ -40,7 +41,18 @@ const commentSchema = new Schema({
     parent_user_id: {
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }
+    },
+    activity: {
+        total_likes: {
+            type: Number,
+            default: 0
+        },       
+        likes: [{ 
+            type: Schema.Types.ObjectId, 
+            ref: 'User',
+            default: [],
+        }]
+    },
 },
 {
     timestamps: {

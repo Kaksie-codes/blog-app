@@ -8,8 +8,11 @@ import commentRoutes from './routes/comment.route.js'
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser'
 import { errorHandler } from './middleware/error.middleware.js'
+import path from 'path'
 
 const server = express();
+
+const __dirname = path.resolve();
 
 // This enables us to read the content of the .env file
 dotenv.config();
@@ -41,6 +44,11 @@ server.use('/api/post', blogPostRoutes);
 server.use('/api/users', userRoutes);
 server.use('/api/comment', commentRoutes);
 
+server.use(express.static(path.join(__dirname, '/frontend/dist')));
+
+server.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'))
+})
 
 // Error handling middleware
 server.use(errorHandler);

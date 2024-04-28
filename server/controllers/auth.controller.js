@@ -140,9 +140,14 @@ const signinUser = async (req, res, next) => {
             const { verified } = user
 
             if(!verified){
-                // Check if user is verified
-                await sendVerificationEmail(user); 
-                return next(handleError(403, "User not Verified, verification link sent to your email" ));   
+                //Send verification email
+               const emailSent =  await sendVerificationEmail(user); 
+
+               if(emailSent){
+                    return next(handleError(403, "User not Verified, verification link sent to your email"));
+                }else{
+                    return  next(handleError(403, `User not Verified, couldn't send email, try again`));
+                }                   
             }
 
             // comapare new password with encrypted password
@@ -341,6 +346,18 @@ const resendOTP = async (req, res, next) => {
         }
         // Check if User has already registered
         const user = await User.findOne({"personal_info.email": email});
+
+        if(!user){// user does not exist
+            return  next(handleError(403, `Account doesn't exist`))
+          }else{//user exists
+              //generate and send new OTP to users email
+              await generateAndSendPasswordResetOTP(user);
+          }
+          return res.status(200).json({
+              success: true,
+              status:'SUCCESS',
+              message:'Password reset OTP sent to user',
+          })        
         
     } catch (error) {
         return next(error)

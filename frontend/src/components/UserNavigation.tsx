@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import AnimationWrapper from "../libs/page-animation"
 import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "../redux/auth/authSlice";
@@ -7,13 +7,14 @@ import { signOut } from "../redux/auth/authSlice";
 const UserNavigation = () => {
     const dispatch = useDispatch();    
     const { userInfo  :{username}} = useSelector((state:any) => state.auth);
+    const navigate = useNavigate();
 
     const signOutUser = async () => {
         try{
             await fetch('/api/auth/signout');
             dispatch(signOut());
-        }catch(err){
-            
+            navigate('/');
+        }catch(err){            
             console.log('error >>', err)
         }
     }

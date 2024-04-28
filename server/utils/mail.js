@@ -78,7 +78,14 @@ const sendVerificationEmail = async (user) => {
             subject: 'Verify your Email',
             html: generateVerificationLinkTemplate(username, verificationLink)
         }
-        await  sendEmail(mailOptions)
+       
+        const emailSent = await sendEmail(mailOptions);
+
+        if(emailSent){
+            return true
+        }else{
+            return false
+        }
 
     }catch(error){
         throw error;
@@ -115,8 +122,13 @@ const sendEmail = async (mailOptions) => {
         // Send email using async/await
         const info = await transporter.sendMail(mailOptions);
         console.log('Email sent:', info);
+
+        // Return true if email is sent successfully
+        return true;
     } catch (error) {
         console.log('Error sending email:', error);
+        // Return false if an error occurs
+        return false;
     }
 };
 

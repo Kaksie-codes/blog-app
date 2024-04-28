@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { getDay, getTime } from "../libs/date"
+import { getTime } from "../libs/date"
 import Avatar from "./Avatar"
 import toast from "react-hot-toast";
 import { useState } from "react";
@@ -7,13 +7,16 @@ import CommentField from "./CommentField";
 import { Blog } from "../pages/Home";
 import SubCommentCard from "./SubCommentCard";
 import AnimationWrapper from "../libs/page-animation";
+import { CommentResponse } from "../pages/BlogPage";
 
 export interface CommentCardProps {  
-  onCommentCreated: (_id: string) => Promise<void>;
+  fetchComments: (_id: string) => Promise<void>;
+  fetchTotalCommentsCount: (_id: string) => Promise<void>;
   blog: Blog,   
   commentData: {
-    commented_by: {
-      username: string;
+    commented_by: {      
+        username: string;
+        profile_img: string;            
     };
     children: any[];
     commentedAt: string; // Assuming the type of commentedAt is string, update as needed
@@ -29,16 +32,18 @@ export interface CommentCardProps {
 const CommentCard = ({ 
   blog,  
   commentData,
-  onCommentCreated
+  fetchComments,
+  fetchTotalCommentsCount
 } : CommentCardProps ) => {
-  const {commented_by:{ username }, commentedAt, comment, _id, children} = commentData;
+  const {commented_by: {username, profile_img}, commentedAt, comment, _id:parentId, children } = commentData;
   const { userInfo } = useSelector((state: any) => state.auth); 
   const { username:_username } = userInfo 
   const [isReplying, setIsReplying] = useState<boolean>(false);  
-  let { _id:blogId, author: {_id: authorId, personal_info} } = blog;
+  let { _id:blogId, author: {_id: authorId} } = blog;
   // let { _id:blogId, author: {_id: authorId, personal_info:{username:author_username}} } = blog;
   const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
   const [showReplies, setShowReplies] = useState<boolean>(false);
+  const [replies, setReplies] = useState<CommentResponse[]>([])
 
   const handleReply = async () => {
     if(!userInfo){
@@ -47,9 +52,39 @@ const CommentCard = ({
     setIsReplying(!isReplying);
   }
 
-  console.log('commentData >>>', commentData.blog_author.username)
+  const handleReveal = (parentId:string) => {
+    setShowReplies(!showReplies);
+    fetchReplies(parentId);
+    // fetchReplies('661d05ba55790c94be37f78c');
+  }
+
+  const fetchReplies = async (parentId: string) => {
+    try {
+        const url = `/api/comment/get-replies-byId/${parentId}`;
+        console.log("Fetching replies from URL:", url);
+        const res = await fetch(url, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        const { replies } = await res.json();
+        setReplies(replies)
+        // Rest of your code...
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+//   fetchReplies('661d05ba55790c94be37f78c');
+
+
+// console.log("comment >>", commentData);
+// console.log('_id >>>', _id)
+// console.log('replies >>>', replies)
 
   const handleLike = async () => {
+    setIsLikedByUser(!isLikedByUser)
     // if (!userInfo) {
     //     toast.error("Please log in to like this post");
     //     return;
@@ -78,7 +113,7 @@ const CommentCard = ({
   return (
     <div className="w-full">
       <div className="my-5 flex items-start gap-3">
-        <Avatar profileImg="" parentStyles="h-12 w-12" fullname="" username={username}/>
+        <Avatar profileImg={profile_img} parentStyles="h-12 w-12" fullname="" username={username}/>
         <div className="">
           <div className="flex gap-3 items-center">            
             <p className="line-clamp-1 text-black font-semibold">@{username}</p>
@@ -88,16 +123,15 @@ const CommentCard = ({
           <div className="flex gap-5 items-center mt-1"> 
             <div className="flex items-center gap-6 justify-center">
               <div className="flex gap-3 items-center">
-                <button onClick={handleLike}
-                  className={`w-10 h-10 flex items-center rounded-full justify-center  ${isLikedByUser ? 'text-red bg-red/20' : 'bg-grey/80'}`}>
-                  <i className={`fi fi-${isLikedByUser ? 'sr' : 'rr'}-heart`}></i>
+                <button onClick={handleLike}>
+                  <i className={`fi ${isLikedByUser ? 'fi-sr-heart text-red' : 'fi-rr-heart'}`}></i>
                 </button>
                 <p>2</p>
               </div>
               {
                  username === _username || _username === commentData.blog_author.username ? (
                   <button>
-                    <i className="fi fi-rr-trash"></i>
+                    <i className="fi fi-rr-trash hover:text-red"></i>
                   </button>
                 ) : (
                   null
@@ -113,7 +147,7 @@ const CommentCard = ({
           {
             children.length > 0 ? (
               <button 
-                onClick={() => setShowReplies(!showReplies)}
+                onClick={() => handleReveal(parentId)}
                 className="mt-1  text-blue-700">
                   {
                     showReplies ? (
@@ -135,11 +169,12 @@ const CommentCard = ({
               <div className="mt-2">
                 <CommentField 
                   action="reply" 
-                  replyingTo={_id}
+                  replyingTo={parentId}
                   setIsReplying={setIsReplying}
                   blogId={blogId}
                   authorId={authorId}
-                  onCommentCreated={onCommentCreated}
+                  fetchComments={fetchComments}
+                  fetchTotalCommentsCount={fetchTotalCommentsCount}
                 />
               </div>
             ) : (
@@ -150,13 +185,15 @@ const CommentCard = ({
       </div>
       <div className={`ml-16 ${showReplies ? 'block' : 'hidden'}`}>
         {
-          children.length > 0 && children.map((item, index) => {            
+          replies && replies.length > 0 && replies.map((item: any, index: number) => {            
             return (
               <AnimationWrapper key={index}>
                 <SubCommentCard
                   commentData={item}
                   blog={blog}
-                  onCommentCreated={onCommentCreated}
+                  parentId={parentId}
+                  fetchReplies={fetchReplies}
+                  fetchTotalCommentsCount={fetchTotalCommentsCount}
                 />
               </AnimationWrapper>
             )
