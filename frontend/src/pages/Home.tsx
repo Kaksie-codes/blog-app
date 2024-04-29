@@ -6,6 +6,7 @@ import MinimalBlogCard from "../components/MinimalBlogCard";
 import BlogCard from "../components/BlogCard";
 import Nodata from "../components/Nodata";
 import LoadMore from "../components/LoadMore";
+import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 export interface Blog {
   activity: {
@@ -48,8 +49,96 @@ const Home = () => {
   const [pageState, setPageState] = useState('home');
   const [blogCategories, setBlogCategories] = useState<string[]>(['']);
   const activeTabRef = useRef<HTMLButtonElement>(null);
+  const tabsBoxRef = useRef<HTMLDivElement>(null);
+  const scrollLeftRef = useRef<HTMLDivElement>(null);
+  const scrollRightRef = useRef<HTMLDivElement>(null);  
+  const [scrolledEnd, setScrolledEnd] = useState(false)
+  const [scrolledStart, setScrolledStart] = useState(true)
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Handle arrow key presses
+      switch (event.key) {
+        case 'ArrowLeft':
+          scrollLeft();
+          break;
+        case 'ArrowRight':
+          scrollRight();
+          break;
+        default:
+          break;
+      }
+    };
+    
+    // Add event listener for keyboard events
+    document.addEventListener('keydown', handleKeyPress);
+
+    // Remove event listener when component unmounts
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, []);
   
-console.log('blogs ====>>>', blogs)
+ 
+
+  const scrollLeft = () => {
+    console.log('Scrolling left...');
+    if(tabsBoxRef.current)
+    tabsBoxRef.current.scrollLeft += -350;
+
+    
+    // Calculate scroll position and max scrollable width
+    let scrollVal = tabsBoxRef.current?.scrollLeft;
+    let maxScrollableWidth = tabsBoxRef.current?.scrollWidth;
+
+    console.log('scrollValue ===>>', scrollVal)
+    console.log('maxScrollableWidth ===>>', maxScrollableWidth)
+
+    // Check if we've reached the end of the scrollable content
+    if (scrollVal && maxScrollableWidth && maxScrollableWidth > scrollVal) {
+        setScrolledEnd(false);  
+    }else if(scrollVal === 0){
+      // If we've reached the end, hide scrollLeftRef
+      setScrolledStart(true);        
+  }  
+}
+
+const scrollRight = () => {
+  
+  console.log('Scrolling Right...');
+
+  // Scroll right by a certain amount
+  if(tabsBoxRef.current)
+  tabsBoxRef.current.scrollLeft += 350;
+
+  // Wait for a short moment before checking scrollVal
+  setTimeout(() => {
+    // Calculate scroll position and max scrollable width
+    let scrollVal = tabsBoxRef.current?.scrollLeft;
+    let maxScrollableWidth = tabsBoxRef.current?.scrollWidth;
+    
+
+    console.log('scrollValue ===>>', scrollVal);
+    console.log('maxScrollableWidth ===>>', maxScrollableWidth);
+    if(scrollVal && tabsBoxRef.current)
+    // console.log('total ===>>', scrollVal + tabsBoxRef.current.offsetWidth);
+
+    // Check if we've reached the end of the scrollable content
+    if (scrollVal && scrollVal > 0) {
+      // If we haven't reached the end, make scrollLeftRef visible
+      setScrolledStart(false);  
+      setScrolledEnd(false);   
+    }
+
+    if(scrollVal && maxScrollableWidth && tabsBoxRef.current && scrollVal + tabsBoxRef.current.offsetWidth >= maxScrollableWidth){
+      // If we've reached the end, hide scrollLeftRef
+      setScrolledEnd(true);
+    }
+  }, 300); // Adjust the timeout delay as needed
+}
+
+
+
   useEffect(() => {
     if (activeTabRef.current) {
       activeTabRef.current.click();
@@ -187,20 +276,42 @@ console.log('blogs ====>>>', blogs)
           max-md:items-center gap-5 md:full  md:pl-8 md:sticky md:block">
             <div className="relative flex flex-col gap-4 w-full h-full">
               <div className="w-full sticky left-0 pb-4  top-[80px] pt-5 bg-white z-20">
-                <div className="bg-grey rounded-lg p-4">
-                  <h1 className="font-bold mb-4 text-2xl">Stories from all interests</h1>
-                  <div className="flex gap-3 ">
-                    {
-                      blogCategories.map((category, index) => (
-                        <button
-                        className={`tag ${pageState === category.toLowerCase() ? 'bg-black text-white' : 'bg-white text-dark-grey '}`}
-                        onClick={(e) => setMode(e)}
-                        key={index}
-                      >
-                        {category}
-                      </button>
-                      ))
-                    }                   
+                <div className="bg-grey rounded-lg py-4">
+                  <h1 className="font-bold mb-4 text-2xl ml-4">Stories from all interests</h1>
+                  <div className="flex gap-3 overflow-x-hidden relative bg-transparent overflow-hidden px-2">
+                    <div className={`icon absolute top-0 left-0 h-full w-[50px] flex items-center ${scrolledStart ? 'hidden' : 'flex'}`}>
+                      <div 
+                        ref={scrollLeftRef} 
+                        onClick={scrollLeft}
+                        className="cursor-pointer rounded-full hover:bg-dark-grey text-black hover:text-white ml-[7px]">
+                        <MdOutlineKeyboardArrowLeft size={30}/>
+                      </div>
+                    </div>
+                    <div 
+                      className=" flex gap-3 overflow-x-scroll scrollbar scroll-smooth  p-4" 
+                      ref={tabsBoxRef}                       
+                      // onScroll={handleScroll}                      
+                    >
+                      {
+                        blogCategories.map((category, index) => (
+                          <button
+                          className={`tag whitespace-nowrap border border-grey ${pageState === category.toLowerCase() ? 'bg-black text-white' : 'bg-white text-dark-grey '}`}
+                          onClick={(e) => setMode(e)}
+                          key={index}
+                        >
+                          {category}
+                        </button>
+                        ))
+                      }
+                    </div>
+                    <div className={`icon absolute top-0 right-0 h-full w-[50px] flex items-center ${scrolledEnd ? 'hidden' : 'flex'}`}>
+                      <div 
+                        ref={scrollRightRef} 
+                        onClick={scrollRight}
+                        className="cursor-pointer rounded-full hover:bg-dark-grey  hover:text-white ml-[9px]">
+                        <MdOutlineKeyboardArrowRight size={30}/> 
+                      </div>
+                    </div>             
                   </div>                
                 </div>
               </div>
