@@ -14,7 +14,7 @@ const MinimalBlogCard = ({
     const {personal_info: {fullname, username, profile_img}} = author;
 
   return (
-    <Link to={`/blogs/${slug}`} className="flex gap-5 py-4 w-full hover:bg-yellow-50 px-4">
+    <Link to={`/blogs/${slug}`} className="flex gap-5 py-4 w-full hover:bg-grey px-4">
         <h1 className="text-3xl sm:text-3xl lg:text-4xl font-bold text-dark-grey leading-none">{index < 10 ? `0${index}` : index}</h1>
         <div className="w-full">
         <div className="flex gap-2 flex-1  mb-2 items-center relative">

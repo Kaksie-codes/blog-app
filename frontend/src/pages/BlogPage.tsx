@@ -62,7 +62,7 @@ const BlogPage = () => {
     const { slug } = useParams();
     const [blog, setBlog] = useState<Blog>(blogStructure);
     const [similarBlogs, setSimilarBlogs] = useState<Blog[] | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [commentsWrapper, setCommentsWrapper] = useState<boolean>(false);
     
 
@@ -176,7 +176,9 @@ const BlogPage = () => {
     <AnimationWrapper>
         {
             isLoading ? (
-                <Loader/>
+                <div className="w-screen h-screen flex items-center justify-center">
+                    <Loader/>
+                </div>
             ) : (
                 <div className="max-w-[900px] center py-10 container">
                     <CommentsContainer

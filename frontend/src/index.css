@@ -142,11 +142,15 @@
         @apply text-2xl font-medium leading-7 line-clamp-3 sm:line-clamp-2;
     }
 
+    /* .blog-index{
+        @apply text-4xl sm:text-3xl lg:text-5xl font-bold text-grey leading-none;
+    } */
     .blog-index{
-        @apply text-4xl sm:text-3xl lg:text-5xl font-bold text-dark-grey leading-none;
+        @apply text-4xl sm:text-3xl lg:text-5xl font-bold text-grey leading-none;
     }
     .scrollbar{
         scrollbar-width: none;
+        /* color: #faf4f4; */
     }
    
     .icon{

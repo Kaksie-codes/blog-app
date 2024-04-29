@@ -315,7 +315,7 @@ const scrollRight = () => {
                   </div>                
                 </div>
               </div>
-              <div className="border border-grey pb-4 rounded-lg bg-grey"> 
+              <div className="border border-grey pb-4 rounded-lg "> 
               <h1 className="py-4 text-2xl px-4 font-bold">
                   Trending
                   <i className="fi fi-rr-arrow-trend-up font-bold"></i>
