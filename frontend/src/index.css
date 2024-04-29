@@ -145,6 +145,20 @@
     .blog-index{
         @apply text-4xl sm:text-3xl lg:text-5xl font-bold text-dark-grey leading-none;
     }
+    .scrollbar{
+        scrollbar-width: none;
+    }
+   
+    .icon{
+        z-index: 20;
+    }
+    .icon:first-child{
+        background: linear-gradient(90deg, #F3F3F3  70%, transparent);
+        /* display: none; */
+    }
+    .icon:last-child{
+        background: linear-gradient(-90deg, #F3F3F3 70%, transparent);
+    }
 }
 
 .ce-block__content, .ce-toolbar__content{
