@@ -31,7 +31,7 @@ const InpageNavigation: React.FC<InpageNavigationProps> = ({ activeTabRef, child
 
     return (
         <div className='w-full '>
-            <div className="top-[80px]  shadow-sm sticky mb-8 border-b bg-white  w-full md:z-50 mx-auto md:w-full md:mr-auto border-grey flex flex-nowrap overflow-x-auto">
+            <div className="top-[80px] z-[1] shadow-sm sticky mb-8 border-b bg-white  w-full mx-auto  md:mr-auto border-grey flex flex-nowrap overflow-x-auto">
                 <div className='relative'>
                     {routes.map((route, index) => (
                         <button
