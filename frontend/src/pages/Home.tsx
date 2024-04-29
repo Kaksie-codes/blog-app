@@ -233,7 +233,7 @@ const scrollRight = () => {
             routes={[pageState, "trending blogs"]} 
             defaultHidden={["trending blogs"]}
           >
-            <div className="w-full pr-8">
+            <div className="w-full md:pr-8">
               {
                 blogs == null ? (
                   <Loader />
