@@ -51,7 +51,7 @@ const Navbar = () => {
                     <img src={logo} alt="logo"  className='flex-none w-6 lg:w-10'/>
                     <p className='font-bold text-xl lg:text-2xl'>enBlogg</p>
                 </Link>
-                <div className={`absolute bg-white left-0 w-full top-full mt-0.5 border-b md:border-0 md:block md:relative md:inset-0 md:p-0 md:w-auto border-grey py-4 px-[5vw] md:show ${searchBoxVisibility ? 'show' : 'hide'}`}>
+                <div className={`absolute z-50 bg-white left-0 w-full top-full mt-0.5 border-b md:border-0 md:block md:relative md:inset-0 md:p-0 md:w-auto border-grey py-4 px-[5vw] md:show ${searchBoxVisibility ? 'show' : 'hide'}`}>
                     <input
                         type="text"
                         onKeyDown={handleSearch}

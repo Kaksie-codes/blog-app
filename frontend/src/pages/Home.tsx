@@ -49,7 +49,7 @@ const Home = () => {
   const [blogCategories, setBlogCategories] = useState<string[]>(['']);
   const activeTabRef = useRef<HTMLButtonElement>(null);
   
-
+console.log('blogs ====>>>', blogs)
   useEffect(() => {
     if (activeTabRef.current) {
       activeTabRef.current.click();
