@@ -8,7 +8,7 @@ import InpageNavigation from "../components/InpageNavigation";
 import LoadMore from "../components/LoadMore";
 import BlogCard from "../components/BlogCard";
 import Nodata from "../components/Nodata";
-import { BlogApiResponse } from "./Home";
+import { Blog, BlogApiResponse, BlogPageStats } from "./Home";
 import PageNotFound from "./PageNotFound";
 
 interface UserProfile {
@@ -61,7 +61,8 @@ const Profile = () => {
   const { id:profileId } = useParams();
   const [profile, setProfile] = useState<UserProfile>(userProfile);
   const [loading, setLoading] = useState<boolean>(true);
-  const [blogs, setBlogs] = useState<BlogApiResponse | null>(null);
+  const [blogs, setBlogs] = useState<Blog[] | null>(null);
+  const [blogStats, setBlogStats] = useState<BlogPageStats>({currentPage: 1, totalBlogs: 0, totalPages:1})
 
   const { personal_info: { fullname:name, username:profile_username, profile_img, bio }}  = profile
   const { account_info : {total_reads, total_posts} }  = profile
@@ -90,23 +91,34 @@ const Profile = () => {
     }
   }
 
-  const getBLogPosts = async() => {
+  const getBLogPosts = async(page:number = 1) => {
     try {
       const res = await fetch(`/api/post/search-blogs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          "authorId": userId
+          "authorId": userId,
+          page
         })
       });
-      const { results, currentPage, totalBlogs, totalPages } = await res.json();      
-      setBlogs({ data:results, currentPage, totalBlogs, totalPages });
+      // const { results, currentPage, totalBlogs, totalPages } = await res.json();  
+      const { data, currentPage, totalBlogs, totalPages } = await res.json();      
+      if (blogs && blogs.length > 0) {
+        // Concatenate new data with existing blogs
+        setBlogs([...blogs, ...data]);
+      } else {
+        // Set the fetched blogs directly
+        setBlogs(data);
+      }
+      setBlogStats({currentPage, totalBlogs, totalPages})
       // console.log('pageState', pageState);
-      console.log('Current user Blogs >>', results);
+      
     } catch (error) {
       console.log('error', error);
     }
   }
+
+ 
 
   useEffect(() => {
     getProfile();    
@@ -155,8 +167,8 @@ const Profile = () => {
                         ) : (
                           <>
                             {
-                              blogs.data.length ? (
-                                blogs.data.map((blog: any, index: number) => (
+                              blogs.length ? (
+                                blogs.map((blog: any, index: number) => (
                                   <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
                                     <BlogCard content={blog} />
                                   </AnimationWrapper>
@@ -168,7 +180,7 @@ const Profile = () => {
                           </>
                         )
                       }
-                      <LoadMore state={blogs} fetchDataFunction={getBLogPosts}/>
+                      <LoadMore state={blogStats} fetchDataFunction={getBLogPosts}/>
                     </div>
                     <AboutUser classNames='flex flex-col items-center' bio={bio} joinedAt={joinedAt} social_links={social_links}/>
                   </InpageNavigation>

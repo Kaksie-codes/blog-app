@@ -122,7 +122,6 @@ const BlogPage = () => {
         }
     };    
     
-    // console.log('fetched blog', blog)
     const fetchBlogPost = async() => {
         try{ 
             const res = await fetch('/api/post/get-blog', {
@@ -131,14 +130,13 @@ const BlogPage = () => {
                 body: JSON.stringify({slug})
             })
             const { blogPost } = await res.json();
-            // console.log('blogPost', blogPost.content)
+            
             if(blogPost != null){                
                 setBlog(blogPost); 
                 setIsLoading(false)
-                fetchRelatedBlogs(blogPost.tags);  
-                // fetchComments(blogPost._id); // Add this line to fetch comments                              
+                fetchRelatedBlogs(blogPost.tags); 
             }
-            // console.log('blogPost', blogPost);
+           
         }catch(error){
             console.log(error);            
         } 
@@ -152,15 +150,13 @@ const BlogPage = () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ tag: tags[0], limit: 2, eliminate_blog: slug })
                 });
-                const { data } = await res.json();
-                // console.log('similar blogPost', results);
+                const { data } = await res.json();                
                 setSimilarBlogs(data);
             } else {
                 console.log('No tags found for the blog.');
             }
         } catch (error) {
-            console.log(error);
-            // Handle error
+            console.log(error);            
         }
     };
 
@@ -209,8 +205,7 @@ const BlogPage = () => {
                                 </p>
                             </div>
                             <p className="text-dark-grey opacity-75 max-sm:mt-6 max-sm:ml-12 max-sm:pl-5">
-                                Published on {getDay(publishedAt)} 
-                                {/* {getFullDay(publishedAt)} */}
+                                Published on {getDay(publishedAt)}                                 
                             </p>
                         </div>
                     </div>

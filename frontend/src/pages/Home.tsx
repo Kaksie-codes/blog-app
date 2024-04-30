@@ -35,6 +35,12 @@ export interface Blog {
   _id:string, 
 }
 
+export interface BlogPageStats {
+  currentPage: number, 
+  totalBlogs: number, 
+  totalPages: number
+}
+
 export interface BlogApiResponse {
   data: Blog[];
   currentPage: number;
@@ -44,7 +50,8 @@ export interface BlogApiResponse {
 
 
 const Home = () => {
-  const [blogs, setBlogs] = useState<BlogApiResponse | null>(null);
+  const [blogs, setBlogs] = useState<Blog[] | null>(null);
+  const [blogStats, setBlogStats] = useState<BlogPageStats>({currentPage: 1, totalBlogs: 0, totalPages:1})
   const [trendingBlogs, setTrendingBlogs] = useState<Blog[] | null>(null);
   const [pageState, setPageState] = useState('home');
   const [blogCategories, setBlogCategories] = useState<string[]>(['']);
@@ -81,19 +88,14 @@ const Home = () => {
   
  
 
-  const scrollLeft = () => {
-    console.log('Scrolling left...');
+  const scrollLeft = () => {    
     if(tabsBoxRef.current)
     tabsBoxRef.current.scrollLeft += -350;
-
     
     // Calculate scroll position and max scrollable width
     let scrollVal = tabsBoxRef.current?.scrollLeft;
     let maxScrollableWidth = tabsBoxRef.current?.scrollWidth;
-
-    console.log('scrollValue ===>>', scrollVal)
-    console.log('maxScrollableWidth ===>>', maxScrollableWidth)
-
+   
     // Check if we've reached the end of the scrollable content
     if (scrollVal && maxScrollableWidth && maxScrollableWidth > scrollVal) {
         setScrolledEnd(false);  
@@ -104,8 +106,6 @@ const Home = () => {
 }
 
 const scrollRight = () => {
-  
-  console.log('Scrolling Right...');
 
   // Scroll right by a certain amount
   if(tabsBoxRef.current)
@@ -116,10 +116,7 @@ const scrollRight = () => {
     // Calculate scroll position and max scrollable width
     let scrollVal = tabsBoxRef.current?.scrollLeft;
     let maxScrollableWidth = tabsBoxRef.current?.scrollWidth;
-    
 
-    console.log('scrollValue ===>>', scrollVal);
-    console.log('maxScrollableWidth ===>>', maxScrollableWidth);
     if(scrollVal && tabsBoxRef.current)
     // console.log('total ===>>', scrollVal + tabsBoxRef.current.offsetWidth);
 
@@ -155,9 +152,9 @@ const scrollRight = () => {
 
   useEffect(() => {
     fetchCategories();
-  }, [blogCategories])
+  }, [])
 
-  const fetchLatestBlogs = async (page:number = 1) => {
+  const fetchLatestBlogs = async (page:number = 1) => {     
     try {      
       const res = await fetch(`/api/post/latest-blogs`, {
         method: 'POST',
@@ -165,11 +162,19 @@ const scrollRight = () => {
         body: JSON.stringify({ page: page })
       });
       const { data, currentPage, totalBlogs, totalPages } = await res.json();      
-      setBlogs({ data, currentPage, totalBlogs, totalPages });
+      if (blogs && blogs.length > 0) {
+        // Concatenate new data with existing blogs
+        setBlogs([...blogs, ...data]);
+      } else {
+        // Set the fetched blogs directly
+        setBlogs(data);
+      }
+      setBlogStats({currentPage, totalBlogs, totalPages})
     } catch (error) {
       console.log('error', error);
     }
-  };
+  }; 
+
 
   const fetchTrendingBlogs = async () => {
     try {
@@ -183,6 +188,7 @@ const scrollRight = () => {
       console.log('error', error);
     }
   };
+
   const fetchCategories = async () => {
     try {
       const res = await fetch(`/api/post/get-categories`, {
@@ -196,7 +202,7 @@ const scrollRight = () => {
     }
   };
 
-  const fetchBlogsbyCategory = async () => {
+  const fetchBlogsbyCategory = async () => {    
     try {
       const res = await fetch(`/api/post/search-blogs`, {
         method: 'POST',
@@ -205,14 +211,14 @@ const scrollRight = () => {
           "tag": pageState
         })
       });
-      const { data, currentPage, totalBlogs, totalPages }  = await res.json();
-      setBlogs({ data, currentPage, totalBlogs, totalPages });
-      // console.log('pageState', pageState);
-      // console.log('catBlog >>', data);
+      const { data, currentPage, totalBlogs, totalPages }  = await res.json();         
+      setBlogs(data);
+      setBlogStats({currentPage, totalBlogs, totalPages}); 
     } catch (error) {
       console.log('error', error);
     }
   };
+
   const setMode = (e: any) => {
     let category = e.target.textContent.toLowerCase();
     setBlogs(null);
@@ -223,7 +229,7 @@ const scrollRight = () => {
       setPageState(category);
     }
   };
-  // console.log('blogs >>>', blogs)
+  
   return (
     <AnimationWrapper>
       <section className="h-cover container xl:px-[5vw] pb-4 flex justify-center">
@@ -240,8 +246,8 @@ const scrollRight = () => {
                 ) : (
                 <>
                   {
-                    blogs && blogs.data.length ? (
-                      blogs.data.map((blog: any, index: number) => (
+                    blogs && blogs.length ? (
+                      blogs.map((blog: any, index: number) => (
                         <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
                           <BlogCard content={blog} />
                         </AnimationWrapper>
@@ -252,7 +258,7 @@ const scrollRight = () => {
                   }
                 </>
               )}
-              <LoadMore state={blogs} fetchDataFunction={fetchLatestBlogs}/>
+              <LoadMore state={blogStats} fetchDataFunction={fetchLatestBlogs}/>
             </div>
             <>
               {trendingBlogs == null ? (

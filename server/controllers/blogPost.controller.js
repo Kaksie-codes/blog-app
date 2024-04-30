@@ -172,22 +172,25 @@ const searchBlogPosts = async (req, res, next) => {
             searchQuery = { author: authorId, draft:false };             
         }
         
-       const totalBlogs = await BlogPost.countDocuments({ draft: false });
-       const totalPages = Math.ceil(totalBlogs / maxLimit);
+       
 
        const searchedBlogs = await BlogPost.find(searchQuery)
       .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
       .sort({"publishedAt": -1})
-      .select("blog_id title description banner activity tags publishedAt -_id")
+      .select("slug blog_id title description banner activity tags publishedAt -_id")
+      .skip((page - 1) * maxLimit)
       .limit(maxLimit);
+      
+      const totalBlogs = await BlogPost.find(searchQuery);
+      const totalPages = Math.ceil(totalBlogs.length / maxLimit);
 
        res.status(200).json({ 
             success: true, 
             message: `Search result for ${tag ? tag : query}`, 
             data: searchedBlogs,
             currentPage:page,
-            totalBlogs: totalBlogs,
-            totalPages: totalPages  
+            totalBlogs: totalBlogs.length,
+            totalPages: totalPages   
         });
     }catch(error){
         return next(error);

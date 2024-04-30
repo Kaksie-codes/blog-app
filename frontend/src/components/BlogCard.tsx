@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
-import { getDay } from "../libs/date";
+import { getTime } from "../libs/date";
 import Avatar from "./Avatar";
 
 
 const BlogCard = ({ content }:{ content:any }) => {
     const { author, publishedAt, tags, title, description, banner, activity, slug } = content;
     const {personal_info: {fullname, username, profile_img}} = author;
-    const { total_likes } = activity;
-    // console.log('content >>', content)
+    const { total_likes, total_comments } = activity;
+    
+    
   return (
     <Link to={`/blogs/${slug}`} className="flex relative items-center gap-8 border-b border-grey pb-5 mb-4">
         <div className="w-full">
@@ -24,7 +25,7 @@ const BlogCard = ({ content }:{ content:any }) => {
                         <p className="line-clamp-1 ">@{username}</p>
                     </div>
                 </div>
-                <p className="m-w-fit absolute top-1 right-1">{getDay(publishedAt)}</p>
+                <p className="m-w-fit absolute top-1 right-1">{getTime(publishedAt)}</p>
             </div>
             <h1 className="blog-title">{title}</h1>
             <p className="font-gelasio my-3 leading-7 text-xl max-sm:hidden md:max-[1100px]:hidden  line-clamp-2">{description}</p>
@@ -33,6 +34,10 @@ const BlogCard = ({ content }:{ content:any }) => {
                 <span className="flex items-center ml-3 text-dark-grey gap-2">
                     <i className="fi fi-rr-heart"></i>
                     {total_likes}
+                </span>
+                <span className="flex items-center ml-3 text-dark-grey gap-2">
+                    <i className="fi fi-rs-comment-dots"></i>
+                    {total_comments}
                 </span>
             </div>
         </div>

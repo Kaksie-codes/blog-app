@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { getDay } from "../libs/date";
+import { getTime } from "../libs/date";
 import Avatar from "./Avatar";
 
 
@@ -29,9 +29,9 @@ const MinimalBlogCard = ({
                    @{username}
                 </p>
                 {/* <p className="m-w-fit">{getDay(publishedAt)}</p> */}
-                <p className="text-sm whitespace-nowrap">{getDay(publishedAt)}</p>
+                <p className="text-sm whitespace-nowrap">{getTime(publishedAt)}</p>
           </div>
-          <h1 className="sm:line-clamp-2 text-xl font-bold leading-7 line-clamp-3 ">{title}</h1>
+          <h1 className="sm:line-clamp-2 text-xl  font-medium  leading-7 line-clamp-3 ">{title}</h1>
         </div>
     </Link>
   )
