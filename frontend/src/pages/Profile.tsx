@@ -8,7 +8,7 @@ import InpageNavigation from "../components/InpageNavigation";
 import LoadMore from "../components/LoadMore";
 import BlogCard from "../components/BlogCard";
 import Nodata from "../components/Nodata";
-import { Blog, BlogApiResponse, BlogPageStats } from "./Home";
+import { Blog, BlogPageStats } from "./Home";
 import PageNotFound from "./PageNotFound";
 
 interface UserProfile {
