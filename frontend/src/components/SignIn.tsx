@@ -98,9 +98,9 @@ const handleSubmit = async (e: any) => {
             userInfo ? (
                 <Navigate to={'/'}/>
             ) : (
-                <div className={` w-full lg:w-[50%]  ${authPageMode == 'sign-in' ? 'block' : 'hidden'} lg:block`}>
+                <div className={`w-full lg:w-[50%] ${authPageMode == 'sign-in' ? 'block' : 'hidden'} lg:block`}>
                     <AnimationWrapper>
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center w-full">
                             <form className="w-full" >
                                 <h1 className="text-4xl mb-3 font-gelasio capitalize text-center">
                                     Welcome back

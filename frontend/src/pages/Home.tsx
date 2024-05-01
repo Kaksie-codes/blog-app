@@ -232,14 +232,14 @@ const scrollRight = () => {
   
   return (
     <AnimationWrapper>
-      <section className="h-cover container xl:px-[5vw] pb-4 flex justify-center">
-        <div className=" flex-1 border-grey md:border-r">
+      <section className="h-cover container  xl:px-[5vw] pb-4 flex justify-center">
+        <div className=" flex-1 border-grey md:border-r w-full">
           <InpageNavigation 
             activeTabRef={activeTabRef} 
             routes={[pageState, "trending blogs"]} 
             defaultHidden={["trending blogs"]}
           >
-            <div className="w-full md:pr-8">
+            <div className="w-full lg:pr-8">
               {
                 blogs == null ? (
                   <Loader />

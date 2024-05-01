@@ -133,7 +133,7 @@ const Profile = () => {
         ) : (          
             profile_username.length ? (
               <section className="container xl:px-[5vw] h-cover md:flex flex-row-reverse items-start">
-                <div className="flex flex-col max-md:items-center gap-5 min-w-[250px] md:border-l h-cover border-grey md:w-[50%] md:pl-8 md:sticky md:top-[80px] md:pt-10">
+                <div className="flex flex-col max-md:items-center gap-5 min-w-[250px] md:border-l  border-grey md:w-[50%] md:pl-8 md:sticky md:top-[80px] md:pt-10">
                   <img src={profile_img} alt="profile image" className="rounded-full w-48 h-48 bg-grey md:w-32 md:h-32" />
                   <div className="flex flex-col max-md:items-center ">
                     <h1 className="twxt-2xl md:text-3xl font-medium">{name}</h1>
@@ -160,7 +160,7 @@ const Profile = () => {
                     routes={['Blogs Published', 'About']}
                     defaultHidden={['About']}
                   >
-                    <div className="pr-8">
+                    <div className="w-full lg:pr-8">
                       {
                         blogs == null ? (
                           <Loader />
