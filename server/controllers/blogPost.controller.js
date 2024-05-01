@@ -116,7 +116,7 @@ const likeBlogPost = async (req, res, next) => {
 
 const getLatestBlogPosts = async (req, res, next) => { 
     try{
-        let maxLimit = 5;
+        let maxLimit = 10;
         let { page } = req.body;
         page = page ? parseInt(page) : 1;
 
@@ -159,7 +159,7 @@ const getTrendingBlogs = async (req, res, next) => {
 const searchBlogPosts = async (req, res, next) => {    
     try{
         let { tag, query, page, authorId, limit, eliminate_blog } = req.body;
-        let maxLimit = limit ? limit : 5;        
+        let maxLimit = limit ? limit : 10;        
         page = page ? parseInt(page) : 1;
 
         let searchQuery
