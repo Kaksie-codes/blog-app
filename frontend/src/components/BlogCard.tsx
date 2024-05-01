@@ -10,7 +10,7 @@ const BlogCard = ({ content }:{ content:any }) => {
     
     
   return (
-    <Link to={`/blogs/${slug}`} className="flex relative items-center gap-8 border-b border-grey pb-5 mb-4">
+    <Link to={`/blogs/${slug}`} className="flex p-2 relative items-center gap-8 border-b border-grey pb-5 mb-4">
         <div className="w-full">
             <div className="flex gap-2 mb-7 items-center justify-between">
                 <div className="flex items-center gap-3">
