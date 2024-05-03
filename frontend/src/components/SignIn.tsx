@@ -98,8 +98,13 @@ const handleSubmit = async (e: any) => {
             userInfo ? (
                 <Navigate to={'/'}/>
             ) : (
-                <div className={`w-full lg:w-[50%] ${authPageMode == 'sign-in' ? 'block' : 'hidden'} lg:block`}>
-                    <AnimationWrapper>
+                <div className={`w-full lg:w-[45%] ${authPageMode == 'sign-in' ? 'block' : 'hidden'} lg:block`}>
+                    <AnimationWrapper
+                        elementKey="sign-in" 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        transition={{ duration: 1, delay: 0.4 }}
+                    >
                         <div className="flex flex-col items-center w-full">
                             <form className="w-full" >
                                 <h1 className="text-4xl mb-3 font-gelasio capitalize text-center">

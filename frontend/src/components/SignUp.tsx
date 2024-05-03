@@ -123,8 +123,13 @@ const SignUp = () => {
             userInfo && verified ? (
                 <Navigate to={'/'}/>
             ) : (
-                <div className={`lg:w-[50%] lg:block w-full ${authPageMode == 'sign-up' ? 'block' : 'hidden'}`}>
-                    <AnimationWrapper>
+                <div className={`w-full lg:w-[45%] lg:block ${authPageMode == 'sign-up' ? 'block' : 'hidden'}`}>
+                    <AnimationWrapper
+                        elementKey="sign-in" 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        transition={{ duration: 1, delay: 0.4 }}
+                    >
                         <div className="text-center flex flex-col items-center">
                             <form className="w-full" onSubmit={handleSubmit}>
                                 <h1 className="text-4xl mb-3 font-gelasio capitalize text-center">
