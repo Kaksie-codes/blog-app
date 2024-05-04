@@ -11,7 +11,7 @@ import Nodata from "../components/Nodata";
 import { Blog, BlogPageStats } from "./Home";
 import PageNotFound from "./PageNotFound";
 
-interface UserProfile {
+export interface UserProfile {
   account_info:{
     total_posts: number,
     total_reads: number,
@@ -21,7 +21,8 @@ interface UserProfile {
     fullname: string;
     profile_img: string;
     username: string;
-    bio:string
+    bio:string;
+    email?: string;
   };
   social_links:{
     youtube:string,
@@ -34,7 +35,7 @@ interface UserProfile {
   _id:string
 }
 
-const userProfile = {
+export const userProfile = {
   account_info:{
     total_posts: 0,
     total_reads: 0,
@@ -143,7 +144,7 @@ const Profile = () => {
                   <div className="flex gap-4 mt-2">
                     {
                       username === profile_username ? (
-                        <Link to='/setting/edit-profile' className="btn-light rounded-md">
+                        <Link to='/settings/edit-profile' className="btn-light rounded-md">
                           Edit Profile
                         </Link>
                         ) :(

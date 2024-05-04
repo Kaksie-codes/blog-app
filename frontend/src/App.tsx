@@ -17,6 +17,9 @@ import OnlyAdminPrivateRoutes from './components/OnlyAdminPrivateRoutes'
 import ForgotPassword from './pages/ForgotPassword'
 import VerifyUser from './pages/VerifyUser'
 import UserAuth from './pages/UserAuth'
+import SideNavbar from './components/SideNavbar'
+import ChangePassword from './pages/ChangePassword'
+import EditProfile from './pages/EditProfile'
 
 function App() {
  
@@ -33,12 +36,16 @@ function App() {
           <Route path='profile' element={<Profile/>}/> 
           <Route path='search/:query' element={<Search/>}/>
           <Route path='blogs/:slug' element={<BlogPage/>}/> 
-          <Route path='users/:id/verify/:token' element={<VerifyUser/>}/>
-
+          <Route path='users/:id/verify/:token' element={<VerifyUser/>}/>  
+          
                    {/*Protected Routes  */}
           <Route path='' element={<PrivateRoute/>}>             
             <Route path='private' element={<PrivatePage/>}/>
             <Route path='users/:id' element={<Profile/>}/> 
+            <Route path='settings' element={<SideNavbar/>}>
+              <Route path='edit-profile' element={<EditProfile/>}/>
+              <Route path='change-password' element={<ChangePassword/>}/>
+            </Route>
           </Route>
 
                   {/* Admin private Routes */}

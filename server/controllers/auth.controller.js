@@ -194,7 +194,6 @@ const signoutUser = async (req, res, next) => {
     }   
 }
 
-
 // @desc Generate OTP
 // @route GET /api/auth/admin'
 // @access Public
@@ -241,6 +240,52 @@ const resetPassword = async (req, res, next) => {
     }
 }
 
+// @desc a sample private route
+// @route GET /api/auth/private'
+// @access Private
+const changePassword = async (req, res, next) => {
+    try {  
+        const { _id } = req.user;
+        const { newPassword, currentPassword } = req.body;        
+
+        const user = await User.findById(_id);
+
+        if(!passwordRegex.test(newPassword) || !passwordRegex.test(currentPassword)){
+            return next(handleError(403, 'Password should be 6 to 20 characters long with a numeric, 1 uppercase and 1 lowercase letter'))
+        }
+
+        if(!user){
+           return next(handleError(403, 'User not found'))
+        }
+        
+        if(user.google_auth){
+            return next(handleError(403, 'User signed-up through google'))
+        }
+
+        const {personal_info: {password: savedPassword}} = user
+
+        const validPassword = await bcrypt.compare(currentPassword, savedPassword);
+
+        if(!validPassword){
+            return next(handleError(403, 'Incorrect Password'))
+        }
+
+        // Hash the password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+ 
+        user.personal_info.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({ 
+            success: true,
+            statusCode: 200, 
+            message: 'Password changed successfully.' 
+        })
+    } catch (error) {
+        return next(error)        
+    }
+}
 
 // @desc Generate OTP
 // @route POST: /api/auth/generateOTP'
@@ -269,7 +314,6 @@ const generateOTP = async (req, res, next) => {
         return next(error);        
     }
 } 
-
 
 // @desc Verify OTP
 // @route POST /api/auth/verifyOTP
@@ -334,7 +378,6 @@ const verifyOTP = async (req, res, next) => {
     }
 }
 
-
 // @desc Successfully redirecting user when OTP is valid
 // @route GET /api/auth/resendOTP
 // @access Public
@@ -364,7 +407,6 @@ const resendOTP = async (req, res, next) => {
         
     }
 }
-
 
 // @desc Authenticate a User using Google
 // @route POST /api/auth/google-auth'
@@ -509,7 +551,8 @@ export  {
     verifyOTP,   
     resendOTP,
     adminRoute,
-    resetPassword,
+    resetPassword,    
     verifyUser,
-    resendVerificationEmail
+    resendVerificationEmail,
+    changePassword,
 }

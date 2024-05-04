@@ -3,21 +3,22 @@ import { useState } from "react"
 const InputBox = ({
   name, 
   type, 
-  // id, 
+  disabled = false, 
   onChange,
   value, 
   placeholder,  
   icon,
-  errorMessage
+  errorMessage, 
 } : {
   name: string,
   type: any,
-  // id: any,
+  disabled?: boolean,
   onChange: any,
   value:any,
   placeholder:string, 
   icon:string,
-  errorMessage?:string
+  errorMessage?:string,
+  
 }) => {
   const [passwordVisible, setPassWordVisible] = useState<boolean>(false);
 
@@ -25,14 +26,14 @@ const InputBox = ({
     <div className="pb-5 relative">
       <div className="relative w-[100%]">
           <input
-            name={name}
+            name={name}            
             type={type === 'password' ? passwordVisible ? 'text' : "password" : type}
-            placeholder={placeholder}
-            // id={id}
+            placeholder={placeholder}            
             onChange={onChange}
             value={value}
+            disabled={disabled}
             className={`w-full ${errorMessage?.length ? 'border-red' : 'border-grey'} bg-grey focus:bg-transparent ${type === 'password' ? 'pr-12' : ''} w-[100%] rounded-md p-4  pl-12 border placeholder:text-black`}
-            />
+          />
             <i className={`fi ${icon} absolute input-icon`}></i>
           <div className="cursor-pointer">
             {
@@ -40,7 +41,7 @@ const InputBox = ({
             }
           </div>
       </div>
-      {errorMessage && <p className="text-[#ff3860] absolute -bottom-[2px]">{errorMessage}</p>}
+      {errorMessage && <p className="text-[#ff3860] absolute -bottom-[7px] mb-2">{errorMessage}</p>}
     </div>
   )
 }

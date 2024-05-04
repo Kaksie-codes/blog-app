@@ -46,7 +46,7 @@ const Navbar = () => {
 
   return (
     <> 
-        <nav className="z-10 sticky top-0 w-full  py-5 h-[80px] border-b border-grey bg-white">
+        <nav className="z-50 sticky top-0 w-full  py-5 h-[80px] border-b border-grey bg-white">
             <div className='container flex items-center gap-12'>
                 <Link to={'/'} className='flex items-center justify-center gap-1'>
                     <img src={logo} alt="logo"  className='flex-none w-6 lg:w-10'/>

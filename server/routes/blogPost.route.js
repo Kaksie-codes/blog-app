@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { 
-    createBlog,     
+    createBlog, 
+    updateProfile,
+    updateProfileImg,    
     getLatestBlogPosts,     
     getTrendingBlogs, 
     searchBlogPosts, 
@@ -20,6 +22,8 @@ router.post('/search-blogs', searchBlogPosts);
 router.post('/get-blog', getBlogPost);
 router.get('/get-categories', getAllTags);
 router.post('/like-blog', protect, likeBlogPost);
+router.post('/update-profile-img', protect, updateProfileImg);
+router.post('/update-profile', protect, updateProfile);
 
 
 export default router;

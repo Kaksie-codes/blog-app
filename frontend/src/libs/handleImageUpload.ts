@@ -14,7 +14,7 @@ const uploadImage = async (file: File, dispatch: any) => {
 
       // Get storage reference and generate unique filename
       const storage = getStorage(app);
-      const fileName = new Date().getTime() + '-' + file.name;
+      const fileName = new Date().getTime() + '-' + file.name; 
       const storageRef = ref(storage, fileName);
 
       // Upload image to storage

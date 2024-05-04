@@ -7,6 +7,7 @@ import {
     generateOTP, 
     verifyOTP, 
     resetPassword,
+    changePassword,
     resendOTP,
     adminRoute,  
     verifyUser,
@@ -48,6 +49,9 @@ router.post('/google-auth', googleAuth);
 
 // private routes
 router.post('/resetPassword', protect, resetPassword);
+
+// private routes
+router.post('/changePassword', protect, changePassword);
 
 // Admin routes
 router.get('/admin', protect, isAdmin,  adminRoute);
