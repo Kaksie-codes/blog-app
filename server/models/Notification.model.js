@@ -16,24 +16,24 @@ const notificationSchema = new Schema({
     notification_for: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'users'
+        ref: 'User'
     },
     user: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'users'
-    },
+        ref: 'User'
+    }, 
     comment: {
         type: Schema.Types.ObjectId,
-        ref: 'comments'
+        ref: 'Comment'
     },
     reply: {
         type: Schema.Types.ObjectId,
-        ref: 'comments'
+        ref: 'Comment'
     }, 
     replied_on_comment: {
         type: Schema.Types.ObjectId,
-        ref: 'comments'
+        ref: 'Comment'
     },
     seen: {
         type: Boolean,

@@ -11,7 +11,7 @@
         let userId = req.user.id;
 
         // Extract data from request body
-        let { blogId, comment, replying_to, blog_author  } = req.body;
+        let { blogId, comment, replying_to, blog_author, notificationId  } = req.body;
 
         // Check if the comment is empty
         if (!comment.length) {
@@ -51,7 +51,12 @@
 
             // Determine comment level based on parent comment's level
             commentLevel = parentComment.comment_level + 1;
-            parent_user_id = parentComment.commented_by
+            parent_user_id = parentComment.commented_by;
+
+            if(notificationId){
+                await Notification.findOneAndUpdate({_id: notificationId}, {reply: comment})
+                console.log('notification updated')
+            }
         }
 
         // Construct new comment object

@@ -3,12 +3,13 @@ import logo from '../imgs/logo.png'
 import { Link, Outlet, useNavigate, } from 'react-router-dom'
 import { useDispatch, useSelector } from "react-redux"
 import UserNavigation from './UserNavigation'
-import { setAuthPageMode } from '../redux/auth/authSlice'
+import { setAuthPageMode, setNotificationStatus } from '../redux/auth/authSlice'
 import Avatar from './Avatar'
+import toast from 'react-hot-toast'
 
 const Navbar = () => {  
     const navPanelRef = useRef<HTMLDivElement>(null); 
-    const { userInfo } = useSelector((state:any) => state.auth);
+    const { userInfo, newNotificationAvailable } = useSelector((state:any) => state.auth);
     
     const profilePic = userInfo ? userInfo.profile_img : null;
     const username = userInfo ? userInfo.username : null;
@@ -36,14 +37,47 @@ const Navbar = () => {
         // e.target.value = '';
     }
     
+    const newNotification = async () => {
+        try {
+            // Submit the form data
+            const res = await fetch(`/api/notification/new-notification`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }                
+            });
+
+            const result = await res.json();
+            const { new_notification_available, success } = result;
+    
+            if (success === true && new_notification_available) {
+                dispatch(setNotificationStatus(true));
+                // toast.success('new notification');
+            } else {
+                dispatch(setNotificationStatus(false));
+                // toast.success('no new notification');
+                // dispatch(setCredentials(user));
+                // navigate('/');
+            }
+        }catch(error:any){
+            console.log(error);
+            toast.error(error.message);
+        }
+    }
+
     useEffect(() => {    
         document.addEventListener('click', closeNav);
         return () => {        
             document.removeEventListener('click', closeNav);
         }       
-      },[closeNav]);
+    },[closeNav]);
+
+    useEffect(() => {
+        if(userInfo){
+            newNotification();
+        }
+    }, [userInfo])
        
 
+    // console.log('not_status ====>>', newNotificationAvailable)
   return (
     <> 
         <nav className="z-50 sticky top-0 w-full  py-5 h-[80px] border-b border-grey bg-white">
@@ -74,6 +108,15 @@ const Navbar = () => {
                                 <Link to={'/dashboard/notifications'}>
                                     <button className='w-12 h-12 bg-grey rounded-full relative hover:bg-black/10 '>
                                         <i className='fi fi-rr-bell text-2xl flex items-center justify-center'></i>
+                                        {
+                                            newNotificationAvailable ? (
+                                                <span className='bg-red rounded-full w-3 h-3 absolute z-10 top-2 right-2'>
+                                                </span>
+                                            ) : (
+                                                null
+                                            )
+                                        }
+                                        
                                     </button>
                                 </Link>
                                 <div className="relative nav__toggle cursor-pointer" onClick={() => setIsNavPanelVisible(!isNavPanelVisible)} ref={navPanelRef}>                                    

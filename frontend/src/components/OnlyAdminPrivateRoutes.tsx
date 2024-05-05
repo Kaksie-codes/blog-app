@@ -6,7 +6,7 @@ const OnlyAdminPrivateRoutes = () => {
     
     // Check if userInfo is undefined or null
     if (userInfo === undefined || userInfo === null) {
-        return <Navigate to="/signin" replace />;
+        return <Navigate to="/auth" replace />;
     }
 
     const { role } = userInfo;
@@ -16,3 +16,4 @@ const OnlyAdminPrivateRoutes = () => {
 };
 
 export default OnlyAdminPrivateRoutes;
+ 

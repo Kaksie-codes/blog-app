@@ -43,7 +43,7 @@ const UserAuth = () => {
             <img src={logo} alt="logo"  className='flex-none w-6 lg:w-10'/>
             <p className='font-bold text-xl lg:text-2xl'>enBlogg</p>
         </Link>
-        <div className="max-h-[87vh] bg-white relative overflow-hidden w-[90vw] xl:w-[70vw] max-w-[500px] lg:max-w-[1000px] px-5 py-8 rounded-[15px] shadow-lg">
+        <div className="max-h-[90vh] bg-white relative overflow-hidden w-[90vw] xl:w-[70vw] max-w-[500px] lg:max-w-[1000px] px-5 py-6 rounded-[15px] shadow-lg">
             <div className={`hidden lg:block absolute top-0 ${authPageMode == 'sign-in' ? 'translate-x-full' : 'translate-x-0'} -left-[50%] w-full h-full bg-gradient-to-l from-pink-400 to-pink-600 z-20 transform  transition duration-1000 ease-in-out`}></div>
             <div className="w-full h-full flex items-center gap-12 justify-between  md:px-8">
                 <SignIn/>

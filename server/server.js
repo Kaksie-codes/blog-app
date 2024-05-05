@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.route.js'
 import blogPostRoutes from './routes/blogPost.route.js'
 import userRoutes from './routes/user.route.js'
 import commentRoutes from './routes/comment.route.js'
+import notificationRoutes from './routes/notification.route.js'
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser'
 import { errorHandler } from './middleware/error.middleware.js'
@@ -43,6 +44,7 @@ server.use('/api/auth', authRoutes);
 server.use('/api/post', blogPostRoutes); 
 server.use('/api/users', userRoutes);
 server.use('/api/comment', commentRoutes);
+server.use('/api/notification', notificationRoutes);
 
 server.use(express.static(path.join(__dirname, '/frontend/dist')));
 

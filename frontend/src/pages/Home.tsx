@@ -35,11 +35,12 @@ export interface Blog {
   _id:string, 
 }
 
-export interface BlogPageStats {
+export interface PaginationStats {
   currentPage: number, 
-  totalBlogs: number, 
-  totalPages: number
-}
+  totalCount: number, 
+  totalPages: number,
+  deletedDocCount?: number
+} 
 
 export interface BlogApiResponse {
   data: Blog[];
@@ -51,7 +52,7 @@ export interface BlogApiResponse {
 
 const Home = () => {
   const [blogs, setBlogs] = useState<Blog[] | null>(null);
-  const [blogStats, setBlogStats] = useState<BlogPageStats>({currentPage: 1, totalBlogs: 0, totalPages:1})
+  const [blogStats, setBlogStats] = useState<PaginationStats>({currentPage: 1, totalCount: 0, totalPages:1})
   const [trendingBlogs, setTrendingBlogs] = useState<Blog[] | null>(null);
   const [pageState, setPageState] = useState('home');
   const [blogCategories, setBlogCategories] = useState<string[]>(['']);
@@ -161,7 +162,7 @@ const scrollRight = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ page: page })
       });
-      const { data, currentPage, totalBlogs, totalPages } = await res.json();      
+      const { data, currentPage, totalCount, totalPages } = await res.json();      
       if (blogs && blogs.length > 0) {
         // Concatenate new data with existing blogs
         setBlogs([...blogs, ...data]);
@@ -169,7 +170,7 @@ const scrollRight = () => {
         // Set the fetched blogs directly
         setBlogs(data);
       }
-      setBlogStats({currentPage, totalBlogs, totalPages})
+      setBlogStats({currentPage, totalCount, totalPages})
     } catch (error) {
       console.log('error', error);
     }
@@ -211,9 +212,9 @@ const scrollRight = () => {
           "tag": pageState
         })
       });
-      const { data, currentPage, totalBlogs, totalPages }  = await res.json();         
+      const { data, currentPage, totalCount, totalPages }  = await res.json();         
       setBlogs(data);
-      setBlogStats({currentPage, totalBlogs, totalPages}); 
+      setBlogStats({currentPage, totalCount, totalPages}); 
     } catch (error) {
       console.log('error', error);
     }

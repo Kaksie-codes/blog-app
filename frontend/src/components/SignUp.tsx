@@ -186,6 +186,7 @@ const SignUp = () => {
                             </form>
                             <div className="relative w-full flex items-center  my-4 gap-2 opacity-10 uppercase text-black font-bold">
                                     <hr className="w-1/2 border-black"/>
+                                    OR
                                     <hr className="w-1/2 border-black"/>
                             </div>
                             <Oauth/>

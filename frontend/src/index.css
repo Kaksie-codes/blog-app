@@ -104,8 +104,14 @@
     .sidebar-link{
         @apply flex gap-4 items-center py-5 text-dark-grey hover:text-black;
     }
+    .admin-sidebar-link{
+        @apply flex gap-4 items-center py-4 text-dark-grey hover:text-black;
+    }
 
     .sidebar-link.active{
+        @apply text-black border-r-2 border-black pl-6 bg-grey/50 -ml-6 md:rounded-tl-lg md:rounded-bl-lg max-md:border-none;
+    }
+    .admin-sidebar-link.active{
         @apply text-black border-r-2 border-black pl-6 bg-grey/50 -ml-6 md:rounded-tl-lg md:rounded-bl-lg max-md:border-none;
     }
 

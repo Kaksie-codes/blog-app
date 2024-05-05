@@ -143,6 +143,7 @@ const handleSubmit = async (e: any) => {
                             </form>
                             <div className="relative w-full my-4 flex items-center gap-2 opacity-10 uppercase text-black font-bold">
                                     <hr className="w-1/2 border-black"/>
+                                    OR
                                     <hr className="w-1/2 border-black"/>
                             </div> 
                             <Oauth/>

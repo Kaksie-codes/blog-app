@@ -42,7 +42,7 @@ const InpageNavigation: React.FC<InpageNavigationProps> = ({ activeTabRef, child
                             {route}
                         </button>
                     ))}
-                    <hr ref={activeTabLineRef} className="absolute bottom-0 duration-300" />
+                    <hr ref={activeTabLineRef} className="absolute bottom-0 bg-black duration-300" />
                 </div>              
             </div>
             {Array.isArray(children) ? children[inPageNavIndex] : children}

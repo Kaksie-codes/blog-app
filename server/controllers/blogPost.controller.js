@@ -189,7 +189,7 @@ const searchBlogPosts = async (req, res, next) => {
             message: `Search result for ${tag ? tag : query}`, 
             data: searchedBlogs,
             currentPage:page,
-            totalBlogs: totalBlogs.length,
+            totalCount: totalBlogs.length,
             totalPages: totalPages   
         });
     }catch(error){
@@ -333,6 +333,46 @@ const updateProfile = async (req, res, next) => { // Function to update user pro
     }
 };
 
+const myBlogs = async (req, res, next) => {
+    try {
+        let { _id: userId } = req.user; // Destructuring user ID from request object
+        let { page, draft, query, deletedDocCount } = req.body;
+
+        let maxLimit = 5;        
+        page = page ? parseInt(page) : 1;
+        let skipDocs = (page -1) * maxLimit;
+
+        if(deletedDocCount){
+            skipDocs -= deletedDocCount;
+        }
+
+        const myBlogs = await BlogPost.find({author: userId, draft, title: new RegExp(query, 'i')})
+        .skip(skipDocs)
+        .limit(maxLimit)
+        .sort({publishedAt: -1})
+        .select('title banner publishedAt slug activity des draft -_id')
+
+        const totalCount =   myBlogs.length;
+        const totalPages = Math.ceil(totalCount/maxLimit);
+
+        if(!myBlogs.length){
+            return next(handleError(400, 'You have no blog posts'));
+        }
+
+        return res.status(200).json({
+            success:true,
+            data: myBlogs,
+            currentPage: page,
+            totalCount,
+            totalPages,
+            message: 'Your blogs found'
+        })
+
+    } catch (error) {
+        return next(error);
+    }
+}
+
 export {  
     createBlog, 
     getLatestBlogPosts,
@@ -342,5 +382,6 @@ export {
     likeBlogPost,   
     getAllTags,  
     updateProfileImg,
-    updateProfile  
+    updateProfile,
+    myBlogs  
 } 

@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux";
 import { NavLink, Outlet, useLocation } from "react-router-dom"
 
-
-const SideNavbar = () => {
+const AdminSidebar = () => {
     const location = useLocation();
     let page = location.pathname.split('/')[2]
     let [pageState, setPageState] = useState<string | undefined>(page.replace('-', " "));
@@ -32,8 +31,8 @@ const SideNavbar = () => {
         pageStateTab.current?.click()
     }, [pageState])
 
-  return ( 
-    <>
+  return (
+    <div>
         <section className="relative flex gap-10 py-0 m-0 max-md:flex-col container mx-auto">
             <div className="sticky z-[5] top-[80px]">
                 <div className="md:hidden flex bg-white py-1 border-b border-grey flex-nowrap overflow-x-auto">
@@ -44,27 +43,32 @@ const SideNavbar = () => {
                         {pageState}
                     </button>
                     <hr ref={activeTabLine} className="absolute bg-black border-black bottom-0 duration-500"/>
-                </div>
-                {/* h-[calc(100vh-80px-60px)] */}
-                {/* max-md:w-[calc(100%+80px] */}
-                {/* max-md:ml-7 */}
+                </div>                
                 <div className={`min-w-[200px] max-md:w-[calc(100%+80px] max-md:h-[calc(100vh-80px-60px)]  w-full  md:h-cover md:sticky top-24 overflow-y-auto p-6 md:pr-0 md:border-grey md:border-r absolute max-md:top-[64px] bg-white  max-md:w-full max-md:px-10  duration-500 ${!showSideNav ? 'max-md:opacity-0 max-md:pointer-events-none' : 'opacity-100 pointer-events-auto'}`}>
                     <h1 className="text-xl text-dark-grey mb-3">
                         Dashboard
                     </h1>
                     <hr className="border-grey -ml-6 mb-8 mr-6"/>
                     <NavLink 
-                        to={'/dashboard/blogs'}
+                        to={'/admin-dashboard/users'}
                         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => setPageState(e.currentTarget.innerText || undefined)}
-                        className='sidebar-link'
+                        className='admin-sidebar-link'
+                    >
+                        <i className="fi fi-rr-user"></i>
+                        Users
+                    </NavLink>
+                    <NavLink 
+                        to={'/admin-dashboard/blogs'}
+                        onClick={(e: React.MouseEvent<HTMLAnchorElement>) => setPageState(e.currentTarget.innerText || undefined)}
+                        className='admin-sidebar-link'
                     >
                         <i className="fi fi-rr-document"></i>
                         Blogs
                     </NavLink>
                     <NavLink 
-                        to={'/dashboard/notifications'}
+                        to={'/admin-dashboard/notifications'}
                         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => setPageState(e.currentTarget.innerText || undefined)}
-                        className='sidebar-link'
+                        className='admin-sidebar-link'
                     >
                         <div className="relative">
                             
@@ -83,19 +87,19 @@ const SideNavbar = () => {
                     <NavLink 
                         to={'/editor'}
                         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => setPageState(e.currentTarget.innerText || undefined)}
-                        className='sidebar-link'
+                        className='admin-sidebar-link'
                     >
                         <i className="fi fi-rr-file-edit"></i>
                         Write
                     </NavLink>
-                    <h1 className="text-xl text-dark-grey mb-3 mt-20">
+                    <h1 className="text-xl text-dark-grey mb-3 mt-10">
                         Settings
                     </h1>
                     <hr className="border-grey -ml-6 mb-8 mr-6"/>
                     <NavLink 
                         to={'/settings/edit-profile'}
                         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => setPageState(e.currentTarget.innerText || undefined)}
-                        className='sidebar-link'
+                        className='admin-sidebar-link'
                     >
                         <i className="fi fi-rr-user"></i>
                         Edit Profile
@@ -103,7 +107,7 @@ const SideNavbar = () => {
                     <NavLink 
                         to={'/settings/change-password'}
                         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => setPageState(e.currentTarget.innerText || undefined)}
-                        className='sidebar-link'
+                        className='admin-sidebar-link'
                     >
                         <i className="fi fi-rr-lock"></i>
                         Change Password
@@ -114,8 +118,8 @@ const SideNavbar = () => {
                 <Outlet/>
             </div>
         </section>        
-    </>
+    </div>
   )
-}
+} 
 
-export default SideNavbar
+export default AdminSidebar

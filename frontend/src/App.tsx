@@ -20,6 +20,9 @@ import UserAuth from './pages/UserAuth'
 import SideNavbar from './components/SideNavbar'
 import ChangePassword from './pages/ChangePassword'
 import EditProfile from './pages/EditProfile'
+import Notifications from './pages/Notifications'
+import ManageBlogs from './pages/ManageBlogs'
+import AdminSidebar from './components/AdminSidebar'
 
 function App() {
  
@@ -37,6 +40,19 @@ function App() {
           <Route path='search/:query' element={<Search/>}/>
           <Route path='blogs/:slug' element={<BlogPage/>}/> 
           <Route path='users/:id/verify/:token' element={<VerifyUser/>}/>  
+
+                  {/* Admin private Routes */}
+          <Route path='' element={<OnlyAdminPrivateRoutes/>}>
+            <Route path='settings' element={<AdminSidebar/>}>
+              <Route path='edit-profile' element={<EditProfile/>}/>
+              <Route path='change-password' element={<ChangePassword/>}/>
+            </Route>
+            <Route path='admin-dashboard' element={<AdminSidebar/>}>              
+              <Route path='notifications' element={<Notifications/>}/>
+              <Route path='blogs' element={<ManageBlogs/>}/>
+              <Route path='users' element={<ManageBlogs/>}/>
+            </Route>
+          </Route>
           
                    {/*Protected Routes  */}
           <Route path='' element={<PrivateRoute/>}>             
@@ -46,12 +62,13 @@ function App() {
               <Route path='edit-profile' element={<EditProfile/>}/>
               <Route path='change-password' element={<ChangePassword/>}/>
             </Route>
+            <Route path='dashboard' element={<SideNavbar/>}>              
+              <Route path='notifications' element={<Notifications/>}/>
+              <Route path='blogs' element={<ManageBlogs/>}/>
+            </Route>
           </Route>
 
-                  {/* Admin private Routes */}
-          <Route path='' element={<OnlyAdminPrivateRoutes/>}>
-            {/* <Route path='admin' element={<AdminDashboard/>}/> */}
-          </Route>
+          
 
           <Route path='*' element={<PageNotFound/>}/>          
         </Route>

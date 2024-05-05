@@ -1,11 +1,11 @@
-import { BlogPageStats } from "../pages/Home"
+import { PaginationStats } from "../pages/Home"
 
 const LoadMore = ({
     state,
     fetchDataFunction
 } : {
-    state: BlogPageStats,
-    fetchDataFunction: (page:number) => void
+    state: PaginationStats,
+    fetchDataFunction: (page:number) => void    
 }) => {
     let {currentPage, totalPages } = state
     

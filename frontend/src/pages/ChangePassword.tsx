@@ -115,7 +115,7 @@ const ChangePassword = () => {
     <AnimationWrapper>
         <form onSubmit={handleSubmit}>
             <h1 className="max-md:hidden">
-                ChangePassword
+                Change Password
             </h1>
             <div className="py-10 w-full md:max-w-[400px]">
                 <InputBox

@@ -11,13 +11,15 @@ interface UserState {
     authPageMode: string;
     resetPageMode: string;
     verified: boolean;
+    newNotificationAvailable: boolean;
 }
 
 const initialState: UserState = {
     userInfo:null,
     authPageMode: 'sign-in',
     resetPageMode: 'input-email',  
-    verified: false
+    verified: false,
+    newNotificationAvailable: false,
 }
 
 const authSlice = createSlice({
@@ -39,8 +41,11 @@ const authSlice = createSlice({
         setVerificationStatus: (state, action) => {
             state.verified = action.payload
         },
+        setNotificationStatus: (state, action) => {
+            state.newNotificationAvailable = action.payload
+        },
     }
 })
 
-export const { setCredentials, signOut, setAuthPageMode, setResetPageMode, setVerificationStatus } = authSlice.actions
+export const { setCredentials, signOut, setAuthPageMode, setResetPageMode, setVerificationStatus, setNotificationStatus } = authSlice.actions
 export default authSlice.reducer
