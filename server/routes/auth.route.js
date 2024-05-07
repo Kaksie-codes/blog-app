@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { 
     signupUser, 
     signinUser, 
+    readCookies,
     signoutUser, 
     googleAuth, 
     generateOTP, 
@@ -55,6 +56,9 @@ router.post('/changePassword', protect, changePassword);
 
 // Admin routes
 router.get('/admin', protect, isAdmin,  adminRoute);
+
+// Read Cookies
+router.get('/read-cookies', readCookies);
 
 
 

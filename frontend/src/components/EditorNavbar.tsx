@@ -9,6 +9,7 @@ import { useState } from "react";
 
 const EditorNavbar = () => {
     const { slug } = useParams();
+    const { userInfo: { role } } = useSelector((state:any) => state.auth);
     const { title, content, banner, tags, description  } = useSelector((state: any) => state.blogPost) || {}; 
     const dispatch = useDispatch(); 
     const [disabled, setDisabled] = useState(false);
@@ -74,7 +75,7 @@ const EditorNavbar = () => {
                   setDisabled(false); 
                 }  
                 // Navigate after 2 seconds        
-                navigate('/');
+                navigate(`${role === 'admin' ? '/admin-dashboard/blogs?tab=draft' : '/dashboard/blogs?tab=draft'}`);
             }, 3000); 
           
             

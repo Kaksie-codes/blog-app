@@ -373,6 +373,32 @@ const myBlogs = async (req, res, next) => {
     }
 }
 
+const deleteBlog = async (req, res, next) => {
+    try {
+        let { _id: userId } = req.user; // Destructuring user ID from request object
+        let { slug } = req.body;
+
+        const deletedBlogPost =  await BlogPost.findOneAndDelete({ slug });
+
+        await Notification.deleteMany({blogPost: deletedBlogPost._id});
+        console.log('notifications deleted');
+
+        await Comment.deleteMany({blog_id: deletedBlogPost._id});
+        console.log('comments deleted');
+
+        User.findOneAndUpdate({_id: userId}, {$pull: {blogPosts: deletedBlogPost._id}, $inc: {"account_info.total_posts": -1}})
+        console.log('Blog deleted');
+
+        return res.status(200).json({
+            success:true,
+            message: 'BlogPost deleted'
+        })
+
+    } catch (error) {
+        return next(error);
+    }
+}
+
 export {  
     createBlog, 
     getLatestBlogPosts,
@@ -383,5 +409,6 @@ export {
     getAllTags,  
     updateProfileImg,
     updateProfile,
-    myBlogs  
+    myBlogs,
+    deleteBlog 
 } 

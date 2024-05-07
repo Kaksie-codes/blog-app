@@ -4,6 +4,9 @@ export interface CurrentUser{
     profile_img: string;
     username: string;
     fullname: string;
+    role: string;
+    userId: string;
+    email: string;
 }
 
 interface UserState {

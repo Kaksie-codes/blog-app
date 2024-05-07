@@ -2,14 +2,17 @@ import { Link } from "react-router-dom";
 import { Blog } from "../pages/Home"
 import { getTime } from "../libs/date";
 import { useState } from "react";
+import BlogStats from "./BlogStats";
 
 
 const ManagePublishedBlogCard = ({
-  blog 
+  blog,
+  deleteBlog
 } : {
-  blog: Blog
+  blog: Blog,
+  deleteBlog: any
 }) => {
-  let { banner, slug, title, publishedAt } = blog;
+  let { banner, slug, title, publishedAt, activity } = blog;
   const [showStat, setShowStat] = useState(false);
 
   return (
@@ -37,15 +40,27 @@ const ManagePublishedBlogCard = ({
             >
               Stats
             </button>
-            <button className="pr-4 py-2 underline text-red">
+            <button 
+              className="pr-4 py-2 underline text-red"
+              onClick={() => deleteBlog(slug)}
+            >
               Delete
             </button>
           </div>
         </div>
         <div className="max-lg:hidden">
-
+          <BlogStats stats={activity}/>
         </div>
       </div>
+      {
+        showStat ? (
+          <div className="lg:hidden">
+            <BlogStats stats={activity}/>
+          </div>
+        ) : (
+          null
+        )
+      }
     </div>
   )
 }

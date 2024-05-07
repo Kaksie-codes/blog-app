@@ -37,13 +37,14 @@ const CommentCard = ({
 } : CommentCardProps ) => {
   const {commented_by: {username, profile_img}, commentedAt, comment, _id:parentId, children } = commentData;
   const { userInfo } = useSelector((state: any) => state.auth); 
-  const { username:_username } = userInfo 
+  const { username: _username } = userInfo || {}; 
   const [isReplying, setIsReplying] = useState<boolean>(false);  
   let { _id:blogId, author: {_id: authorId} } = blog;
   // let { _id:blogId, author: {_id: authorId, personal_info:{username:author_username}} } = blog;
   const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
   const [showReplies, setShowReplies] = useState<boolean>(false);
-  const [replies, setReplies] = useState<CommentResponse[]>([])
+  const [replies, setReplies] = useState<CommentResponse[]>([]);
+  
 
   const handleReply = async () => {
     if(!userInfo){

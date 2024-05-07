@@ -11,8 +11,8 @@ const NotificationCommentField = ({
 } : {
     _id:string,
     blog_author: string,
-    index: number,
-    replyingTo: string,
+    index: number | undefined,
+    replyingTo: string | undefined,
     notification_id:string,
     setReplying: any,
     notificationData: any

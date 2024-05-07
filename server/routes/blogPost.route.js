@@ -9,6 +9,7 @@ import {
     searchBlogPosts, 
     getBlogPost, 
     likeBlogPost,
+    deleteBlog,
     getAllTags } from '../controllers/blogPost.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 
@@ -26,6 +27,7 @@ router.post('/like-blog', protect, likeBlogPost);
 router.post('/update-profile-img', protect, updateProfileImg);
 router.post('/update-profile', protect, updateProfile);
 router.post('/myBlogs', protect, myBlogs);
+router.post('/delete-blog', protect, deleteBlog);
 
 
 export default router;

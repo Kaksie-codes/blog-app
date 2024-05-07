@@ -14,6 +14,7 @@ const Navbar = () => {
     const profilePic = userInfo ? userInfo.profile_img : null;
     const username = userInfo ? userInfo.username : null;
     const fullname = userInfo ? userInfo.fullname : null;
+    const role = userInfo ? userInfo.role : null;
     const [searchBoxVisibility, setSeachBoxVisibility] = useState<boolean>(false);
     const [isNavPanelVisible, setIsNavPanelVisible] = useState(false);
     const navigate = useNavigate();
@@ -105,7 +106,7 @@ const Navbar = () => {
                     {
                         userInfo ? (
                             <>
-                                <Link to={'/dashboard/notifications'}>
+                                <Link to={`${role === 'admin' ? '/admin-dashboard/notifications' : '/dashboard/notifications'}`}>
                                     <button className='w-12 h-12 bg-grey rounded-full relative hover:bg-black/10 '>
                                         <i className='fi fi-rr-bell text-2xl flex items-center justify-center'></i>
                                         {

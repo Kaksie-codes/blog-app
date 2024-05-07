@@ -542,6 +542,53 @@ const verifyUser = async (req, res, next) => {
     }
 }
 
+const readCookies= async (req, res, next) => {
+    try {
+        const token = req.cookies.jwt;
+        if(token === undefined){
+            return next(handleError(401, 'cookie not found'));
+        }
+        console.log("token now ------>>>", token)
+        if(token){
+            const decoded = jwt.verify(token, process.env.SECRET_ACCESS_KEY);
+            // Check if decoded is a string (invalid token)
+            if (typeof decoded === 'string') {
+                return next(handleError(401, 'Invalid token'));
+            }
+            // Get user from the token
+            const user = await User.findById(decoded.userId).select('-personal_info.password');
+
+            const {personal_info: {fullname, username, email, profile_img}, verified, role, _id} = user;
+
+            // const fullname = user?.personal_info?.fullname;
+            // const username = user?.personal_info?.username;
+            // const email = user?.personal_info?.email;
+            // const profileImg = user?.personal_info?.profile_img;
+            // const verified = user?.verified
+            // const role = user?.role
+            // const userId = user?._id
+
+            // run the next middleware
+            return res.status(200).json({
+                success: true,
+                message: 'successfully verified',
+                userData: {
+                    fullname,
+                    username,
+                    email,
+                    profileImg: profile_img,
+                    verified,
+                    role,
+                    userId: _id
+                }
+            })
+        }else{
+            return next(handleError(401, 'token expired'));
+        }
+    } catch (error) {
+        return next(error);
+    }
+}
 export  {
     signupUser,
     signinUser,
@@ -555,4 +602,5 @@ export  {
     verifyUser,
     resendVerificationEmail,
     changePassword,
+    readCookies
 }

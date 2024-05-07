@@ -59,8 +59,7 @@ const getNotifications = async (req, res, next) => {
             data: notifications,
             currentPage: page,
             totalCount,
-            totalPages,
-            deletedDocCount: 0
+            totalPages,            
         })
     } catch (error) {
         return next(error);

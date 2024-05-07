@@ -55,13 +55,20 @@ const Home = () => {
   const [blogStats, setBlogStats] = useState<PaginationStats>({currentPage: 1, totalCount: 0, totalPages:1})
   const [trendingBlogs, setTrendingBlogs] = useState<Blog[] | null>(null);
   const [pageState, setPageState] = useState('home');
+  const [prevPageState, setPrevPageState] = useState('home');
   const [blogCategories, setBlogCategories] = useState<string[]>(['']);
   const activeTabRef = useRef<HTMLButtonElement>(null);
   const tabsBoxRef = useRef<HTMLDivElement>(null);
   const scrollLeftRef = useRef<HTMLDivElement>(null);
   const scrollRightRef = useRef<HTMLDivElement>(null);  
   const [scrolledEnd, setScrolledEnd] = useState(false)
-  const [scrolledStart, setScrolledStart] = useState(true)
+  const [scrolledStart, setScrolledStart] = useState(true);
+
+  // console.log(`${pageState} blogs ===>>`, blogs)
+
+  // useEffect(() => {    
+  //     window.scrollTo(0, 0);    
+  // }, [blogs]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -139,7 +146,8 @@ const scrollRight = () => {
 
   useEffect(() => {
     if (activeTabRef.current) {
-      activeTabRef.current.click();
+      activeTabRef.current.click();  
+      setBlogStats({currentPage: 1, totalCount: 0, totalPages:1})    
     }
     if (pageState === 'home') {
       fetchLatestBlogs();
@@ -163,14 +171,19 @@ const scrollRight = () => {
         body: JSON.stringify({ page: page })
       });
       const { data, currentPage, totalCount, totalPages } = await res.json();      
-      if (blogs && blogs.length > 0) {
-        // Concatenate new data with existing blogs
-        setBlogs([...blogs, ...data]);
-      } else {
-        // Set the fetched blogs directly
+      if (pageState === prevPageState) {
+        if(blogs && blogs.length > 0){
+             // Append fetched data to existing notifications
+            setBlogs([...blogs, ...data]);
+        }else{
+          setBlogs(data);
+        }               
+    } else {
+        // Set the fetched data directly
         setBlogs(data);
-      }
-      setBlogStats({currentPage, totalCount, totalPages})
+    }
+      setBlogStats({currentPage, totalCount, totalPages});
+      setPrevPageState(pageState);
     } catch (error) {
       console.log('error', error);
     }
@@ -203,18 +216,30 @@ const scrollRight = () => {
     }
   };
 
-  const fetchBlogsbyCategory = async () => {    
+  const fetchBlogsbyCategory = async (page:number = 1) => { 
     try {
       const res = await fetch(`/api/post/search-blogs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          "tag": pageState
+          tag: pageState,
+          page
         })
       });
       const { data, currentPage, totalCount, totalPages }  = await res.json();         
-      setBlogs(data);
-      setBlogStats({currentPage, totalCount, totalPages}); 
+      if (pageState === prevPageState) {
+        if(blogs && blogs.length > 0){
+             // Append fetched data to existing notifications
+            setBlogs([...blogs, ...data]);
+        }else{
+          setBlogs(data);
+        }               
+    } else {
+        // Set the fetched data directly
+        setBlogs(data);
+    }
+      setBlogStats({currentPage, totalCount, totalPages});
+      setPrevPageState(pageState);
     } catch (error) {
       console.log('error', error);
     }
@@ -259,7 +284,7 @@ const scrollRight = () => {
                   }
                 </>
               )}
-              <LoadMore state={blogStats} fetchDataFunction={fetchLatestBlogs}/>
+              <LoadMore state={blogStats} fetchDataFunction={pageState === 'home' ? fetchLatestBlogs : fetchBlogsbyCategory}/>
             </div>
             <>
               {trendingBlogs == null ? (

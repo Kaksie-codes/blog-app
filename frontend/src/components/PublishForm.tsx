@@ -9,6 +9,7 @@ import { useState } from "react";
 
 const PublishForm = () => {
   const { slug } = useParams();
+  const { userInfo: { role } } = useSelector((state:any) => state.auth);
   const { title, content, banner, tags, description, draft } = useSelector((state: any) => state.blogPost) || {};
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -70,7 +71,7 @@ const PublishForm = () => {
         content,
         tags
       }
-      console.log('blogObject >>>', blogObject)
+      // console.log('blogObject >>>', blogObject)
       // loading = toast.loading('Publishing...');    
       if(banner.length){
         const res = await fetch(`/api/post/create-post`, {
@@ -94,7 +95,7 @@ const PublishForm = () => {
           setDisabled(false); 
         }  
         // Navigate after 2 seconds        
-        navigate('/');
+        navigate(`${role === 'admin' ? '/admin-dashboard/blogs' : '/dashboard/blogs'}`);
     }, 3000);  
       }
               

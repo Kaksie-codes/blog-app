@@ -9,7 +9,7 @@ import Loader from './Loader';
 
 const UploadBanner = () => {
     const { banner, uploadProgress, uploadError } = useSelector((state: any) => state.blogPost) || {};
-    // const [uploading, setUploading] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const dispatch = useDispatch();    
     const [image, setImage] = useState<File | null>(null); 
 
@@ -19,20 +19,10 @@ const UploadBanner = () => {
     
     if (file) {
         // If banner is not empty, delete the existing banner from Firebase storage
-        if (banner) {
-            // const storage = getStorage();
-            // const bannerRef = ref(storage, banner);
-            // try {
-            //     await deleteObject(bannerRef);
-            //     console.log('Banner deleted successfully');
-            // } catch (error) {
-            //     console.error('Error deleting banner:', error);
-            // }
-            // // Set the banner in Redux store to an empty string
+        if (banner) {           
             dispatch(setBanner(''));
         }
-        setImage(file);
-        // uploadImage(file, dispatch); 
+        setImage(file);        
     }
 };
 
@@ -46,9 +36,11 @@ const UploadBanner = () => {
                 dispatch(setBanner(null));
                 return;
             } 
+            setUploading(true);
             dispatch(setUploadError('Uploading...'));       
             uploadImage(image, dispatch); // Dispatch the uploadImage action
             dispatch(setUploadError(null));
+            setUploading(false);
         } else {
             if(banner){
                 dispatch(setUploadError(null));
@@ -72,12 +64,15 @@ const UploadBanner = () => {
                                     <img src={banner} alt="banner image" className="z-20 cursor-pointer" />
                                 ) : (
                                     <div className='relative'>
-                                    <div className='absolute top-[50%] left-[50%] -translate-x-[50%] '>
-                                        <Loader/>
-                                        <span className='animate-pulse mt-1'>Loading...</span>
+                                        {
+                                            uploading ?  (
+                                            <div className='absolute top-[50%] left-[50%] -translate-x-[50%]'>
+                                                <Loader/>
+                                                <span className='animate-pulse mt-1'>Loading...</span>
+                                            </div>
+                                        ) : (
+                                            <img src={defaultBanner} alt="banner image" className="z-20 cursor-pointer"/>)}
                                     </div>
-                                    <img src={defaultBanner} alt="banner image" className="z-20 cursor-pointer"/>
-                                </div>
                                 )
                             }                           
                         </div>

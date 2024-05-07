@@ -2,19 +2,32 @@ import { PaginationStats } from "../pages/Home"
 
 const LoadMore = ({
     state,
-    fetchDataFunction
+    draft,
+    fetchDataFunction,
+    fetchBlogsDraft,
 } : {
     state: PaginationStats,
-    fetchDataFunction: (page:number) => void    
+    draft?:boolean,
+    fetchBlogsDraft?: (page:number, draft:boolean) => void,  
+    fetchDataFunction?: (page:number) => void    
 }) => {
     let {currentPage, totalPages } = state
     
     let nextPage = currentPage + 1;    
 
+    const fetchData = () => {
+        if(draft && fetchBlogsDraft){
+            fetchBlogsDraft(nextPage, draft)
+        }else if(fetchDataFunction){
+            fetchDataFunction(nextPage)
+        }
+        
+    }
+
     if(currentPage < totalPages){
         return (
             <button
-                onClick={() => fetchDataFunction(nextPage)} 
+                onClick={fetchData} 
                 className='text-dark-grey rounded-md p-2 px-3 flex hover:bg-grey/30 items-center gap-2'>
                 LoadMore
             </button>

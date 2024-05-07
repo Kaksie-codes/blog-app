@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 interface InpageNavigationProps {
     routes: string[];    
-    defaultHidden: string[];
+    defaultHidden?: string[];
     children: ReactNode;
     activeTabRef: React.RefObject<HTMLButtonElement>;
     defaultActiveIndex?: number;
@@ -11,6 +11,8 @@ interface InpageNavigationProps {
 const InpageNavigation: React.FC<InpageNavigationProps> = ({ activeTabRef, children, routes, defaultHidden, defaultActiveIndex = 0 }) => {
     const [inPageNavIndex, setInPageNavIndex] = useState<number>(defaultActiveIndex);
     const activeTabLineRef = useRef<HTMLHRElement>(null);
+    let [width, setWidth] = useState<number>(window.innerWidth);
+    let [isResizeEventAdded, setIsResizeEventAdded] = useState<boolean>(false);
     
 
     const changePageState = (btn: HTMLButtonElement, i: number) => {
@@ -23,11 +25,24 @@ const InpageNavigation: React.FC<InpageNavigationProps> = ({ activeTabRef, child
     };
 
     useEffect(() => {
-        if (activeTabRef.current && activeTabLineRef.current) {
-            const btn = activeTabRef.current;
-            changePageState(btn, defaultActiveIndex);
+        if(width > 766 && inPageNavIndex !== defaultActiveIndex){
+            if (activeTabRef.current && activeTabLineRef.current) {
+                const btn = activeTabRef.current;
+                changePageState(btn, defaultActiveIndex);
+            }
         }
-    }, [defaultActiveIndex]);
+        
+        if(!isResizeEventAdded){
+            window.addEventListener('resize', () => {
+                if(!isResizeEventAdded){
+                    setIsResizeEventAdded(true);
+                }
+                setWidth(window.innerWidth);
+            })
+        }
+    }, [defaultActiveIndex, width]);
+
+    // console.log('width', width)
 
     return (
         <div className='w-full '>
@@ -38,11 +53,11 @@ const InpageNavigation: React.FC<InpageNavigationProps> = ({ activeTabRef, child
                             key={index}
                             ref={index === defaultActiveIndex ? activeTabRef : undefined}
                             onClick={(e) => changePageState(e.currentTarget as HTMLButtonElement, index)}
-                            className={`p-4 pt-8 px-5 capitalize ${inPageNavIndex === index ? 'text-black font-bold' : 'text-dark-grey'} ${defaultHidden.includes(route) ? 'md:hidden' : ''}`}>
+                            className={`p-4 pt-8 px-5 capitalize ${inPageNavIndex === index ? 'text-black font-bold' : 'text-dark-grey'} ${defaultHidden?.includes(route) ? 'md:hidden' : ''}`}>
                             {route}
                         </button>
                     ))}
-                    <hr ref={activeTabLineRef} className="absolute bottom-0 bg-black duration-300" />
+                    <hr ref={activeTabLineRef} className="absolute h-1 bottom-0 bg-black duration-300" />
                 </div>              
             </div>
             {Array.isArray(children) ? children[inPageNavIndex] : children}

@@ -11,6 +11,7 @@ import CommentsContainer from "../components/CommentsContainer";
 import Avatar from "../components/Avatar";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import Nodata from "../components/Nodata";
 
 export const blogStructure = {
     activity:{
@@ -73,6 +74,8 @@ const BlogPage = () => {
     const { userInfo } = useSelector((state: any) => state.auth);        
     const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
     const [likesCount, setLikesCount] = useState(total_likes);
+
+    console.log("comment >>", blog);
 
     // console.log('id >>', _id)
     useEffect(() => {
@@ -233,7 +236,7 @@ const BlogPage = () => {
                                 />
                     }
                     {
-                        similarBlogs !=null ? (
+                        similarBlogs && similarBlogs.length ? (
                             <>
                                 <h1 className="text-2xl mt-14 mb-10 font-medium">Similar Blogs</h1>
                                 {
@@ -248,7 +251,8 @@ const BlogPage = () => {
                             </>
 
                         ) : (
-                            <h1>No similar blogs found</h1>
+                            // <h1>No similar blogs found</h1>
+                            <Nodata message="No similar blogs found"/>
                         )
                     }
                 </div>

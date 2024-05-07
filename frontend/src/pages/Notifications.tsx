@@ -44,8 +44,7 @@ const Notifications = () => {
     const [notificationStats, setNotificationStats] = useState<PaginationStats>({
         currentPage: 1, 
         totalCount: 0, 
-        totalPages:1,
-        deletedDocCount: 0 
+        totalPages:1        
     })
     let filters = ['all', 'like', 'comment', 'reply'];
 
@@ -86,6 +85,8 @@ const Notifications = () => {
     const handleFilter = (e:any) => {
         const btn = e.target;        
         setFilter(btn.textContent);
+        setNotifications(null);
+        setNotificationStats({currentPage: 1,totalCount: 0,totalPages:1})
         // fetchNotifications()
     }
 
@@ -93,24 +94,34 @@ const Notifications = () => {
         fetchNotifications()
     }, [filter])
 
+    useEffect(() => {    
+        window.scrollTo(0, 0); 
+    }, [filter]);
+
   return (
     <div>
         <h1 className="max-md:hidden">Recent Notifications</h1>
-        <div className="my-8 flex gap-6">
-            {
-                filters.map((filterName, index) => {
-                    return (
-                        <button 
-                            key={index}
-                            onClick={handleFilter}
-                            className={`py-2 ${filter === filterName ? 'btn-dark' : 'btn-light'}`}
-                        >
-                            {filterName}
-                        </button>
-                    )
-                })
+        {
+            notifications && notifications.length ? (
+                <div className="my-4 flex gap-6 px-2 py-4 sticky bg-white shadow-sm top-[78px]">
+                    {
+                        filters.map((filterName, index) => {
+                            return (
+                                <button 
+                                    key={index}
+                                    onClick={handleFilter}
+                                    className={`py-2 ${filter === filterName ? 'btn-dark' : 'btn-light'}`}
+                                >
+                                    {filterName}
+                                </button>
+                            )
+                        })
+                    }
+                </div>
+                ) : (
+                    null
+                )
             }
-        </div>
         <div className="flex flex-col gap-2">
             {
                 notifications === null ? (
