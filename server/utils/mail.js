@@ -69,7 +69,7 @@ const sendVerificationEmail = async (user) => {
         await verificationToken.save();
 
         // Include the verification token in the link sent to the user's email
-        const verificationLink = `https://enblogg.onrender.com/users/${userId}/verify/${unhashedToken}`; // Assuming localhost and port 3000
+        const verificationLink = `https://enblogg-app.onrender.com/users/${userId}/verify/${unhashedToken}`; // Assuming localhost and port 3000
 
         // Send a mail to the users email address
          const mailOptions = {
