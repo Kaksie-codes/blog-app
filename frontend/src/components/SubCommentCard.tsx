@@ -58,7 +58,7 @@ const SubCommentCard = ({
       commentedAt, comment_level, 
       comment, 
       _id:commentId,
-      activity: {total_likes, likes}, 
+      activity: {total_likes, likes},  
       parent_user_id:parentUserData  
     } = commentData;
 
