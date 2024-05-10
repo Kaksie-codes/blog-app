@@ -33,7 +33,7 @@ const ManageUsers = () => {
     const { activeFilter } = useContext(AdminContext);  
     const [prevFilter, setPrevFilter] = useState('');  
 
-    
+    console.log('<<<====== allUsers before ======>>>', allUsers)  
     const handleChange = (e:any) => {
         e.preventDefault();
         let searchQuery = e.target.value;    
@@ -57,8 +57,7 @@ const ManageUsers = () => {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },                
               });
-              const { data } = await res.json(); 
-              console.log('dat fom back', data)
+              const { data } = await res.json();               
               if(searchedUsers && searchedUsers.length > 0){
                 // Append fetched data to existing notifications
                 setSearchedUsers([...searchedUsers, ...data]);
@@ -78,7 +77,7 @@ const ManageUsers = () => {
             body: JSON.stringify({ page, filter: activeFilter })
           });
           const { data, currentPage, totalCount, totalPages } = await res.json(); 
-        //   console.log('getAlUsers ===>>', data)     
+          console.log('<<<====== searching ======>>>')     
           if (activeFilter.toLocaleLowerCase() === 'all') {
             if(prevFilter === activeFilter){
                 if(allUsers && allUsers.length > 0){
@@ -89,7 +88,8 @@ const ManageUsers = () => {
                }             
             }else{
                 setAllUsers(data);
-            }              
+            } 
+            console.log('<<<====== allUsers after ======>>>', allUsers)               
         } else if(activeFilter.toLocaleLowerCase() === 'verified') {
             if(prevFilter === activeFilter){
                 if(verifiedUsers && verifiedUsers.length > 0){
@@ -125,6 +125,7 @@ const ManageUsers = () => {
             activeTabRef.current.click();          
           }
       }, [])
+     
       
       useEffect(() => {
             setAllUsers(null);          
@@ -160,9 +161,12 @@ const ManageUsers = () => {
                         <AnimationWrapper  key={index} transition={{ duration: 1, delay: index * 0.1 }}>
                             <ManageUserCard  
                                 data={user}
+                                index={index}
                                 getAllUsers={getAllUsers}
-                                page={userStats.currentPage}
-                                filter={activeFilter}
+                                count={userStats}
+                                setCount={setUserStats}                                
+                                state={searchedUsers}
+                                setState={setSearchedUsers}                                
                             />
                         </AnimationWrapper>
                     ))
@@ -181,9 +185,12 @@ const ManageUsers = () => {
                                     <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
                                         <ManageUserCard  
                                             data={user}
-                                            getAllUsers={getAllUsers}
-                                            page={userStats.currentPage}
-                                            filter={activeFilter}
+                                            index={index}
+                                            count={userStats}
+                                            setCount={setUserStats}   
+                                            getAllUsers={getAllUsers} 
+                                            setState={setAllUsers}
+                                            state={allUsers}                                            
                                         />
                                     </AnimationWrapper>                            
                                 )) 
@@ -200,9 +207,12 @@ const ManageUsers = () => {
                                     <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
                                         <ManageUserCard  
                                             data={user}
-                                            getAllUsers={getAllUsers}
-                                            page={userStats.currentPage}
-                                            filter={activeFilter}
+                                            index={index}
+                                            count={userStats}
+                                            setCount={setUserStats}   
+                                            getAllUsers={getAllUsers}                 
+                                            state={verifiedUsers}
+                                            setState={setVerifiedUsers}
                                         />
                                     </AnimationWrapper>                            
                                 )) 
@@ -219,9 +229,12 @@ const ManageUsers = () => {
                                     <AnimationWrapper key={index} transition={{ duration: 1, delay: index * 0.1 }}>
                                         <ManageUserCard  
                                             data={user}
-                                            getAllUsers={getAllUsers}
-                                            page={userStats.currentPage}
-                                            filter={activeFilter}
+                                            index={index}
+                                            count={userStats}
+                                            setCount={setUserStats}   
+                                            getAllUsers={getAllUsers}                                            
+                                            state={unVerifiedUsers}
+                                            setState={setUnVerifiedUsers}                                            
                                         />
                                     </AnimationWrapper>                            
                                 )) 

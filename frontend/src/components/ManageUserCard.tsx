@@ -3,23 +3,28 @@ import { User } from "../pages/ManageUsers";
 import { getTime } from "../libs/date";
 import { FaCheckCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { PaginationStats } from "../pages/Home";
 
 
 const ManageUserCard = ({ 
-    data,
-    getAllUsers,
-    page,
-    filter
+    data,   
+    state,
+    setState,
+    count,
+    setCount,
+    index
 } : { 
-    data: User,
-    page: number,
-    filter: string,
+    data: User, 
+    count:PaginationStats,   
+    state: User[],
+    setCount:any
+    setState:any,
+    index:number,
     getAllUsers:(page:number, activeFilter:string) => void,
 }) => { 
     const {personal_info:{profile_img, username, fullname}, joinedAt, verified, role, _id:userId} = data;
 
-    console.log('paggge', page);
-    
+        
     const handleDelete = async () => {
         try {
             const res = await fetch(`/api/users/delete-user`, {
@@ -30,7 +35,10 @@ const ManageUserCard = ({
             const { message, success } = await res.json(); 
             if(success){
                 toast.success(message);
-                getAllUsers(page, filter);
+                const newState = [...state];
+                newState.splice(index, 1);
+                setState(newState);   
+                setCount({...count, totalCount: count.totalCount - 1 })             
             }else{
                 toast.error(message);
             }
