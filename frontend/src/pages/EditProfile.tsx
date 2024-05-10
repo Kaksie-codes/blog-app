@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage"
 import { app } from "../firebase";
 import { UserProfile, userProfile } from "./Profile";
@@ -7,6 +7,8 @@ import AnimationWrapper from "../libs/page-animation";
 import Loader from "../components/Loader";
 import InputBox from "../components/InputBox";
 import toast from "react-hot-toast";
+import { setCredentials } from "../redux/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileData {
     username: string, 
@@ -21,6 +23,8 @@ interface ProfileData {
 }
 
 const EditProfile = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { userInfo: {username} } = useSelector((state:any) => state.auth); 
     const [profile, setProfile] = useState<UserProfile>(userProfile);
     const [loading, setLoading] = useState<boolean>(true);
@@ -29,7 +33,7 @@ const EditProfile = () => {
     const [updatedProfileImg, setUpdatedProfileImg] = useState<File | null>(null); 
     const [imageUploading, setImageUploading] = useState(false);   
     
-    const bioLimit = 300;
+    const bioLimit = 150;
     const [charactersLeft, setCharactersLimit] = useState(bioLimit);
 
     const { personal_info: { fullname, username:profile_username, profile_img, bio, email }}  = profile
@@ -132,7 +136,7 @@ const EditProfile = () => {
                 const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                 console.log("File available at", downloadURL);
                 if(downloadURL){
-                    const res = await fetch(`/api/post/update-profile-img`, {
+                    const res = await fetch(`/api/users/update-profile-img`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ url: downloadURL }),
@@ -182,7 +186,7 @@ const EditProfile = () => {
         }
 
         try {
-            const res = await fetch(`/api/post/update-profile`, {
+            const res = await fetch(`/api/users/update-profile`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({                    
@@ -200,20 +204,35 @@ const EditProfile = () => {
                 }),
             });
             const result = await res.json(); 
-            const { success, message } = result          
+            const { success, message, data } = result          
             // console.log('user >>', user); 
             if(success == false){
                 toast.error(message);
                 setUpdating(false);                         
             }else{
+                // Extract user data from response and dispatch actions to set user and authentication data
+                const { fullname, userId, username, role, profileImg, email } = data;
                 toast.success(message)                
-                setUpdating(false);                                       
+                setUpdating(false);  
+                
+                dispatch(setCredentials({
+                    profile_img: profileImg,
+                    username,
+                    fullname,
+                    role,
+                    userId,
+                    email
+                  }));
+
+                  setTimeout(() => {
+                    navigate(`/users/${username}`)
+                  }, 1000);
             }     
         } catch (error:any) {
             toast.error(error.message);
         }
     }
-
+ 
     const getProfile = async() => {
         try{
           const res = await fetch('/api/users/get-user', {
@@ -310,7 +329,7 @@ const EditProfile = () => {
                                 value={profileData.bio}
                                 maxLength={bioLimit}
                                 onChange={handleChange}
-                                className="input-box h-64 lg:h-40 resize-none leading-7 mt-5 pl-5"
+                                className="input-box h-[100px] resize-none leading-7 mt-5 pl-5"
                                 placeholder="Bio"
                             ></textarea>
                             <p className="mt-1 text-dark-grey">

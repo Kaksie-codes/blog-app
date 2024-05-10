@@ -1,4 +1,5 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import { AdminContext } from '../App';
 
 interface InpageNavigationProps {
     routes: string[];    
@@ -13,14 +14,18 @@ const InpageNavigation: React.FC<InpageNavigationProps> = ({ activeTabRef, child
     const activeTabLineRef = useRef<HTMLHRElement>(null);
     let [width, setWidth] = useState<number>(window.innerWidth);
     let [isResizeEventAdded, setIsResizeEventAdded] = useState<boolean>(false);
-    
 
+    const { setActiveFilter } = useContext(AdminContext);
+    
+ 
     const changePageState = (btn: HTMLButtonElement, i: number) => {
         const { offsetLeft, offsetWidth } = btn;
         if (activeTabLineRef.current) {
             activeTabLineRef.current.style.width = offsetWidth + 'px';
             activeTabLineRef.current.style.left = offsetLeft + 'px';
         }
+        // console.log('Clicked button value:', routes[i]); // Log the clicked button value
+        setActiveFilter(routes[i]);
         setInPageNavIndex(i);
     };
 

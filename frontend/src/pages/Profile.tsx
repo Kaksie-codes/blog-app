@@ -8,8 +8,9 @@ import InpageNavigation from "../components/InpageNavigation";
 import LoadMore from "../components/LoadMore";
 import BlogCard from "../components/BlogCard";
 import Nodata from "../components/Nodata";
-import { Blog, BlogPageStats } from "./Home";
+import { Blog, PaginationStats  } from "./Home";
 import PageNotFound from "./PageNotFound";
+
 
 export interface UserProfile {
   account_info:{
@@ -63,7 +64,7 @@ const Profile = () => {
   const [profile, setProfile] = useState<UserProfile>(userProfile);
   const [loading, setLoading] = useState<boolean>(true);
   const [blogs, setBlogs] = useState<Blog[] | null>(null);
-  const [blogStats, setBlogStats] = useState<BlogPageStats>({currentPage: 1, totalBlogs: 0, totalPages:1})
+  const [blogStats, setBlogStats] = useState<PaginationStats>({currentPage: 1, totalCount: 0, totalPages:1})
 
   const { personal_info: { fullname:name, username:profile_username, profile_img, bio }}  = profile
   const { account_info : {total_reads, total_posts} }  = profile
@@ -103,7 +104,7 @@ const Profile = () => {
         })
       });
       // const { results, currentPage, totalBlogs, totalPages } = await res.json();  
-      const { data, currentPage, totalBlogs, totalPages } = await res.json();      
+      const { data, currentPage, totalCount, totalPages } = await res.json();      
       if (blogs && blogs.length > 0) {
         // Concatenate new data with existing blogs
         setBlogs([...blogs, ...data]);
@@ -111,7 +112,7 @@ const Profile = () => {
         // Set the fetched blogs directly
         setBlogs(data);
       }
-      setBlogStats({currentPage, totalBlogs, totalPages})
+      setBlogStats({currentPage, totalCount, totalPages})
       // console.log('pageState', pageState);
       
     } catch (error) {
@@ -149,7 +150,7 @@ const Profile = () => {
                         </Link>
                         ) :(
                           null
-                        )
+                        ) 
                     }                
                   </div>
                   <AboutUser classNames='max-md:hidden' bio={bio} joinedAt={joinedAt} social_links={social_links}/>

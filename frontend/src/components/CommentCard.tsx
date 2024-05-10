@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { getTime } from "../libs/date"
 import Avatar from "./Avatar"
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CommentField from "./CommentField";
 import { Blog } from "../pages/Home";
 import SubCommentCard from "./SubCommentCard";
@@ -14,20 +14,33 @@ export interface CommentCardProps {
   fetchTotalCommentsCount: (_id: string) => Promise<void>;
   blog: Blog,   
   commentData: {
-    commented_by: {      
+    commented_by: {
+      personal_info: {
         username: string;
-        profile_img: string;            
+        profile_img: string;       
+      };
+      _id: string            
     };
     children: any[];
     commentedAt: string; // Assuming the type of commentedAt is string, update as needed
     comment: string;
     comment_level: number;
     _id: string;    
-    parent_reply:  any,
-    blog_author: any
+    parent_reply:  any;
+    blog_author:{ 
+      personal_info: {
+        username: string;
+        profile_img: string;       
+      }
+      _id: string;
+    };    
+    activity: {
+      total_likes: string,
+      likes: string[]
+    }
     // Add more specific types for commentData if available
   };
-}
+} 
 
 const CommentCard = ({ 
   blog,  
@@ -35,16 +48,27 @@ const CommentCard = ({
   fetchComments,
   fetchTotalCommentsCount
 } : CommentCardProps ) => {
-  const {commented_by: {username, profile_img}, commentedAt, comment, _id:parentId, children } = commentData;
+  // console.log('commentData ======>>>', commentData)
+  const {
+    commented_by: { personal_info:{ username, profile_img}, _id:comment_author}, 
+    commentedAt, 
+    children,  
+    comment, 
+    _id:parentId, 
+    activity: {total_likes, likes} 
+  } = commentData;
+ 
   const { userInfo } = useSelector((state: any) => state.auth); 
   const { username: _username } = userInfo || {}; 
   const [isReplying, setIsReplying] = useState<boolean>(false);  
-  let { _id:blogId, author: {_id: authorId} } = blog;
-  // let { _id:blogId, author: {_id: authorId, personal_info:{username:author_username}} } = blog;
+  const [isEditing, setIsEditing] = useState<boolean>(false);  
+  let { _id:blogId, author: {_id: authorId} } = blog;  
   const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
   const [showReplies, setShowReplies] = useState<boolean>(false);
   const [replies, setReplies] = useState<CommentResponse[]>([]);
-  
+  const [totalRepliesCount, setTotalRepliesCount] = useState<number>(0);
+  const [likesCount, setLikesCount] = useState(total_likes);  
+ 
 
   const handleReply = async () => {
     if(!userInfo){
@@ -55,61 +79,115 @@ const CommentCard = ({
 
   const handleReveal = (parentId:string) => {
     setShowReplies(!showReplies);
-    fetchReplies(parentId);
-    // fetchReplies('661d05ba55790c94be37f78c');
+    fetchReplies(parentId);    
   }
 
-  const fetchReplies = async (parentId: string) => {
+  const editComment = () => { 
+    setIsEditing(!isEditing);    
+  }
+
+    const fetchReplies = async (parentId: string) => {
+      try {
+          const url = `/api/comment/get-replies-byId/${parentId}`;       
+          const res = await fetch(url, {
+              method: "GET",
+              headers: { "Content-Type": "application/json" }
+          });
+
+          const { replies } = await res.json();
+          setReplies(replies)
+          // console.log('replies ===>>', replies)
+          
+      } catch (error) {
+          console.log(error);
+      }
+  }
+
+  const getTotalRepliesCount = async (parentId: string) => {
+    // console.log('fetching repliesCount  ===>>>')
     try {
-        const url = `/api/comment/get-replies-byId/${parentId}`;
-        console.log("Fetching replies from URL:", url);
+        const url = `/api/comment/get-total-replies-byId/${parentId}`;        
         const res = await fetch(url, {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         });
 
-        const { replies } = await res.json();
-        setReplies(replies)
-        // Rest of your code...
+        const { total_replies_count } = await res.json();
+        // console.log('repliesCount successfull ===>>>', total_replies_count)
+        setTotalRepliesCount(total_replies_count);
+        
     } catch (error) {
         console.log(error);
     }
-}
+  }
 
+  const deleteComment = async () => {
+    try {
+        const url = `/api/comment/delete-comment/${parentId}`;
+        console.log("Fetching replies from URL:", url);
+        const res = await fetch(url, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" }
+        });
 
-//   fetchReplies('661d05ba55790c94be37f78c');
+        const { success, message } = await res.json();
+        
+        if(success){
+          toast.success(message);
+          fetchComments(blogId);
+          fetchTotalCommentsCount(blogId);
+        }else{
+          toast.error(message);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+  }
 
-
-// console.log("comment >>", commentData);
-// console.log('_id >>>', _id)
-// console.log('replies >>>', replies)
+  useEffect(() => {
+    getTotalRepliesCount(parentId);
+  }, [getTotalRepliesCount, totalRepliesCount])
 
   const handleLike = async () => {
-    setIsLikedByUser(!isLikedByUser)
-    // if (!userInfo) {
-    //     toast.error("Please log in to like this post");
-    //     return;
-    // }
+    if (!userInfo) {
+        toast.error("Please log in to like this post");
+        return;
+    }
 
-    // try {
-    //     const res = await fetch(`/api/post/like-blog`, {
-    //         method: "POST",
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify({ _id})
-    //     });
+    try {
+        const res = await fetch(`/api/comment/like-comment`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              commentId: parentId,
+              comment_author,
+              blogId 
+            })
+        });
 
-    //     const { data, success, message } = await res.json();
+        const { data, success, message } = await res.json();       
         
-    //     if(success){
-    //         // setLikesCount(data.likesCount);
-    //         setIsLikedByUser(data.likes.includes(userInfo.userId));
-    //         toast.success(message);
-    //     }                     
-    // } catch (error) {
-    //     console.error("Error toggling like:", error);
-    //     toast.error("Failed to toggle like. Please try again later.");
-    // }
-};
+        if(success){
+            setLikesCount(data.likesCount);
+            setIsLikedByUser(data.likes.includes(userInfo.userId));
+            toast.success(message);
+        }                     
+    } catch (error) {
+        console.error("Error toggling like:", error);
+        toast.error("Failed to toggle like. Please try again later.");
+    }
+  };  
+
+  useEffect(() => {
+    // Check if the user's ID exists in the array of liked users
+    if (userInfo) {
+        setIsLikedByUser(likes.includes(userInfo.userId));
+        setLikesCount(total_likes);
+    }
+  }, [userInfo, likes]);
+ 
+// console.log('commentData ======>>>', commentData)
+// console.log('commentData.blog_author ======>>>', commentData.blog_author )
 
   return (
     <div className="w-full">
@@ -127,11 +205,12 @@ const CommentCard = ({
                 <button onClick={handleLike}>
                   <i className={`fi ${isLikedByUser ? 'fi-sr-heart text-red' : 'fi-rr-heart'}`}></i>
                 </button>
-                <p>2</p>
-              </div>
+                <p>{likesCount}</p>
+              </div>             
+                     
               {
-                 username === _username || _username === commentData.blog_author.username ? (
-                  <button>
+                 username === _username || _username === commentData.blog_author.personal_info.username ? (
+                  <button onClick={deleteComment}>
                     <i className="fi fi-rr-trash hover:text-red"></i>
                   </button>
                 ) : (
@@ -140,9 +219,19 @@ const CommentCard = ({
               }              
               <button 
                 onClick={handleReply}
-                className="underline">
+                className="underline"
+              >
                   Reply
-              </button>           
+              </button> 
+              {
+                 username === _username ? (
+                  <button onClick={() => editComment()}>
+                    <p className="underline">Edit</p>
+                  </button>
+                ) : (
+                  null
+                )
+              }                
             </div>                     
           </div>          
           {
@@ -156,7 +245,7 @@ const CommentCard = ({
                     ) : (
                       <div className="flex items-center justify-center gap-3">
                         <i className="fi fi-rs-comment-dots"></i>
-                        {`${children.length} ${children.length > 1 ? 'replies' : 'reply'}`}    
+                        {`${totalRepliesCount} ${totalRepliesCount > 1 ? 'replies' : 'reply'}`}    
                       </div>
                     )
                   }                         
@@ -171,9 +260,30 @@ const CommentCard = ({
                 <CommentField 
                   action="reply" 
                   replyingTo={parentId}
+                  parentId={parentId}
                   setIsReplying={setIsReplying}
                   blogId={blogId}
                   authorId={authorId}
+                  fetchComments={fetchComments}
+                  fetchReplies={fetchReplies}
+                  fetchTotalCommentsCount={fetchTotalCommentsCount}
+                />
+              </div>
+            ) : (
+              null
+            )
+          }        
+          {
+            isEditing ? (
+              <div className="mt-2">
+                <CommentField 
+                  action="Edit" 
+                  value={comment}
+                  replyingTo={parentId}
+                  setIsReplying={setIsEditing}
+                  blogId={blogId}
+                  authorId={authorId}
+                  commentId={parentId}
                   fetchComments={fetchComments}
                   fetchTotalCommentsCount={fetchTotalCommentsCount}
                 />
@@ -191,10 +301,11 @@ const CommentCard = ({
               <AnimationWrapper key={index}>
                 <SubCommentCard
                   commentData={item}
-                  blog={blog}
+                  blog={blog} 
                   parentId={parentId}
                   fetchReplies={fetchReplies}
                   fetchTotalCommentsCount={fetchTotalCommentsCount}
+                  getTotalRepliesCount={getTotalRepliesCount}
                 />
               </AnimationWrapper>
             )

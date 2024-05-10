@@ -31,7 +31,7 @@ const UserNavigation = () => {
             <Link to={`/users/${username}`} className="link pl-8 py-4">
                 Profile
             </Link>
-            <Link to={`${role === 'admin' ? '/admin-dashboard/blogs' : '/dashboard/blogs'}`} className="link pl-8 py-4">
+            <Link to={`${role === 'admin' ? '/admin-dashboard/users' : '/dashboard/blogs'}`} className="link pl-8 py-4">
                 Dashboard
             </Link>
             <Link to={`/settings/edit-profile`} className="link pl-8 py-4">

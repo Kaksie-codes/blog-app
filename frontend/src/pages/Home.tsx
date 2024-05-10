@@ -47,7 +47,7 @@ export interface BlogApiResponse {
   currentPage: number;
   totalBlogs: number;
   totalPages: number;  
-}
+} 
 
 
 const Home = () => {
@@ -92,9 +92,7 @@ const Home = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
-  }, []);
-  
- 
+  }, []); 
 
   const scrollLeft = () => {    
     if(tabsBoxRef.current)

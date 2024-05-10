@@ -9,10 +9,10 @@ import { setBlogContent, setBlogTitle, setBanner, setBlogDescription, setTags } 
 const Editor = () => {
   const { slug } = useParams();
   const [isLoading, setIsLoading] = useState(true);
-  const [blog, setBlog] = useState(null);
+  // const [blog, setBlog] = useState(null);
   const { editorMode } = useSelector((state:any) => state.blogPost);
   const dispatch = useDispatch();
-  console.log('blogs in editor page', blog)
+  // console.log('blogs in editor page', blog)
   
   
 
@@ -35,7 +35,7 @@ const Editor = () => {
         // dispatch(setBlogContent(blogPost.content[0]));
         setIsLoading(false);
         if(blogPost != null){                
-            setBlog(blogPost);
+            // setBlog(blogPost);
           const { content, title, banner, description, tags } = blogPost;
           dispatch(setBlogContent(content));
           dispatch(setBanner(banner));

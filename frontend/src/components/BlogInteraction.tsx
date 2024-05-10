@@ -9,7 +9,7 @@ const BlogInteraction = ({
     blog,   
     setCommentsWrapper,
     totalComments
-    } : { 
+    } : {  
     handleLike: any,
     likesCount: number, 
     isLikedByUser : boolean,
@@ -23,6 +23,7 @@ const BlogInteraction = ({
     const { userInfo } = useSelector((state: any) => state.auth);
     const username = userInfo ? userInfo.username : '';     
       
+    // console.log('blogInteraction ------>>>', blog)
 
   return (
     <div>        

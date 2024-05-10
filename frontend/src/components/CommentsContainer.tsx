@@ -5,8 +5,16 @@ import { CommentResponse } from "../pages/BlogPage";
 import { Blog } from "../pages/Home";
 import CommentCard from "./CommentCard";
 import CommentField from "./CommentField"
+import LoadMore from "./LoadMore";
 import Nodata from "./Nodata";
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'; // Import Dispatch and SetStateAction types
+
+export interface CommentStats {
+    currentPage: number, 
+    totalCount: number, 
+    totalPages: number,
+    deletedDocCount?: number 
+} 
 
 interface CommentsContainerProps {
     blog: Blog;
@@ -21,50 +29,48 @@ interface CommentsContainerProps {
 }
 
 const CommentsContainer = ({ 
-    blog,   
+    blog,    
     // setBlog,
     setCommentsWrapper,
     commentsWrapper,    
     fetchTotalCommentsCount,
-} : CommentsContainerProps) => { 
-    const [page, setPage] = useState(1);   
-    const [comments, setComments] = useState<CommentResponse[]>([]);      
-    const [totalParentsComments, setTotalParentsComments] = useState(0);
+} : CommentsContainerProps) => {       
+    const [comments, setComments] = useState<CommentResponse[]>([]); 
+    const [commentStats, setCommentStats] = useState<CommentStats>({currentPage: 1, totalCount: 0, totalPages:1})
     const { author: {_id:authorId} , title, _id} = blog
     
-    // Function to handle "Load More" button click
-    const handleLoadMore = () => {
-        setPage(prevPage => prevPage + 1);
-    };
-
+        
     useEffect(() => {
         fetchComments(blog._id);        
-    }, [page, blog._id]);
+    }, [blog._id]);
 
-    const fetchComments = async (_id: string) => {
+    const fetchComments = async (_id: string, page:number = 1) => {
         try {
             const res = await fetch(`/api/comment/get-comments-byId/${_id}?page=${page}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             });
-            const { total_comments, comments: blog_comments } = await res.json();
-                   
-            // If it's the first page, set the comments directly
-            if (page === 1) {
-                setComments(blog_comments);
-            } else {
-                // Concatenate the new page of comments to the previous comments array
-                setComments(prevComments => [...prevComments, ...blog_comments]);
-            }
-    
-            // setTotalComments(total_comments);
-           
-            setTotalParentsComments(total_comments);
+            // const data = await res.json();
+
+            // console.log('dataComment ====>>', data)
+
+            const { comments: blog_comments, totalCount, totalPages, currentPage } = await res.json();
+
+            if(comments && comments.length > 0 && currentPage > 1){
+                // Append fetched data to existing notifications
+               setComments([...comments, ...blog_comments]);
+           }else{
+             setComments(blog_comments);
+           }  
+
+            setCommentStats({currentPage, totalCount, totalPages})
     
         } catch (error) {
             console.log(error);
         }
     }
+    
+    // console.log(' commentStats state  ======>>', commentStats)
 
   return (
     <div className={`max-sm:w-full fixed ${commentsWrapper ? 'top-0 sm:right-0' : 'top-[100%] sm:right-[-100%]'} duration-700 max-sm:right-0 sm:top-0 w-[40%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden`}>
@@ -105,13 +111,12 @@ const CommentsContainer = ({
                     <Nodata message="No comments"/>
                 )
             }
-        </div>
-        {comments && comments.length < totalParentsComments && (
-            <button className="text-dark-grey p-2 px-3 hover:bg-grey/30 rounded-md flex items-center gap-2"
-            onClick={handleLoadMore}>
-                Load More
-            </button>
-        )}
+             <LoadMore 
+            state={commentStats} 
+            fetchCommentsFunction={fetchComments}  
+            blogId={_id}          
+        />
+        </div>       
     </div>
   )
 }

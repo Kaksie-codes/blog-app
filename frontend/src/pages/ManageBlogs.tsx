@@ -9,7 +9,7 @@ import ManageDraftBlogCard from "../components/ManageDraftBlogCard";
 import toast from "react-hot-toast";
 import LoadMore from "../components/LoadMore";
 import { useSearchParams } from "react-router-dom";
-
+ 
 
 const ManageBlogs = () => {
   const [blogs, setBlogs] = useState<Blog[] | null>(null);
@@ -19,9 +19,9 @@ const ManageBlogs = () => {
   const activeTabRef = useRef<HTMLButtonElement>(null);
   let activeTab = useSearchParams()[0].get("tab")
 
-  console.log('blogs in mangeBlogs', blogs)
-  console.log('blogStats in mangeBlogs', blogStats)
-  console.log('drafts in mangeBlogs', drafts)
+  // console.log('blogs in mangeBlogs', blogs)
+  // console.log('blogStats in mangeBlogs', blogStats)
+  // console.log('drafts in mangeBlogs', drafts)
 
   const deleteBlog = useCallback(async (slug: string) => {
     try {
@@ -56,7 +56,7 @@ const ManageBlogs = () => {
         if (draft) {
             setDrafts(data);
         } else {
-            if (blogs && blogs.length > 0) {
+            if (blogs && blogs.length > 0) { 
                 // Concatenate new data with existing blogs
                 setBlogs([...blogs, ...data]);
             } else {
@@ -90,12 +90,15 @@ const ManageBlogs = () => {
        setDrafts(null);
     }
   }
-
+ 
   useEffect(() => {    
       window.scrollTo(0, 0); 
   }, [blogs, drafts, query, deleteBlog]);
 
   useEffect(() => {
+    if (activeTabRef.current) {
+      activeTabRef.current.click();          
+    }
 
     if(blogs === null){
       getBlogs(1, false);

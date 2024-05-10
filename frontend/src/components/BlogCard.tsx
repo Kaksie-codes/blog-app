@@ -8,14 +8,14 @@ const BlogCard = ({ content }:{ content:any }) => {
     const {personal_info: {fullname, username, profile_img}} = author;
     const { total_likes, total_comments } = activity;
     
-    
+    // console.log('blog ------>>>', content) 
   return (
-    <Link to={`/blogs/${slug}`} className="flex px-4 relative w-full  items-center gap-8 border-b border-grey pb-5 mb-4">
+    <Link to={`/blogs/${slug}`} className="flex px-2 lg:px-4 relative w-full  items-center gap-8 border-b border-grey pb-5 mb-4">
         <div className="w-full">
             <div className="flex gap-2 mb-7 items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Avatar
-                        parentStyles="w-6 h-6 rounded-full md:w-10 md:h-10 overflow-hidden"
+                        parentStyles="w-8 h-8 rounded-full md:w-10 md:h-10 overflow-hidden"
                         username={username}
                         fullname={fullname}
                         profileImg={profile_img}
@@ -25,7 +25,7 @@ const BlogCard = ({ content }:{ content:any }) => {
                         <p className="line-clamp-1 ">@{username}</p>
                     </div>
                 </div>
-                <p className="m-w-fit absolute top-1 right-4">{getTime(publishedAt)}</p>
+                <p className="m-w-fit absolute top-1 right-2 lg:right-4">{getTime(publishedAt)}</p>
             </div>
             <h1 className="blog-title">{title}</h1>
             <p className="font-gelasio my-3 leading-7 text-xl max-sm:hidden md:max-[1100px]:hidden  line-clamp-2">{description}</p>

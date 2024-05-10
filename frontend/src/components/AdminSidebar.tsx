@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux";
 import { NavLink, Outlet, useLocation } from "react-router-dom"
 
+
 const AdminSidebar = () => {
     const location = useLocation();
     let page = location.pathname.split('/')[2]
@@ -10,7 +11,7 @@ const AdminSidebar = () => {
     let activeTabLine = useRef<HTMLHRElement>(null);
     let sidebarIconTab = useRef<HTMLButtonElement>(null);
     let pageStateTab = useRef<HTMLButtonElement>(null);
-    let [showSideNav, setShowSideNav] = useState(false);
+    let [showSideNav, setShowSideNav] = useState(false);    
 
     const changePageState = (e: React.MouseEvent<HTMLButtonElement>) => {
         const { offsetLeft, offsetWidth } = e.target as HTMLButtonElement; 
@@ -32,7 +33,7 @@ const AdminSidebar = () => {
     }, [pageState])
 
   return (
-    <div>
+    <>
         <section className="relative flex gap-10 py-0 m-0 max-md:flex-col container mx-auto">
             <div className="sticky z-[5] top-[80px]">
                 <div className="md:hidden flex bg-white py-1 border-b border-grey flex-nowrap overflow-x-auto">
@@ -118,7 +119,7 @@ const AdminSidebar = () => {
                 <Outlet/>
             </div>
         </section>        
-    </div>
+    </>
   )
 } 
 

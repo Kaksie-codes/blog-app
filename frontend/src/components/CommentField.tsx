@@ -1,7 +1,7 @@
 import { toast} from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Blog } from "../pages/Home";
-import { Dispatch, SetStateAction, useState } from 'react'; 
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'; 
 // import { blogStructure } from "../pages/BlogPage";
 
 
@@ -10,12 +10,13 @@ const CommentField = ({
     authorId,
     parentId,
     blogId,
-    // setBlog,
+    value,
+    commentId,    
     // blog,
     fetchComments,
     fetchTotalCommentsCount,
-    fetchReplies,
-    
+    getTotalRepliesCount,
+    fetchReplies,    
     replyingTo = undefined,
     setIsReplying
 }: {
@@ -23,22 +24,28 @@ const CommentField = ({
     authorId: string,
     parentId?:string,
     blogId:string,
+    value?: string,
+    commentId?: string,
     // setBlog:any,
     blog?: Blog,
     fetchComments?: (_id: string) => Promise<void>;
     fetchReplies?: (_id: string) => Promise<void>;
     fetchTotalCommentsCount: (_id: string) => Promise<void>;
-    index?: number | undefined,
-    replyingTo?: string | undefined,
+    getTotalRepliesCount?: (_id: string) => Promise<void>;
+    index?: number,
+    replyingTo?: string,
     setIsReplying?: Dispatch<SetStateAction<boolean>>;
 }) => {
     
     const [comment, setComment] = useState('');
     const { userInfo } = useSelector((state: any) => state.auth);
-    // const { fullname, profile_img, username} = userInfo
-    // const username = userInfo ? userInfo.username : ''; 
-    // const accessToken = currentUser ? currentUser.accessToken : '';
-    // let { title, banner, comments, content, publishedAt,_id } = blog;
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (value !== undefined) {
+            setComment(value);
+        }
+    }, [value]);
 
     const handleComment = () => {
         if(!userInfo){
@@ -50,8 +57,50 @@ const CommentField = ({
         createComment()
     }
 
-    const createComment = async () => {         
+    const handleEdit = async () => {        
         try{ 
+            setLoading(true);
+            const res = await fetch('/api/comment/edit-comment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    commentId, 
+                    editedComment: comment
+                })
+            })
+            const { success, message } = await res.json();
+            if(success){
+                toast.success(message);
+                setLoading(false);
+                setComment("");
+
+                if(fetchComments && parentId){
+                    fetchReplies?.(parentId)
+                    fetchComments(blogId);                    
+                }
+                if(fetchReplies && parentId){
+                    fetchReplies(parentId);
+                }
+                
+                fetchTotalCommentsCount(blogId);
+                if(parentId && getTotalRepliesCount){
+                    getTotalRepliesCount(parentId) 
+                }                
+                setIsReplying ? setIsReplying(false) : null                            
+            }else{
+                toast.error(message);
+                setLoading(false);
+            }
+            // console.log('comment stats', data)            
+        }catch(error){
+            console.log(error);
+            setLoading(false);            
+        } 
+    }
+
+    const createComment = async () => {               
+        try{ 
+            setLoading(true);
             const res = await fetch('/api/comment/create-comment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -60,12 +109,12 @@ const CommentField = ({
                     blog_author: authorId,
                     comment,
                     replying_to: replyingTo,
-
                 })
             })
             const { success, message } = await res.json();
             if(success){
                 toast.success(message);
+                setLoading(false);
                 setComment("");
                 if(fetchComments){
                     fetchComments(blogId);
@@ -75,13 +124,18 @@ const CommentField = ({
                 }
                 
                 fetchTotalCommentsCount(blogId);
+                if(parentId && getTotalRepliesCount){
+                    getTotalRepliesCount(parentId)
+                }                
                 setIsReplying ? setIsReplying(false) : null                           
             }else{
                 toast.error(message);
+                setLoading(false);
             }
             // console.log('comment stats', data)            
         }catch(error){
-            console.log(error);            
+            console.log(error);  
+            setLoading(false);          
         } 
     }
 
@@ -91,14 +145,18 @@ const CommentField = ({
             value={comment}
             placeholder="Leave a comment..."
             onChange={(e) => setComment(e.target.value)}
-            className="input-box pl-5 resize-none placeholder:text-dark-grey h-[150px] overflow-auto"
+            className="input-box pl-5 resize-none placeholder:text-dark-grey h-[100px] overflow-auto"
         >            
         </textarea>
         <button 
-            onClick={handleComment}
-            className="btn-dark mt-5 px-10">{action}</button>
+            onClick={value ? handleEdit : handleComment}
+            disabled={loading}
+            className={`btn-dark mt-5 px-10 ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+        >
+            {loading ? `${action}ing...` : action}
+        </button>
     </>
   )
-}
+} 
 
 export default CommentField

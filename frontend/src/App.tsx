@@ -7,7 +7,7 @@ import Home from './pages/Home'
 import Search from './pages/Search'
 import PageNotFound from './pages/PageNotFound'
 import BlogPage from './pages/BlogPage'
-import toast, { Toaster } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import PrivateRoute from './components/PrivateRoute'
@@ -22,19 +22,24 @@ import EditProfile from './pages/EditProfile'
 import Notifications from './pages/Notifications'
 import ManageBlogs from './pages/ManageBlogs'
 import AdminSidebar from './components/AdminSidebar'
-import { useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import Loader from './components/Loader'
 import { setCredentials, setVerificationStatus } from './redux/auth/authSlice'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import ManageUsers from './pages/ManageUsers'
+
+export const AdminContext = createContext<any | null>(null);
 
 function App() {
   const navigate = useNavigate(); // Hook for navigating within React Router
-  const [loading, setLoading] = useState(true); // State for managing loading state
+  const [loading, setLoading] = useState(false); // State for managing loading state
   const dispatch = useDispatch();
+  let [activeFilter, setActiveFilter] = useState('');
+  const { userInfo } = useSelector((state: any) => state.auth);
 
   // Function to read authentication cookies
   const readCookies = async () => {  
-    console.log('reading cookies  ====>>>');
+    // console.log('reading cookies  ====>>>');
     try {
         // Submit request to server to read cookies
         const res = await fetch(`/api/auth/read-cookies`, {
@@ -47,8 +52,8 @@ function App() {
         } else {
             // Extract user data from response and dispatch actions to set user and authentication data
             const { fullname, userId, username, role, verified, profileImg, email } = userData;
-            toast.success(message);
-            console.log(userData);  
+            // toast.success(message);
+            // console.log(userData);  
 
             dispatch(setCredentials({
               profile_img: profileImg,
@@ -70,6 +75,8 @@ function App() {
 
   // Effect hook to trigger cookie reading when navigation changes
   useEffect(() => {
+    if(userInfo)
+      setLoading(true)
       readCookies();
   }, [navigate]); 
 
@@ -83,7 +90,7 @@ function App() {
   }
 
   return (
-    <> 
+    <AdminContext.Provider value={{activeFilter, setActiveFilter}}> 
       <ToastContainer/>   
       <Toaster/>  
       <Routes>
@@ -96,19 +103,7 @@ function App() {
           <Route path='blogs/:slug' element={<BlogPage/>}/> 
           <Route path='users/:id/verify/:token' element={<VerifyUser/>}/>  
 
-                  {/* Admin private Routes */}
-          <Route path='' element={<OnlyAdminPrivateRoutes/>}>
-            <Route path='settings' element={<AdminSidebar/>}>
-              <Route path='edit-profile' element={<EditProfile/>}/>
-              <Route path='change-password' element={<ChangePassword/>}/>
-            </Route>
-            <Route path='admin-dashboard' element={<AdminSidebar/>}>              
-              <Route path='notifications' element={<Notifications/>}/>
-              <Route path='blogs' element={<ManageBlogs/>}/>
-              <Route path='users' element={<ManageBlogs/>}/>
-            </Route>
-          </Route>
-          
+
                    {/*Protected Routes  */}
           <Route path='' element={<PrivateRoute/>}>             
             <Route path='private' element={<PrivatePage/>}/>
@@ -123,6 +118,21 @@ function App() {
             </Route>
           </Route>
 
+
+                  {/* Admin private Routes */}
+          <Route path='' element={<OnlyAdminPrivateRoutes/>}>
+            <Route path='settings' element={<AdminSidebar/>}>
+              <Route path='edit-profile' element={<EditProfile/>}/>
+              <Route path='change-password' element={<ChangePassword/>}/>
+            </Route>
+            <Route path='admin-dashboard' element={<AdminSidebar/>}>              
+              <Route path='notifications' element={<Notifications/>}/>
+              <Route path='blogs' element={<ManageBlogs/>}/>
+              <Route path='users' element={<ManageUsers/>}/>
+            </Route>
+          </Route>
+          
+          
           
 
           <Route path='*' element={<PageNotFound/>}/>          
@@ -138,7 +148,7 @@ function App() {
         </Route>
         
       </Routes>
-    </>
+    </AdminContext.Provider>
   )
 }
 

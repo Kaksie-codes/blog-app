@@ -1,9 +1,7 @@
 import { Router } from 'express';
 import { 
     createBlog,
-    myBlogs, 
-    updateProfile,
-    updateProfileImg,    
+    myBlogs,      
     getLatestBlogPosts,     
     getTrendingBlogs, 
     searchBlogPosts, 
@@ -23,9 +21,7 @@ router.get('/trending-blogs', getTrendingBlogs);
 router.post('/search-blogs', searchBlogPosts); 
 router.post('/get-blog', getBlogPost);
 router.get('/get-categories', getAllTags);
-router.post('/like-blog', protect, likeBlogPost);
-router.post('/update-profile-img', protect, updateProfileImg);
-router.post('/update-profile', protect, updateProfile);
+router.post('/like-blog', protect, likeBlogPost);;
 router.post('/myBlogs', protect, myBlogs);
 router.post('/delete-blog', protect, deleteBlog);
 

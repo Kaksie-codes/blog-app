@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
 import InpageNavigation from "../components/InpageNavigation"
 import { useEffect, useRef, useState } from "react";
-import { Blog, BlogPageStats } from "./Home";
+import { Blog, PaginationStats } from "./Home";
 import AnimationWrapper from "../libs/page-animation";
 import BlogCard from "../components/BlogCard";
 import Loader from "../components/Loader";
@@ -21,7 +21,7 @@ const Search = () => {
     const { query } = useParams();
     const activeTabRef = useRef<HTMLButtonElement>(null);
     const [blogs, setBlogs] = useState<Blog[] | null>(null);
-    const [blogStats, setBlogStats] = useState<BlogPageStats>({currentPage: 1, totalBlogs: 0, totalPages:1})
+    const [blogStats, setBlogStats] = useState<PaginationStats>({currentPage: 1, totalCount: 0, totalPages:1})
     const [users, setUsers] = useState<User[] | null>(null);
 
     const searchBlogs = async (page:number = 1) => {
@@ -31,7 +31,7 @@ const Search = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ page, query})
           });
-          const { data, currentPage, totalBlogs, totalPages } = await res.json();      
+          const { data, currentPage, totalCount, totalPages } = await res.json();      
           if (blogs && blogs.length > 0) {
             // Concatenate new data with existing blogs
             setBlogs([...blogs, ...data]);
@@ -39,7 +39,7 @@ const Search = () => {
             // Set the fetched blogs directly
             setBlogs(data);
           }
-          setBlogStats({currentPage, totalBlogs, totalPages})
+          setBlogStats({currentPage, totalCount, totalPages})
         } catch (error) {
           console.log('error', error);
         }

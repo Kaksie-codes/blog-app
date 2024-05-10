@@ -522,7 +522,8 @@ const verifyUser = async (req, res, next) => {
         // Delete verification token from the database
         await VerificationToken.deleteOne({ owner: userId  });
 
-        const { personal_info: { username:user_username, profile_img}, role, _id, verified} = user
+        // const { personal_info: { username:user_username, profile_img}, role, _id, verified} = user;
+        const {personal_info: {fullname, username, email, profile_img}, verified, role, _id} = user;
 
         generateToken(res, _id);
 
@@ -530,12 +531,15 @@ const verifyUser = async (req, res, next) => {
             success: true, 
             message: 'User successfully verified',
             userId,
-            user:{
-                username: user_username,                
-                profile_img, 
-                userId,
-                role,                
-            },        
+            userData: {
+                fullname,
+                username,
+                email,
+                profileImg: profile_img,
+                verified,
+                role,
+                userId: _id
+            }        
          });
     } catch (error) {
         return next(error);
@@ -547,8 +551,8 @@ const readCookies= async (req, res, next) => {
         const token = req.cookies.jwt;
         if(token === undefined){
             return next(handleError(401, 'cookie not found'));
-        }
-        console.log("token now ------>>>", token)
+        } 
+        
         if(token){
             const decoded = jwt.verify(token, process.env.SECRET_ACCESS_KEY);
             // Check if decoded is a string (invalid token)
@@ -559,14 +563,6 @@ const readCookies= async (req, res, next) => {
             const user = await User.findById(decoded.userId).select('-personal_info.password');
 
             const {personal_info: {fullname, username, email, profile_img}, verified, role, _id} = user;
-
-            // const fullname = user?.personal_info?.fullname;
-            // const username = user?.personal_info?.username;
-            // const email = user?.personal_info?.email;
-            // const profileImg = user?.personal_info?.profile_img;
-            // const verified = user?.verified
-            // const role = user?.role
-            // const userId = user?._id
 
             // run the next middleware
             return res.status(200).json({

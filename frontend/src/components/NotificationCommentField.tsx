@@ -1,46 +1,70 @@
-import { useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
+import toast from "react-hot-toast";
 
 const NotificationCommentField = ({
-    _id,
-    blog_author,
-    index = undefined,
-    replyingTo = undefined,
+    blogId,
+    blog_author,    
+    replyingTo,
     setReplying,
-    notification_id,
-    notificationData
 } : {
-    _id:string,
-    blog_author: string,
-    index: number | undefined,
-    replyingTo: string | undefined,
-    notification_id:string,
-    setReplying: any,
-    notificationData: any
+    blogId:string,
+    blog_author: string,    
+    replyingTo: string,    
+    setReplying: Dispatch<SetStateAction<boolean>>;    
 }) => {
     let [comment, setComment] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    let { notifications, notifications: { results }, setNotifications } = notificationData
+    
 
-    const handleComment = () => {
-
-    }
-
-    console.log('results ===>>', results)
+    const createReply = async () => {               
+        try{ 
+            setLoading(true);
+            const res = await fetch('/api/comment/create-comment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    blogId, 
+                    blog_author,
+                    comment,
+                    replying_to: replyingTo,
+                })
+            })
+            const { success, message } = await res.json();
+            if(success){
+                toast.success(message);
+                setLoading(false);
+                setComment(""); 
+                setReplying(false)                           
+            }else{
+                toast.error(message);
+                setLoading(false);
+            }
+            // console.log('comment stats', data)            
+        }catch(error){
+            console.log(error);  
+            setLoading(false);          
+        } 
+    }  
 
   return (
-    <>
+    <div className="w-full">
         <textarea 
             name="" 
             onChange={(e) => setComment(e.target.value)}
             value={comment}
-            className="input-box pl-5 placeholder:text-dark-grey resize-none h-[150px] overflow-auto"
+            className="input-box w-full pl-5 placeholder:text-dark-grey resize-none h-[150px] overflow-auto"
             placeholder="Leave a reply..."
         >            
         </textarea>
-        <button className="btn-dark mt-5 px-10" onClick={handleComment}>
-            Reply
+        <button 
+            className={`btn-dark mt-5 px-10 ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`} 
+            disabled={loading}
+            onClick={createReply}
+        >
+            {loading ? `Replying...` : 'Reply'}
         </button>
-    </>
+    </div>
   )
 }
 

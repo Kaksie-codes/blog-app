@@ -25,7 +25,7 @@ const newNotification = async (req, res, next) => {
 const getNotifications = async (req, res, next) => {
     try {
         let { _id: userId } = req.user; // Destructuring user ID from request object
-        let { page, filter, deletedDocument } = req.body;
+        let { page, filter  } = req.body;
         page = page ? parseInt(page) : 1;
 
         let maxLimit = 10;
@@ -36,14 +36,11 @@ const getNotifications = async (req, res, next) => {
             findQuery.type = filter
         }
 
-        if(deletedDocument){
-            skipDocs -= deletedDocument;
-        }
-
+        
         const notifications = await Notification.find(findQuery)
         .skip(skipDocs)
         .limit(maxLimit)
-        .populate("blogPost", "title slug author")
+        .populate("blogPost", "title slug author _id")
         .populate("user", "personal_info.fullname personal_info.username personal_info.profile_img")
         .populate("comment", "comment")
         .populate("replied_on_comment", "comment")
@@ -85,8 +82,55 @@ const allNotificationsCount = async (req, res, next) => {
     }
 }
 
+const deleteNotification = async (req, res, next) => {
+    try {
+        let { _id: userId } = req.user; // Destructuring user ID from request object
+        const { notificationId } = req.body;
+
+        const notification = await Notification.findById(notificationId)
+
+        if(!notification){
+            return next(handleError(404, 'Notification not found')); 
+        }
+
+        await notification.deleteOne();
+
+        return res.status(200).json({
+            message: 'Successfully deleted Notification',
+            success: true
+        })
+
+    } catch (error) {
+        return next(error);
+    }
+}
+
+const notificationsSeen = async (req, res, next) => {
+    try {
+        const { notifications } = req.body;
+
+        // Loop through each notification ID
+        for (const notificationId of notifications) {
+            // Fetch the notification from the database
+            const notification = await Notification.findById(notificationId);
+
+            // If the notification exists, update its 'seen' property to true
+            if (notification) {
+                notification.seen = true;
+                await notification.save();
+            }
+        }
+
+        res.json({ success: true, message: "Notifications marked as seen." });
+    } catch (error) {
+        return next(error);
+    }
+}
+
 export {
     newNotification,
     getNotifications,
-    allNotificationsCount
+    allNotificationsCount,
+    deleteNotification,
+    notificationsSeen,
 }

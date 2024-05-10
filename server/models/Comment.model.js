@@ -19,7 +19,7 @@ const commentSchema = new Schema({
     comment: {
         type: String,
         required: true
-    },
+    }, 
     children: [{
         type: Schema.Types.ObjectId,
         ref: 'Comment',        

@@ -47,12 +47,32 @@ const Notifications = () => {
         totalPages:1        
     })
     let filters = ['all', 'like', 'comment', 'reply'];
+    let notificationIds: string[];
 
-    console.log('notifications ====>>', notifications)
+    const getNotificationIds = (notifications: Notification[]) => {
+        return notifications.map(notification => notification._id);
+    }
+    
 
+    const notificationsSeen = async () => {
+        try {
+            if(notifications)
+            notificationIds = getNotificationIds(notifications);
+            const res = await fetch(`/api/notification/notifications-seen`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notifications: notificationIds })
+            });
+            const data = await res.json();
+            toast.success(data.message)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+  
     const fetchNotifications = async (page: number = 1) => {
         try {
-            console.log('fetching all notifications ====>>')
+            
             // Submit the form data
             const res = await fetch(`/api/notification/get-notifications`, {
                 method: 'POST',
@@ -75,6 +95,7 @@ const Notifications = () => {
             }
             setNotificationStats({ currentPage, totalCount, totalPages })
             setPrevFilter(filter); // Update prevFilter
+            // setFetchNeeded(false); // Reset fetchNeeded after fetching
         } catch (error: any) {
             console.log(error);
             toast.error(error.message);
@@ -86,43 +107,71 @@ const Notifications = () => {
         const btn = e.target;        
         setFilter(btn.textContent);
         setNotifications(null);
-        setNotificationStats({currentPage: 1,totalCount: 0,totalPages:1})
+        setNotificationStats({currentPage: 1,totalCount: 0,totalPages:1});
+        // setFetchNeeded(true); // Trigger fetch after filter change
         // fetchNotifications()
     }
 
+    const handleDelete = async (index: number, notificationId: string) => {       
+        try {
+            const res = await fetch(`/api/notification/delete-notification`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notificationId })              
+            });
+            
+            const { message, success } = await res.json(); 
+            if (success) {
+                toast.success(message);
+                if (notifications) {
+                    // Create a new array without the deleted notification
+                    const updatedNotifications = [...notifications];
+                    updatedNotifications.splice(index, 1);
+                    setNotifications(updatedNotifications); // Update the state with the new array
+                }
+            } else {
+                toast.error(message);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    
+
     useEffect(() => {
-        fetchNotifications()
-    }, [filter])
+        fetchNotifications();        
+    }, [filter]);
+
+    useEffect(() => {
+        if(notifications)
+        notificationsSeen()
+    }, [notifications])
 
     useEffect(() => {    
         window.scrollTo(0, 0); 
     }, [filter]);
 
+    // console.log('notifications ====>>', notifications)
+
   return (
     <div>
-        <h1 className="max-md:hidden">Recent Notifications</h1>
-        {
-            notifications && notifications.length ? (
-                <div className="my-4 flex gap-6 px-2 py-4 sticky bg-white shadow-sm top-[78px]">
-                    {
-                        filters.map((filterName, index) => {
-                            return (
-                                <button 
-                                    key={index}
-                                    onClick={handleFilter}
-                                    className={`py-2 ${filter === filterName ? 'btn-dark' : 'btn-light'}`}
-                                >
-                                    {filterName}
-                                </button>
-                            )
-                        })
-                    }
-                </div>
-                ) : (
-                    null
-                )
-            }
-        <div className="flex flex-col gap-2">
+        <h1 className="max-md:hidden">Recent Notifications</h1>        
+            <div className="my-4 flex gap-6 px-2 py-4 sticky bg-white shadow-sm top-[78px]">
+                {
+                    filters.map((filterName, index) => {
+                        return (
+                            <button 
+                                key={index}
+                                onClick={handleFilter}
+                                className={`py-2 ${filter === filterName ? 'btn-dark' : 'btn-light'}`}
+                            >
+                                {filterName}
+                            </button>
+                        )
+                    })
+                }
+            </div>             
+        <div className="flex flex-col gap-2 pb-4">
             {
                 notifications === null ? (
                     <Loader />
@@ -132,7 +181,8 @@ const Notifications = () => {
                             <NotificationCard
                                 data={notification}
                                 index={index}
-                                notificationState={{notifications, setNotifications}}
+                                // notificationState={{notifications, setNotifications}}
+                                handleDelete={handleDelete}
                             />
                         </AnimationWrapper>
                     ))

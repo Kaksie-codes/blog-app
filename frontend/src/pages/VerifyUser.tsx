@@ -11,7 +11,7 @@ const VerifyUser = () => {
     const [loading, setLoading] = useState(true);
     const { token, id }= useParams();
     const navigate = useNavigate();
-    const [userId, setUserId] = useState<string>('');
+    // const [userId, setUserId] = useState<string>('');
     const [status, setStatus] = useState<boolean>(false);
     const dispatch = useDispatch();
 
@@ -25,13 +25,13 @@ const VerifyUser = () => {
                 headers: { 'Content-Type': 'application/json' }
             })
 
-            const { message:statusMessage, userId, success} = await res.json();
+            const { message:statusMessage, success} = await res.json();
 
             if(success == false){
                 setStatus(false); 
                 toast.error(statusMessage);                   
             }else{
-                setUserId(userId);                    
+                // setUserId(userId);                    
                 setStatus(true);
                 toast.success(statusMessage);
             }
@@ -42,7 +42,7 @@ const VerifyUser = () => {
             setLoading(false);
         }
     }
-
+ 
     useEffect(() => {
         const verifyUser = async () => {
             try {
@@ -51,17 +51,31 @@ const VerifyUser = () => {
                     headers: { 'Content-Type': 'application/json' }
                 })
 
-                const { message:statusMessage, userId, success, user} = await res.json();
+                const { message:statusMessage, success, userData} = await res.json();
 
+                
                 if(success == false){
                     setStatus(false);
                     toast.error(statusMessage);                                      
                 }else{
-                    setUserId(userId);                    
+                    console.log('userData ====>>>', userData)
+                    // Extract user data from response and dispatch actions to set user and authentication data
+                    const { fullname, userId, username, role, verified, profileImg, email } = userData;
+                    // setUserId(userId); 
+                    dispatch(setCredentials({
+                        profile_img: profileImg,
+                        username,
+                        fullname,
+                        role,
+                        userId,
+                        email
+                      }));
+          
+                    dispatch(setVerificationStatus(verified));                    
                     setStatus(true);
                     toast.success(statusMessage);
                     dispatch(setVerificationStatus(true));
-                    dispatch(setCredentials(user)) 
+                    dispatch(setCredentials(userData)) 
                 }
                 // setMessage(statusMessage);
                 setStatus(status)
@@ -92,7 +106,7 @@ const VerifyUser = () => {
                     <div className="text-center">
                         <h1 className="font-gelasio text-5xl">Your Account is successfully verified</h1>
                         <button
-                            onClick={() => navigate(`/users/${userId}`)} 
+                            onClick={() => navigate(`/settings/edit-profile`)} 
                             className="btn-dark"
                         >
                             Update your Profile

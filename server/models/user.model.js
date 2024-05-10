@@ -28,7 +28,7 @@ const userSchema = new Schema({
         password: String,       
         bio: {
             type: String,
-            maxlength: [200, 'Bio should not be more than 200'],
+            maxlength: [150, 'Bio should not be more than 150 words'],
             default: "",
         },
         profile_img: {

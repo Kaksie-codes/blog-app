@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const notificationSchema = new Schema({
     type: {
         type: String,
-        enum: ["like", "comment", "reply"],
+        enum: ["like", "comment", "reply", "edit"],
         required: true
     },
     blogPost: {
@@ -18,7 +18,7 @@ const notificationSchema = new Schema({
         required: true,
         ref: 'User'
     },
-    user: {
+    user: { 
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'User'

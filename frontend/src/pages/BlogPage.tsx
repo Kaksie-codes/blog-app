@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom"
 import { Blog } from "./Home";
 import Loader from "../components/Loader";
 import AnimationWrapper from "../libs/page-animation";
-import { getDay } from "../libs/date";
+import { getTime } from "../libs/date";
 import BlogInteraction from "../components/BlogInteraction";
 import BlogCard from "../components/BlogCard";
 import BlogContent from "../components/BlogContent";
@@ -59,6 +59,7 @@ export interface CommentResponse {
     commentedAt: string
 } 
 
+
 const BlogPage = () => {
     const { slug } = useParams();
     const [blog, setBlog] = useState<Blog>(blogStructure);
@@ -68,14 +69,14 @@ const BlogPage = () => {
     
 
     let { title, banner, content, publishedAt,_id:blogId } = blog;
-    let { author : {personal_info: {fullname, username:author_username, profile_img}}} = blog;
+    let { author : {personal_info: {fullname, username:author_username, profile_img}, _id:blog_author}} = blog;
     let {activity: { total_comments, total_likes, likes} } = blog;
-    const [totalComments, setTotalComments] = useState<number>(total_comments);
+    const [totalComments, setTotalComments] = useState<number>(total_comments);    
     const { userInfo } = useSelector((state: any) => state.auth);        
     const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
     const [likesCount, setLikesCount] = useState(total_likes);
 
-    console.log("comment >>", blog);
+    // console.log("comment >>", blog);
 
     // console.log('id >>', _id)
     useEffect(() => {
@@ -91,7 +92,7 @@ const BlogPage = () => {
             const res = await fetch(`/api/comment/get-total-comments-count-byId/${blogId}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
-            });
+            }); 
             const { total_comments } = await res.json(); 
             setTotalComments(total_comments);     
         } catch (error) {
@@ -109,7 +110,7 @@ const BlogPage = () => {
             const res = await fetch(`/api/post/like-blog`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ blogId })
+                body: JSON.stringify({ blogId, blog_author })
             });
     
             const { data, success, message } = await res.json();
@@ -171,6 +172,7 @@ const BlogPage = () => {
         fetchTotalCommentsCount(blogId);        
     }, [blogId])
 
+
   return (
     <AnimationWrapper>
         {
@@ -186,7 +188,7 @@ const BlogPage = () => {
                         commentsWrapper={commentsWrapper} 
                         setCommentsWrapper={setCommentsWrapper}                       
                         fetchTotalCommentsCount={fetchTotalCommentsCount}                        
-                    />
+                    /> 
                     <img src={banner} alt="banner image" className="aspect-video bg-grey" />
                     <div className="mt-12">
                         <h2 className="">{title}</h2>
@@ -208,7 +210,7 @@ const BlogPage = () => {
                                 </p>
                             </div>
                             <p className="text-dark-grey opacity-75 max-sm:mt-6 max-sm:ml-12 max-sm:pl-5">
-                                Published on {getDay(publishedAt)}                                 
+                                Published {getTime(publishedAt)}                                 
                             </p>
                         </div>
                     </div>
