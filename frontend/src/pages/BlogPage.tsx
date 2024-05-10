@@ -65,7 +65,7 @@ const BlogPage = () => {
     const [blog, setBlog] = useState<Blog>(blogStructure);
     const [similarBlogs, setSimilarBlogs] = useState<Blog[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [commentsWrapper, setCommentsWrapper] = useState<boolean>(true);
+    const [commentsWrapper, setCommentsWrapper] = useState<boolean>(false);
     
 
     let { title, banner, content, publishedAt,_id:blogId } = blog;

@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 
 const Navbar = () => {  
     const navPanelRef = useRef<HTMLDivElement>(null); 
+    const searchBarRef = useRef<HTMLButtonElement>(null); 
     const { userInfo, newNotificationAvailable } = useSelector((state:any) => state.auth);
     
     const profilePic = userInfo ? userInfo.profile_img : null;
@@ -16,7 +17,7 @@ const Navbar = () => {
     const fullname = userInfo ? userInfo.fullname : null;
     const role = userInfo ? userInfo.role : null;
     const [searchBoxVisibility, setSeachBoxVisibility] = useState<boolean>(false);
-    const [isNavPanelVisible, setIsNavPanelVisible] = useState(false);
+    const [isNavPanelVisible, setIsNavPanelVisible] = useState<boolean>(false);
     const navigate = useNavigate();
     const dispatch = useDispatch()
 
@@ -26,6 +27,16 @@ const Navbar = () => {
         // Check if the clicked element or its parent has the toggle button class
         if (!(e.target as HTMLElement).classList.contains('nav__toggle')) {
             setIsNavPanelVisible(false);
+        }
+      }
+    };
+
+    const closeSearchBar = (e: MouseEvent) => {
+    // Check if the click occurred outside the navigation menu
+    if (searchBarRef.current && !searchBarRef.current.contains(e.target as Node)) {
+        // Check if the clicked element or its parent has the toggle button class
+        if (!(e.target as HTMLElement).classList.contains('search__toggle')) {
+            setSeachBoxVisibility(false);
         }
       }
     };
@@ -71,6 +82,13 @@ const Navbar = () => {
         }       
     },[closeNav]);
 
+    useEffect(() => {    
+        document.addEventListener('click', closeSearchBar);
+        return () => {        
+            document.removeEventListener('click', closeSearchBar);
+        }       
+    },[closeSearchBar]);
+
     useEffect(() => {
         if(userInfo){
             newNotification();
@@ -96,7 +114,11 @@ const Navbar = () => {
                     <i className='fi fi-rr-search absolute right-[10%]  md:pointer-events-none md:left-5 top-1/2 -translate-y-1/2 text-xl text-dark-grey'></i>
                 </div>
                 <div className='flex items-center gap-3 md:gap-6 ml-auto'>
-                    <button onClick={() => setSeachBoxVisibility(!searchBoxVisibility)} className='md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center '>
+                    <button 
+                        onClick={() => setSeachBoxVisibility(!searchBoxVisibility)} 
+                        className='search__toggle md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center'
+                        ref={searchBarRef}
+                    >
                          <i className='fi fi-rr-search text-xl'></i>
                     </button>
                     <Link to={'/editor'} className='hidden md:flex gap-2 link'>
