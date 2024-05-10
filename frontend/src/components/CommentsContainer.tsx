@@ -37,17 +37,17 @@ const CommentsContainer = ({
     const { author: {_id:authorId} , title, _id} = blog;
 
    
-     // Function to close the comment container when clicking outside
-     const closeCommentContainer = (e: MouseEvent) => {
-        // Check if the click occurred outside the comment container
-        if (commentsContainerToggleRef.current && !commentsContainerToggleRef.current.contains(e.target as Node)) {
-            // Check if the clicked element or its parent has the 'Comment__toggle' class
-            if (!(e.target as HTMLElement).classList.contains('Comment__toggle')) {
-                // If not, close the comment container
-                setCommentsWrapper(false);
-            }
-        }
-    };
+    //  // Function to close the comment container when clicking outside
+    //  const closeCommentContainer = (e: MouseEvent) => {
+    //     // Check if the click occurred outside the comment container
+    //     if (commentsContainerToggleRef.current && !commentsContainerToggleRef.current.contains(e.target as Node)) {
+    //         // Check if the clicked element or its parent has the 'Comment__toggle' class
+    //         if (!(e.target as HTMLElement).classList.contains('Comment__toggle')) {
+    //             // If not, close the comment container
+    //             setCommentsWrapper(false);
+    //         }
+    //     }
+    // };
 
     // useEffect(() => {
     //     // Add event listener when the component mounts
