@@ -7,7 +7,7 @@ import CommentCard from "./CommentCard";
 import CommentField from "./CommentField"
 import LoadMore from "./LoadMore";
 import Nodata from "./Nodata";
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'; // Import Dispatch and SetStateAction types
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'; // Import Dispatch and SetStateAction types
 
 export interface CommentStats {
     currentPage: number, 
@@ -20,25 +20,43 @@ interface CommentsContainerProps {
     blog: Blog;
     setBlog: Dispatch<SetStateAction<Blog>>;
     setCommentsWrapper: Dispatch<SetStateAction<boolean>>;
-    commentsWrapper: boolean;
-    // comments: any[];
-    // onCommentCreated: (_id: string) => Promise<void>;
-    fetchTotalCommentsCount: (_id: string) => Promise<void>;
-    // totalParentsComments: number;
-    // setPage: Dispatch<SetStateAction<number>>; // Define the type of setPage
+    commentsWrapper: boolean;    
+    fetchTotalCommentsCount: (_id: string) => Promise<void>;    
 }
-
+ 
 const CommentsContainer = ({ 
     blog,    
     // setBlog,
     setCommentsWrapper,
     commentsWrapper,    
     fetchTotalCommentsCount,
-} : CommentsContainerProps) => {       
+} : CommentsContainerProps) => {   
+    const commentsContainerToggleRef = useRef<HTMLDivElement>(null);  
     const [comments, setComments] = useState<CommentResponse[]>([]); 
     const [commentStats, setCommentStats] = useState<CommentStats>({currentPage: 1, totalCount: 0, totalPages:1})
-    const { author: {_id:authorId} , title, _id} = blog
-    
+    const { author: {_id:authorId} , title, _id} = blog;
+
+   
+     // Function to close the comment container when clicking outside
+     const closeCommentContainer = (e: MouseEvent) => {
+        // Check if the click occurred outside the comment container
+        if (commentsContainerToggleRef.current && !commentsContainerToggleRef.current.contains(e.target as Node)) {
+            // Check if the clicked element or its parent has the 'Comment__toggle' class
+            if (!(e.target as HTMLElement).classList.contains('Comment__toggle')) {
+                // If not, close the comment container
+                setCommentsWrapper(false);
+            }
+        }
+    };
+
+    useEffect(() => {
+        // Add event listener when the component mounts
+        document.addEventListener('click', closeCommentContainer);
+        // Remove event listener when the component unmounts
+        return () => {
+            document.removeEventListener('click', closeCommentContainer);
+        };
+    }, [closeCommentContainer]); // Ensure to include closeCommentContainer in the dependencies array
         
     useEffect(() => {
         fetchComments(blog._id);        
@@ -73,12 +91,15 @@ const CommentsContainer = ({
     // console.log(' commentStats state  ======>>', commentStats)
 
   return (
-    <div className={`max-sm:w-full fixed ${commentsWrapper ? 'top-0 sm:right-0' : 'top-[100%] sm:right-[-100%]'} duration-700 max-sm:right-0 sm:top-0 w-[40%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden`}>
+    <div 
+        className={`max-sm:w-full fixed ${commentsWrapper ? 'top-0 sm:right-0' : 'top-[100%] sm:right-[-100%]'} duration-700 max-sm:right-0 sm:top-0 w-[40%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden`}
+        ref={commentsContainerToggleRef}
+    >
         <div className="relative">
             <h1 className="text-xl font-medium">Comments</h1>
             <p className="text-lg mt-2 w-[70%] text-dark-grey line-clamp-1">{title}</p>
             <button 
-                onClick={() => setCommentsWrapper((prevVal:boolean) => !prevVal)}
+                onClick={() => setCommentsWrapper(false)}
                 className="absolute top-0 right-0 flex items-center justify-center rounded-full bg-grey w-12 h-12">
                 <i className="fi fi-br-cross"></i>
             </button>

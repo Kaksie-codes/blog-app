@@ -102,7 +102,7 @@ const Navbar = () => {
                     <Link to={'/editor'} className='hidden md:flex gap-2 link'>
                         <i className='fi fi-rr-file-edit'></i>
                         <p>Write</p>
-                    </Link>
+                    </Link> 
                     {
                         userInfo ? (
                             <>

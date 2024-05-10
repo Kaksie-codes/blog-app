@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Blog } from "../pages/Home"
 import { useSelector } from "react-redux";
 
+
 const BlogInteraction = ({
     handleLike, 
     likesCount,
@@ -17,14 +18,19 @@ const BlogInteraction = ({
     setCommentsWrapper:any   ,
     totalComments: number
 }) => {    
-    // let {activity: { total_comments } } = blog;
+    
     let { title, slug } = blog;
     let { author : {personal_info: { username: author_username }}} = blog;    
     const { userInfo } = useSelector((state: any) => state.auth);
-    const username = userInfo ? userInfo.username : '';     
-      
-    // console.log('blogInteraction ------>>>', blog)
+    const username = userInfo ? userInfo.username : '';  
 
+    const handleCommentButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        // Prevent the event from propagating to the document level
+        e.stopPropagation();
+        // Open the comments container
+        setCommentsWrapper((prevVal:boolean)=> !prevVal);
+    };
+    
   return (
     <div>        
         <hr className="border-grey my-2"/>
@@ -38,9 +44,9 @@ const BlogInteraction = ({
                     <p>{likesCount}</p>
                 </div>
                 <div className="flex gap-3 items-center">
-                    <button 
-                        className="w-10 h-10 flex items-center rounded-full justify-center bg-grey/80"
-                        onClick={() => setCommentsWrapper((prevVal:boolean) => !prevVal)}>
+                    <button                        
+                        className="Comment__toggle w-10 h-10 flex relative z-10 items-center rounded-full justify-center bg-grey/80"
+                        onClick={handleCommentButtonClick}>
                         <i className="fi fi-rr-comment-dots"></i>
                     </button>
                     <p>{totalComments}</p>
