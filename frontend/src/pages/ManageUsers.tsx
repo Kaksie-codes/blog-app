@@ -33,7 +33,7 @@ const ManageUsers = () => {
     const { activeFilter } = useContext(AdminContext);  
     const [prevFilter, setPrevFilter] = useState('');  
 
-    console.log('<<<====== allUsers before ======>>>', allUsers)  
+    // console.log('<<<====== allUsers before ======>>>', allUsers)  
     const handleChange = (e:any) => {
         e.preventDefault();
         let searchQuery = e.target.value;    
@@ -77,7 +77,7 @@ const ManageUsers = () => {
             body: JSON.stringify({ page, filter: activeFilter })
           });
           const { data, currentPage, totalCount, totalPages } = await res.json(); 
-          console.log('<<<====== searching ======>>>')     
+        //   console.log('<<<====== searching ======>>>')     
           if (activeFilter.toLocaleLowerCase() === 'all') {
             if(prevFilter === activeFilter){
                 if(allUsers && allUsers.length > 0){
@@ -89,7 +89,7 @@ const ManageUsers = () => {
             }else{
                 setAllUsers(data);
             } 
-            console.log('<<<====== allUsers after ======>>>', allUsers)               
+            // console.log('<<<====== allUsers after ======>>>', allUsers)               
         } else if(activeFilter.toLocaleLowerCase() === 'verified') {
             if(prevFilter === activeFilter){
                 if(verifiedUsers && verifiedUsers.length > 0){
