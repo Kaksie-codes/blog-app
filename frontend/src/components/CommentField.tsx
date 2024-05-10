@@ -11,6 +11,7 @@ const CommentField = ({
     parentId,
     blogId,
     value,
+    page,
     commentId,    
     // blog,
     fetchComments,
@@ -26,9 +27,10 @@ const CommentField = ({
     blogId:string,
     value?: string,
     commentId?: string,
+    page?:number,
     // setBlog:any,
     blog?: Blog,
-    fetchComments?: (_id: string) => Promise<void>;
+    fetchComments?: (blogId: string, page:number) => Promise<void>;
     fetchReplies?: (_id: string) => Promise<void>;
     fetchTotalCommentsCount: (_id: string) => Promise<void>;
     getTotalRepliesCount?: (_id: string) => Promise<void>;
@@ -40,6 +42,8 @@ const CommentField = ({
     const [comment, setComment] = useState('');
     const { userInfo } = useSelector((state: any) => state.auth);
     const [loading, setLoading] = useState(false);
+
+    // console.log('page in commentField', page)
 
     useEffect(() => {
         if (value !== undefined) {
@@ -74,9 +78,9 @@ const CommentField = ({
                 setLoading(false);
                 setComment("");
 
-                if(fetchComments && parentId){
-                    fetchReplies?.(parentId)
-                    fetchComments(blogId);                    
+                if(fetchComments && page){
+                    // fetchReplies?.(parentId)
+                    fetchComments(blogId, page);                    
                 }
                 if(fetchReplies && parentId){
                     fetchReplies(parentId);
@@ -116,14 +120,17 @@ const CommentField = ({
                 toast.success(message);
                 setLoading(false);
                 setComment("");
-                if(fetchComments){
-                    fetchComments(blogId);
+
+                if(fetchComments && page){                    
+                    fetchComments(blogId, page);
                 }
+
                 if(fetchReplies && parentId){
                     fetchReplies(parentId);
                 }
                 
                 fetchTotalCommentsCount(blogId);
+
                 if(parentId && getTotalRepliesCount){
                     getTotalRepliesCount(parentId)
                 }                

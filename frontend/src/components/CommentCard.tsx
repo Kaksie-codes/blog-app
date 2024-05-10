@@ -12,7 +12,8 @@ import { CommentResponse } from "../pages/BlogPage";
 export interface CommentCardProps {  
   fetchComments: (_id: string) => Promise<void>;
   fetchTotalCommentsCount: (_id: string) => Promise<void>;
-  blog: Blog,   
+  blog: Blog, 
+  page:number,  
   commentData: {
     commented_by: {
       personal_info: {
@@ -45,10 +46,11 @@ export interface CommentCardProps {
 const CommentCard = ({ 
   blog,  
   commentData,
+  page,
   fetchComments,
   fetchTotalCommentsCount
 } : CommentCardProps ) => {
-  // console.log('commentData ======>>>', commentData)
+  // console.log('page in commentCard ======>>>', page)
   const {
     commented_by: { personal_info:{ username, profile_img}, _id:comment_author}, 
     commentedAt, 
@@ -75,7 +77,7 @@ const CommentCard = ({
       toast.error('login first to leave a reply')
     }
     setIsReplying(!isReplying);
-  }
+  } 
 
   const handleReveal = (parentId:string) => {
     setShowReplies(!showReplies);
@@ -263,6 +265,7 @@ const CommentCard = ({
                   parentId={parentId}
                   setIsReplying={setIsReplying}
                   blogId={blogId}
+                  page={page}
                   authorId={authorId}
                   fetchComments={fetchComments}
                   fetchReplies={fetchReplies}
@@ -284,6 +287,7 @@ const CommentCard = ({
                   blogId={blogId}
                   authorId={authorId}
                   commentId={parentId}
+                  page={page}
                   fetchComments={fetchComments}
                   fetchTotalCommentsCount={fetchTotalCommentsCount}
                 />

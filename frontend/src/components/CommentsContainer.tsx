@@ -52,7 +52,7 @@ const CommentsContainer = ({
             });
             // const data = await res.json();
 
-            // console.log('dataComment ====>>', data)
+            // console.log('fetching dataComment ====>>', )
 
             const { comments: blog_comments, totalCount, totalPages, currentPage } = await res.json();
 
@@ -87,6 +87,7 @@ const CommentsContainer = ({
         <CommentField 
             action="Comment" 
             fetchComments={fetchComments} 
+            page={commentStats.currentPage}
             fetchTotalCommentsCount={fetchTotalCommentsCount} 
             authorId={authorId} 
             blogId={_id} 
@@ -101,6 +102,7 @@ const CommentsContainer = ({
                                 <CommentCard                                    
                                     commentData={comment}
                                     blog={blog}
+                                    page={commentStats.currentPage}
                                     fetchComments={fetchComments}
                                     fetchTotalCommentsCount={fetchTotalCommentsCount}
                                 />                                
