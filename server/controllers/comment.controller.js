@@ -11,7 +11,7 @@
         let userId = req.user.id;
 
         // Extract data from request body
-        let { blogId, comment, replying_to, blog_author, notificationId  } = req.body;
+        let { blogId, comment, replying_to, blog_author  } = req.body;
 
         // Check if the comment is empty
         if (!comment.length) {
@@ -41,13 +41,7 @@
 
             // Determine comment level based on parent comment's level
             commentLevel = parentComment.comment_level + 1;
-            parent_user_id = parentComment.commented_by;
-
-            // // Update notification with reply if notification ID is provided
-            // if(notificationId){
-            //     await Notification.findOneAndUpdate({_id: notificationId}, {reply: comment});
-            //     console.log('notification updated');
-            // }
+            parent_user_id = parentComment.commented_by;           
         }
 
         // Construct new comment object
@@ -91,6 +85,8 @@
 
         // Save new comment
         const savedComment = await newComment.save();
+
+        console.log('<<<---=== saved comment ===--->>>', savedComment);
 
         // Update the associated blog post
         blogPost.comments.push(savedComment._id);

@@ -23,7 +23,7 @@ interface CommentsContainerProps {
     commentsWrapper: boolean;    
     fetchTotalCommentsCount: (_id: string) => Promise<void>;    
 }
- 
+
 const CommentsContainer = ({ 
     blog,    
     // setBlog,
@@ -49,14 +49,14 @@ const CommentsContainer = ({
         }
     };
 
-    useEffect(() => {
-        // Add event listener when the component mounts
-        document.addEventListener('click', closeCommentContainer);
-        // Remove event listener when the component unmounts
-        return () => {
-            document.removeEventListener('click', closeCommentContainer);
-        };
-    }, [closeCommentContainer]); // Ensure to include closeCommentContainer in the dependencies array
+    // useEffect(() => {
+    //     // Add event listener when the component mounts
+    //     document.addEventListener('click', closeCommentContainer);
+    //     // Remove event listener when the component unmounts
+    //     return () => {
+    //         document.removeEventListener('click', closeCommentContainer);
+    //     };
+    // }, [closeCommentContainer]); // Ensure to include closeCommentContainer in the dependencies array
         
     useEffect(() => {
         fetchComments(blog._id);        

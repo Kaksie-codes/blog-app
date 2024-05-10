@@ -52,25 +52,29 @@ const SubCommentCard = ({
     fetchTotalCommentsCount,
     getTotalRepliesCount
   } : SubCommentCardProps) => {
+    console.log('commentData in subCard ==>', commentData)
     const {
       commented_by:{ personal_info:{ username:commenter_username, profile_img }, _id:comment_author }, 
       commentedAt, comment_level, 
       comment, 
       _id:commentId,
       activity: {total_likes, likes}, 
-      parent_user_id:{ personal_info:{username: parent}} 
+      parent_user_id:parentUserData  
     } = commentData;
+
+    // Destructure parent username only if parent_user_id exists
+    const parent = parentUserData ? parentUserData.personal_info.username : null;
     let { _id:blogId, author: {_id: authorId} } = blog;
     const [isReplying, setIsReplying] = useState<boolean>(false);
     const [isLikedByUser, setIsLikedByUser] = useState<boolean>(false);
-    const { userInfo } = useSelector((state: any) => state.auth); 
+    const { userInfo } = useSelector((state: any) => state.auth);  
     // const { username:_username } = userInfo;
     const _username = userInfo ? userInfo.username : null;
     const [likesCount, setLikesCount] = useState(total_likes); 
     const [isEditing, setIsEditing] = useState<boolean>(false);   
 
 
-    // console.log('commentData in subCard ==>', commentData)
+  
 
     const handleReply = async () => {
         if(!userInfo){
