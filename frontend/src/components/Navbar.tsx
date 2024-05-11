@@ -32,14 +32,15 @@ const Navbar = () => {
     };
 
     const closeSearchBar = (e: MouseEvent) => {
-    // Check if the click occurred outside the navigation menu
-    if (searchBarRef.current && !searchBarRef.current.contains(e.target as Node)) {
-        // Check if the clicked element or its parent has the toggle button class
-        if (!(e.target as HTMLElement).classList.contains('search__toggle')) {
-            setSeachBoxVisibility(false);
+        // Check if the click occurred outside the search bar and the search bar is visible
+        if (searchBoxVisibility && searchBarRef.current && !searchBarRef.current.contains(e.target as Node)) {
+            // Check if the clicked element or its parent has the toggle button class
+            if (!(e.target as HTMLElement).classList.contains('search__toggle')) {
+                setSeachBoxVisibility(false);
+            }
         }
-      }
     };
+    
 
     const handleSearch = (e:any) => {
         let query = e.target.value;
@@ -105,7 +106,9 @@ const Navbar = () => {
                     <img src={logo} alt="logo"  className='flex-none w-6 lg:w-10'/>
                     <p className='font-bold text-xl lg:text-2xl'>enBlogg</p>
                 </Link>
-                <div className={`absolute z-50 bg-white left-0 w-full top-full mt-0.5 border-b md:border-0 md:block md:relative md:inset-0 md:p-0 md:w-auto border-grey py-4 px-[5vw] md:show ${searchBoxVisibility ? 'show' : 'hide'}`}>
+                <div 
+                     onClick={(e) => e.stopPropagation()}
+                    className={`absolute z-50 search__toggle bg-white left-0 w-full top-full mt-0.5 border-b md:border-0 md:block md:relative md:inset-0 md:p-0 md:w-auto border-grey py-4 px-[5vw] md:show ${searchBoxVisibility ? 'show' : 'hide'}`}>
                     <input
                         type="text"
                         onKeyDown={handleSearch}
@@ -116,7 +119,7 @@ const Navbar = () => {
                 <div className='flex items-center gap-3 md:gap-6 ml-auto'>
                     <button 
                         onClick={() => setSeachBoxVisibility(!searchBoxVisibility)} 
-                        className='search__toggle md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center'
+                        className=' md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center'
                         ref={searchBarRef}
                     >
                          <i className='fi fi-rr-search text-xl'></i>
