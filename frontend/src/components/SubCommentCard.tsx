@@ -151,7 +151,7 @@ const SubCommentCard = ({
   return (
     <div className="my-5 flex items-start gap-3">
         <Avatar profileImg={profile_img} parentStyles="h-9 w-9" fullname="" username={commenter_username}/>
-          <div className="">
+          <div className="w-full">
             <div className="flex gap-3 items-center">            
               <p className="line-clamp-1 text-black font-semibold">@{commenter_username}</p>                    
               <p className="min-w-fit text-dark-grey">{getTime(commentedAt)}</p>
