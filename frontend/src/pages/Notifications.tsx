@@ -156,14 +156,14 @@ const Notifications = () => {
   return (
     <div>
         <h1 className="max-md:hidden">Recent Notifications</h1>        
-            <div className="my-4 flex gap-2 lg:gap-6 px-2 py-4 sticky bg-white shadow-sm top-[78px]">
+            <div className="my-4 flex gap-2 px-1 lg:gap-6 lg:px-2 py-4 sticky bg-white shadow-sm top-[78px]">
                 {
                     filters.map((filterName, index) => {
                         return (
                             <button 
                                 key={index}
                                 onClick={handleFilter}
-                                className={`py-2 ${filter === filterName ? 'btn-dark' : 'btn-light'}`}
+                                className={`py-1 md:py-2 ${filter === filterName ? 'btn-dark' : 'btn-light'}`}
                             >
                                 {filterName}
                             </button>

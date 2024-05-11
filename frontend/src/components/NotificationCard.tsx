@@ -84,35 +84,34 @@ const NotificationCard = ({
 
     if(type === 'reply'){
         return (
-            <div className={`p-6 border-b border-grey border-l-black ${!seen ? 'border-l-2' : ''}`}>
-                <div className="flex gap-5 mb-3">
+            <div className={`p-6 border-b border-grey border-l-black ${!seen ? 'border-l-2' : ''} `}>
+                <div className="flex gap-5 mb-3 items-center">
                     <img src={profile_img} alt="profile image" className="w-14 h-14 rounded-full flex-none" />
-                    <div className="w-full">
-                        <h1 className="font-medium text-xl text-dark-grey">
-                            <span className="lg:inline-block hidden capitalize">{fullname}</span>
-                            <Link to={`/users/${username}`} className="mx-1 text-black underline">
-                                @{username}
-                            </Link>
-                            <span className="font-normal">
-                                {
-                                    "replied to your comment"
-                                }
-                            </span>
-                        </h1>                        
-                        <div className="p-4 mt-4 rounded-md bg-grey flex items-center gap-4">
-                            <img 
-                                src={author_profile_img} 
-                                alt="author profile image" 
-                                className="h-8 w-8 rounded-full"
-                            />
-                            {replied_on_comment?.comment}
-                        </div>
-                    </div>
+                    <h1 className="font-medium text-xl text-dark-grey">
+                        <span className="lg:inline-block hidden capitalize">{fullname}</span>
+                        <Link to={`/users/${username}`} className="mx-1 text-black underline">
+                            @{username}
+                        </Link>
+                        <span className="font-normal">
+                            {
+                                "replied to your comment"
+                            }
+                        </span>
+                    </h1>
                 </div>
-                <p className="font-gelasio text-xl my-5 pl-5 ml-14">
-                    {comment.comment}
-                </p>
-                <div className="ml-14 pl-5 mt-3 text-dark-grey flex gap-8">
+                <div className="w-full lg:pl-14">  
+                    <div className="p-4 mt-4 rounded-md bg-grey flex items-center gap-4">
+                        <img 
+                            src={author_profile_img} 
+                            alt="author profile image" 
+                            className="h-8 w-8 rounded-full"
+                        />
+                            {replied_on_comment?.comment}
+                    </div>
+                    <p className="font-gelasio text-xl my-5 pl-5">
+                        {comment.comment}
+                    </p>
+                    <div className="px-4 mt-3 text-dark-grey flex gap-8">
                     <p>{getTime(createdAt)}</p>            
                     <>
                         <button 
@@ -129,23 +128,24 @@ const NotificationCard = ({
                         </button>
                     </>               
                 </div>
+                </div> 
                 {
-                isReplying ? (
-                    <div className="pl-10 mt-8 gap-5 flex items-start w-full">
-                        <img 
-                            src={author_profile_img} 
-                            alt="author profile image" 
-                            className="h-12 w-12 rounded-full"
-                        />
-                        <div className="flex-1"> 
-                            <NotificationCommentField
-                                blogId={blogId}
-                                blog_author={author}
-                                replyingTo={comment._id}
-                                setReplying={setIsReplying}
+                    isReplying ? (
+                        <div className="mt-8 gap-5 flex items-start w-full lg:pl-20">
+                            <img 
+                                src={author_profile_img} 
+                                alt="author profile image" 
+                                className="h-10 w-10 rounded-full"
                             />
+                            <div className="flex-1"> 
+                                <NotificationCommentField
+                                    blogId={blogId}
+                                    blog_author={author}
+                                    replyingTo={comment._id}
+                                    setReplying={setIsReplying}
+                                />
+                            </div>
                         </div>
-                    </div>
                     ) : (
                         null
                     ) 
@@ -178,12 +178,13 @@ const NotificationCard = ({
                         >
                             {`"${title}"`}
                         </Link>
-                        <div className="p-4 mt-4 rounded-md bg-grey">
-                            {comment?.comment}
-                        </div>
+                        
                     </div>
                 </div>
-                <div className="ml-14 pl-5 mt-3 text-dark-grey flex gap-8">
+                <div className="p-4 mt-4 rounded-md bg-grey lg:ml-14">
+                    {comment?.comment}
+                </div>
+                <div className="mt-3 text-dark-grey flex gap-8 lg:pl-14">
                     <p>{getTime(createdAt)}</p>            
                     <>
                         <button 
@@ -203,13 +204,20 @@ const NotificationCard = ({
                 <div>
                     {
                         isReplying ? (
-                            <div className="mt-8">
-                                 <NotificationCommentField
-                                    blogId={blogId}
-                                    blog_author={author}
-                                    replyingTo={comment._id}                                    
-                                    setReplying={setIsReplying}                                                                      
+                            <div className="mt-8 gap-5 flex items-start w-full lg:pl-20">
+                                 <img 
+                                    src={author_profile_img} 
+                                    alt="author profile image" 
+                                    className="h-10 w-10 rounded-full"
                                 />
+                                <div className="flex-1">
+                                    <NotificationCommentField
+                                        blogId={blogId}
+                                        blog_author={author}
+                                        replyingTo={comment._id}
+                                        setReplying={setIsReplying}
+                                    />
+                                </div>
                             </div>
                         ) : (
                             null
