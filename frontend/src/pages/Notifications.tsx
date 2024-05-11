@@ -163,7 +163,7 @@ const Notifications = () => {
                             <button 
                                 key={index}
                                 onClick={handleFilter}
-                                className={`py-1 md:py-2 ${filter === filterName ? 'btn-dark' : 'btn-light'}`}
+                                className={`py-1 max-md:px-5 md:py-2 ${filter === filterName ? 'btn-dark' : 'btn-light'}`}
                             >
                                 {filterName}
                             </button>
