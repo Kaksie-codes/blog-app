@@ -195,7 +195,7 @@ const CommentCard = ({
     <div className="w-full">
       <div className="my-5 flex items-start gap-3">
         <Avatar profileImg={profile_img} parentStyles="h-12 w-12" fullname="" username={username}/>
-        <div className="">
+        <div className="flex-1">
           <div className="flex gap-3 items-center">            
             <p className="line-clamp-1 text-black font-semibold">@{username}</p>
             <p className="min-w-fit text-dark-grey">{getTime(commentedAt)}</p>

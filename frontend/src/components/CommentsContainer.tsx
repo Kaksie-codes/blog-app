@@ -36,28 +36,7 @@ const CommentsContainer = ({
     const [commentStats, setCommentStats] = useState<CommentStats>({currentPage: 1, totalCount: 0, totalPages:1})
     const { author: {_id:authorId} , title, _id} = blog;
 
-   
-    //  // Function to close the comment container when clicking outside
-    //  const closeCommentContainer = (e: MouseEvent) => {
-    //     // Check if the click occurred outside the comment container
-    //     if (commentsContainerToggleRef.current && !commentsContainerToggleRef.current.contains(e.target as Node)) {
-    //         // Check if the clicked element or its parent has the 'Comment__toggle' class
-    //         if (!(e.target as HTMLElement).classList.contains('Comment__toggle')) {
-    //             // If not, close the comment container
-    //             setCommentsWrapper(false);
-    //         }
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     // Add event listener when the component mounts
-    //     document.addEventListener('click', closeCommentContainer);
-    //     // Remove event listener when the component unmounts
-    //     return () => {
-    //         document.removeEventListener('click', closeCommentContainer);
-    //     };
-    // }, [closeCommentContainer]); // Ensure to include closeCommentContainer in the dependencies array
-        
+          
     useEffect(() => {
         fetchComments(blog._id);        
     }, [blog._id]);
@@ -92,7 +71,7 @@ const CommentsContainer = ({
 
   return (
     <div 
-        className={`max-sm:w-full fixed ${commentsWrapper ? 'top-0 sm:right-0' : 'top-[100%] sm:right-[-100%]'} duration-700 max-sm:right-0 sm:top-0 w-[40%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-16 overflow-y-auto overflow-x-hidden`}
+        className={`max-sm:w-full fixed ${commentsWrapper ? 'top-0 sm:right-0' : 'top-[100%] sm:right-[-100%]'} duration-700 max-sm:right-0 sm:top-0 w-[40%] min-w-[350px] h-full z-50 bg-white shadow-2xl p-8 px-4 lg:px-16 overflow-y-auto overflow-x-hidden`}
         ref={commentsContainerToggleRef}
     >
         <div className="relative">
