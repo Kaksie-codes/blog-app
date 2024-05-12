@@ -7,7 +7,7 @@ import Home from './pages/Home'
 import Search from './pages/Search'
 import PageNotFound from './pages/PageNotFound'
 import BlogPage from './pages/BlogPage'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import PrivateRoute from './components/PrivateRoute'
@@ -37,6 +37,7 @@ function App() {
   let [activeFilter, setActiveFilter] = useState('');
   const { userInfo } = useSelector((state: any) => state.auth);
 
+  
   // Function to read authentication cookies
   const readCookies = async () => {  
     // console.log('reading cookies  ====>>>');
@@ -49,14 +50,14 @@ function App() {
         const {message, userData, success} = await res.json(); // Parse response JSON           
         if (success === false) {
             console.log(message); // Log error message if cookie reading fails
+            await fetch('/api/auth/signout');            
+            dispatch(signOut());             
         } else {
             // Extract user data from response and dispatch actions to set user and authentication data
-            const { fullname, userId, username, role, verified, profileImg, email } = userData;
-            // toast.success(message);
-            // console.log(userData);  
+            const { fullname, userId, username, role, verified, profileImg, email } = userData;             
 
             dispatch(setCredentials({
-              profile_img: profileImg,
+              profile_img: profileImg, 
               username,
               fullname,
               role,
@@ -64,13 +65,10 @@ function App() {
               email
             }));
 
-            dispatch(setVerificationStatus(verified));  
+            dispatch(setVerificationStatus(verified));   
         }
     } catch(err:any) {        
-        console.log('backend error >>', err.message); // Log backend error message if request fails \
-        await fetch('/api/auth/signout');
-        dispatch(signOut())  
-        navigate('/');    
+        console.log('backend error >>', err.message); // Log backend error message if request fails \         
     } finally {
         setLoading(false); // Set loading to false after cookie reading process completes
     }       
