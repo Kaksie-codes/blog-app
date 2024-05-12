@@ -24,7 +24,7 @@ import ManageBlogs from './pages/ManageBlogs'
 import AdminSidebar from './components/AdminSidebar'
 import { createContext, useEffect, useState } from 'react'
 import Loader from './components/Loader'
-import { setCredentials, setVerificationStatus } from './redux/auth/authSlice'
+import { setCredentials, setVerificationStatus, signOut } from './redux/auth/authSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import ManageUsers from './pages/ManageUsers'
 
@@ -66,8 +66,11 @@ function App() {
 
             dispatch(setVerificationStatus(verified));  
         }
-    } catch(err:any) {
-        console.log('backend error >>', err.message); // Log backend error message if request fails       
+    } catch(err:any) {        
+        console.log('backend error >>', err.message); // Log backend error message if request fails \
+        await fetch('/api/auth/signout');
+        dispatch(signOut())  
+        navigate('/');    
     } finally {
         setLoading(false); // Set loading to false after cookie reading process completes
     }       
