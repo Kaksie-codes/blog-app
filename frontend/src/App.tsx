@@ -7,7 +7,7 @@ import Home from './pages/Home'
 import Search from './pages/Search'
 import PageNotFound from './pages/PageNotFound'
 import BlogPage from './pages/BlogPage'
-import toast, { Toaster } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import PrivateRoute from './components/PrivateRoute'
