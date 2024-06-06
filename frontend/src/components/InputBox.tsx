@@ -46,4 +46,4 @@ const InputBox = ({
   )
 }
 
-export default InputBox
+export default InputBox 

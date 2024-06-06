@@ -154,7 +154,7 @@ const SignUp = () => {
                                     icon="fi-rr-envelope"
                                     value={signUpData.email}
                                     errorMessage={validationErrors.email}
-                                />
+                                /> 
                                 <InputBox                                    
                                     name="password"
                                     type='password'
