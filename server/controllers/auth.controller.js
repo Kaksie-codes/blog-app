@@ -59,7 +59,8 @@ const signupUser = async (req, res, next) => {
                 email,
                 fullname: '', 
                 password: hashedPassword            
-            }        
+            } ,
+            verified: true       
         });
 
         // save the user
@@ -72,7 +73,8 @@ const signupUser = async (req, res, next) => {
             success: true,
             status: 'verification pending', 
             statusCode:200,
-            message: `verification link sent to your email'`,                     
+            // message: `verification link sent to your email'`,                     
+            message: `Account created Successfully'`,                     
         })         
     }catch(error){
         if(error.code === 11000){
