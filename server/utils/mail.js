@@ -8,13 +8,16 @@ import VerificationToken from '../models/VerificationToken.model.js';
 const sendEmail = async (mailOptions) => {
     try {
         // configure your service
-        let config = { 
-            service: "gmail",
+        let config = {
+            host: process.env.MAIL_SERVER,
+            port: 465,
+            secure: true,
+            // service: "gmail",
             auth: {
-                user: process.env.EMAIL,
-                pass: process.env.PASSWORD,
-            }
-        };
+              user: process.env.MAIL_USER,
+              pass: process.env.MAIL_PASS,
+            },
+          }
 
         // Create a transporter
         const transporter = nodemailer.createTransport(config);
